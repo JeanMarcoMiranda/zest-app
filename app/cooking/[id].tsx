@@ -1,17 +1,20 @@
 // app/cooking/[id].tsx
 
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { ErrorView, LoadingSpinner } from "../../src/components/common";
+import { getRecipeById } from "../../src/services/api";
 import { colors, fontSize, spacing } from "../../src/styles/theme";
-import { Recipe } from "../../src/types";
+import { Recipe } from "../../src/types/recipe.types";
 
 export default function CookingStepsScreen() {
   const { id, recipeData } = useLocalSearchParams<{
@@ -19,59 +22,55 @@ export default function CookingStepsScreen() {
     recipeData?: string;
   }>();
   const router = useRouter();
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [loading, setLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Parsear la receta si viene como parámetro
-  let recipe: Recipe | null = null;
-  if (recipeData) {
-    try {
-      recipe = JSON.parse(recipeData);
-    } catch (error) {
-      console.error("Error parsing recipe data:", error);
-    }
-  }
+  useEffect(() => {
+    const loadRecipe = async () => {
+      // Primero intentar usar los datos pasados como parámetro
+      if (recipeData) {
+        try {
+          const parsedRecipe = JSON.parse(recipeData);
+          setRecipe(parsedRecipe);
+          setLoading(false);
+          return;
+        } catch (error) {
+          console.error("Error parsing recipe data:", error);
+        }
+      }
 
-  // Si no hay receta, crear una de ejemplo
-  if (!recipe) {
-    recipe = {
-      id: parseInt(id),
-      title: "Receta de Ejemplo",
-      image: "",
-      servings: 4,
-      readyInMinutes: 30,
-      summary: "Receta de ejemplo",
-      cuisines: [],
-      dishTypes: [],
-      diets: [],
-      occasions: [],
-      extendedIngredients: [],
-      analyzedInstructions: [
-        {
-          name: "",
-          steps: [
-            { number: 1, step: "Precalienta el horno a 180°C" },
-            { number: 2, step: "Mezcla los ingredientes secos en un bowl" },
-            {
-              number: 3,
-              step: "Agrega los ingredientes húmedos y mezcla bien",
-            },
-            { number: 4, step: "Vierte la mezcla en el molde preparado" },
-            { number: 5, step: "Hornea por 30-35 minutos hasta dorar" },
-          ],
-        },
-      ],
-      vegetarian: false,
-      vegan: false,
-      glutenFree: false,
-      dairyFree: false,
-      veryHealthy: false,
-      cheap: false,
-      veryPopular: false,
-      sustainable: false,
+      // Si no hay datos o falló el parsing, obtener de la API
+      try {
+        const data = await getRecipeById(id);
+        setRecipe(data);
+      } catch (err) {
+        console.error("Error loading recipe:", err);
+      } finally {
+        setLoading(false);
+      }
     };
+
+    loadRecipe();
+  }, [id, recipeData]);
+
+  if (loading) {
+    return <LoadingSpinner message="Preparando la cocina..." />;
   }
 
-  const steps = recipe.analyzedInstructions[0]?.steps || [];
+  if (!recipe) {
+    return <ErrorView message="No pudimos cargar las instrucciones." />;
+  }
+
+  // Dividir instrucciones en pasos
+  const steps = recipe.instructions
+    .split("\n")
+    .filter((step) => step.trim() !== "")
+    .map((step, index) => ({
+      number: index + 1,
+      text: step.trim(),
+    }));
+
   const totalSteps = steps.length;
 
   const handleNextStep = () => {
@@ -109,15 +108,18 @@ export default function CookingStepsScreen() {
       </View>
 
       {/* Contenido del paso actual */}
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+      >
         <View style={styles.stepCircle}>
           <Text style={styles.stepNumber}>{currentStep + 1}</Text>
         </View>
 
         <Text style={styles.stepText}>
-          {steps[currentStep]?.step || "No hay instrucciones disponibles"}
+          {steps[currentStep]?.text || "No hay instrucciones disponibles"}
         </Text>
-      </View>
+      </ScrollView>
 
       {/* Botones de navegación */}
       <View style={styles.buttonContainer}>
@@ -186,11 +188,14 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: colors.primary,
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  content: {
     padding: spacing.lg,
-    justifyContent: "center",
     alignItems: "center",
+    minHeight: "100%",
+    justifyContent: "center",
   },
   stepCircle: {
     width: 80,
@@ -217,6 +222,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: spacing.lg,
     gap: spacing.md,
+    backgroundColor: colors.surface,
+    borderTopWidth: 1,
+    borderTopColor: colors.divider,
   },
   button: {
     flex: 1,
