@@ -1,7 +1,9 @@
-import { MaterialIcons } from "@expo/vector-icons";
+// app/index.tsx
+
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   FlatList,
   RefreshControl,
@@ -11,9 +13,20 @@ import {
   Text,
   View,
 } from "react-native";
-import { ErrorView, RecipeCardSkeleton } from "../src/components/common";
+import {
+  CategoryFilter,
+  ErrorView,
+  RecipeCardSkeleton,
+  SearchBar,
+} from "../src/components/common";
 import { RecipeCardItem } from "../src/components/recipe";
-import { getRandomRecipes } from "../src/services/api";
+import { useFavorites } from "../src/hooks";
+import {
+  getCategories,
+  getRandomRecipes,
+  getRecipesByCategory,
+  searchRecipes,
+} from "../src/services/api";
 import {
   borderRadius,
   colors,
@@ -26,15 +39,37 @@ import { RecipeCard } from "../src/types/recipe.types";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { favorites } = useFavorites();
+
   const [recipes, setRecipes] = useState<RecipeCard[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const loadCategories = async () => {
+    const cats = await getCategories();
+    setCategories(cats);
+  };
+
   const loadRecipes = async () => {
     try {
       setError(false);
-      const data = await getRandomRecipes(10);
+      let data: RecipeCard[] = [];
+
+      if (searchQuery.trim() !== "") {
+        // Búsqueda por query
+        data = await searchRecipes(searchQuery);
+      } else if (selectedCategory) {
+        // Filtrar por categoría
+        data = await getRecipesByCategory(selectedCategory);
+      } else {
+        // Recetas aleatorias
+        data = await getRandomRecipes(10);
+      }
+
       setRecipes(data);
     } catch (err) {
       console.error("Error loading recipes:", err);
@@ -50,15 +85,39 @@ export default function HomeScreen() {
     setRefreshing(false);
   };
 
-  useEffect(() => {
-    loadRecipes();
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
   }, []);
 
+  const handleClearSearch = useCallback(() => {
+    setSearchQuery("");
+  }, []);
+
+  const handleSelectCategory = useCallback((category: string | null) => {
+    setSelectedCategory(category);
+    setSearchQuery(""); // Limpiar búsqueda al seleccionar categoría
+  }, []);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
+    // Delay para evitar muchas llamadas mientras se escribe
+    const delayDebounce = setTimeout(() => {
+      setLoading(true);
+      loadRecipes();
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, selectedCategory]);
+
   const handleRecipePress = (recipeId: string) => {
-    router.push(`/recipe/${recipeId}`);
+    router.push(`/recipe/${recipeId}` as any);
   };
 
-  if (error) {
+  if (error && recipes.length === 0) {
     return (
       <ErrorView
         message="No pudimos cargar las recetas. Verifica tu conexión."
@@ -76,7 +135,7 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View style={styles.headerContent}>
             <View style={styles.titleRow}>
-              <MaterialIcons
+              <Ionicons
                 name="restaurant"
                 size={32}
                 color={colors.textInverse}
@@ -84,7 +143,11 @@ export default function HomeScreen() {
               />
               <Text style={styles.title}>ChefHub</Text>
             </View>
-            <Text style={styles.subtitle}>Descubre recetas increíbles</Text>
+            <Text style={styles.subtitle}>
+              {favorites.length > 0
+                ? `${favorites.length} ${favorites.length === 1 ? "favorito" : "favoritos"}`
+                : "Descubre recetas increíbles"}
+            </Text>
           </View>
           {!loading && recipes.length > 0 && (
             <View style={styles.recipeBadge}>
@@ -95,8 +158,22 @@ export default function HomeScreen() {
         </View>
       </LinearGradient>
 
+      {/* Barra de búsqueda */}
+      <SearchBar
+        placeholder="Buscar recetas..."
+        onSearch={handleSearch}
+        onClear={handleClearSearch}
+      />
+
+      {/* Filtro de categorías */}
+      <CategoryFilter
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onSelectCategory={handleSelectCategory}
+      />
+
       {/* Lista de recetas con skeleton loaders */}
-      {loading ? (
+      {loading && recipes.length === 0 ? (
         <View style={styles.listContent}>
           <RecipeCardSkeleton />
           <RecipeCardSkeleton />
@@ -124,15 +201,17 @@ export default function HomeScreen() {
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <MaterialIcons
-                name="restaurant"
+              <Ionicons
+                name="search"
                 size={64}
                 color={colors.textLight}
                 style={styles.emptyIcon}
               />
-              <Text style={styles.emptyTitle}>No hay recetas disponibles</Text>
+              <Text style={styles.emptyTitle}>No se encontraron recetas</Text>
               <Text style={styles.emptySubtitle}>
-                Desliza hacia abajo para recargar
+                {searchQuery
+                  ? "Intenta con otro término de búsqueda"
+                  : "Desliza hacia abajo para recargar"}
               </Text>
             </View>
           }
@@ -172,7 +251,6 @@ const styles = StyleSheet.create({
     fontSize: fontSize.xxxl,
     fontWeight: "700",
     color: colors.textInverse,
-    marginBottom: spacing.xs,
     textShadowColor: "rgba(0, 0, 0, 0.2)",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
@@ -208,7 +286,6 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   emptyContainer: {
-    padding: spacing.xl,
     alignItems: "center",
     marginTop: spacing.xxl,
   },

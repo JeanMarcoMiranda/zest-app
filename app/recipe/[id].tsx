@@ -1,4 +1,4 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -11,20 +11,21 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { ErrorView, LoadingSpinner } from "../../src/components/common";
-import { getRecipeById } from "../../src/services/api";
 import {
-  borderRadius,
-  colors,
-  fontSize,
-  shadows,
-  spacing,
-} from "../../src/styles/theme";
+  ErrorView,
+  FavoriteButton,
+  LoadingSpinner,
+} from "../../src/components/common";
+import { useFavorites } from "../../src/hooks";
+import { getRecipeById } from "../../src/services/api";
+import { colors, fontSize, shadows, spacing } from "../../src/styles/theme";
 import { Recipe } from "../../src/types/recipe.types";
 
 export default function RecipeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { isFavorite, toggleFavorite } = useFavorites();
+
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -51,11 +52,23 @@ export default function RecipeDetailScreen() {
   const handleStartCooking = () => {
     if (recipe) {
       router.push({
-        pathname: "/cooking/[id]",
+        pathname: "/cooking/[id]" as any,
         params: {
           id: recipe.id,
           recipeData: JSON.stringify(recipe),
         },
+      });
+    }
+  };
+
+  const handleToggleFavorite = () => {
+    if (recipe) {
+      toggleFavorite({
+        id: recipe.id,
+        title: recipe.title,
+        thumbnail: recipe.thumbnail,
+        category: recipe.category,
+        area: recipe.area,
       });
     }
   };
@@ -75,18 +88,26 @@ export default function RecipeDetailScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.surface} />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
-        {/* Imagen principal */}
-        <Image
-          source={{ uri: recipe.thumbnail }}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        {/* Imagen principal con botón de favorito */}
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: recipe.thumbnail }}
+            style={styles.image}
+            resizeMode="cover"
+          />
+          <View style={styles.favoriteButtonContainer}>
+            <FavoriteButton
+              isFavorite={isFavorite(recipe.id)}
+              onPress={handleToggleFavorite}
+            />
+          </View>
+        </View>
 
         <View style={styles.content}>
           {/* Título */}
@@ -95,18 +116,18 @@ export default function RecipeDetailScreen() {
           {/* Tags */}
           <View style={styles.tagsContainer}>
             <View style={styles.tag}>
-              <MaterialIcons
-                name="category"
-                size={16}
+              <Ionicons
+                name="pricetag"
+                size={14}
                 color={colors.surface}
                 style={styles.tagIcon}
               />
               <Text style={styles.tagText}>{recipe.category}</Text>
             </View>
             <View style={styles.tag}>
-              <MaterialIcons
-                name="public"
-                size={16}
+              <Ionicons
+                name="globe-outline"
+                size={14}
                 color={colors.surface}
                 style={styles.tagIcon}
               />
@@ -117,10 +138,10 @@ export default function RecipeDetailScreen() {
           {/* Ingredientes */}
           <View style={styles.section}>
             <View style={styles.sectionTitleRow}>
-              <MaterialIcons
-                name="restaurant-menu"
+              <Ionicons
+                name="restaurant-outline"
                 size={20}
-                color={colors.text}
+                color={colors.primary}
               />
               <Text style={styles.sectionTitle}>Ingredientes</Text>
             </View>
@@ -142,15 +163,19 @@ export default function RecipeDetailScreen() {
           {/* Vista previa de instrucciones */}
           <View style={styles.section}>
             <View style={styles.sectionTitleRow}>
-              <MaterialIcons name="description" size={20} color={colors.text} />
+              <Ionicons
+                name="document-text-outline"
+                size={20}
+                color={colors.primary}
+              />
               <Text style={styles.sectionTitle}>Instrucciones</Text>
             </View>
             <View style={styles.card}>
               <Text style={styles.instructionsPreview} numberOfLines={3}>
                 {recipe.instructions}
               </Text>
-              <Text style={styles.instructionsNote}>
-                Toca "Comenzar a Cocinar" para ver el paso a paso
+              <Text style={styles.instructionsHint}>
+                Toca "Comenzar a Cocinar" para ver todas las instrucciones
               </Text>
             </View>
           </View>
@@ -159,11 +184,7 @@ export default function RecipeDetailScreen() {
           {recipe.tags.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionTitleRow}>
-                <MaterialIcons
-                  name="local-offer"
-                  size={20}
-                  color={colors.text}
-                />
+                <Ionicons name="pricetags" size={20} color={colors.primary} />
                 <Text style={styles.sectionTitle}>Etiquetas</Text>
               </View>
               <View style={styles.tagsRow}>
@@ -178,11 +199,7 @@ export default function RecipeDetailScreen() {
 
           {/* Botón de cocinar */}
           <TouchableOpacity style={styles.button} onPress={handleStartCooking}>
-            <MaterialIcons
-              name="whatshot"
-              size={24}
-              color={colors.textInverse}
-            />
+            <Ionicons name="flame" size={24} color={colors.textInverse} />
             <Text style={styles.buttonText}>Comenzar a Cocinar</Text>
           </TouchableOpacity>
 
@@ -202,10 +219,18 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  imageContainer: {
+    position: "relative",
+  },
   image: {
     width: "100%",
     height: 300,
     backgroundColor: colors.divider,
+  },
+  favoriteButtonContainer: {
+    position: "absolute",
+    top: spacing.md,
+    right: spacing.md,
   },
   content: {
     padding: spacing.lg,
@@ -281,33 +306,35 @@ const styles = StyleSheet.create({
     fontSize: fontSize.md,
     color: colors.text,
     lineHeight: 22,
-    marginBottom: spacing.sm,
   },
-  instructionsNote: {
+  instructionsHint: {
     fontSize: fontSize.sm,
-    color: colors.textSecondary,
+    color: colors.textLight,
     fontStyle: "italic",
+    marginTop: spacing.sm,
   },
   tagsRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   tagSmall: {
-    backgroundColor: colors.accent,
+    backgroundColor: colors.background,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   tagSmallText: {
     fontSize: fontSize.xs,
-    color: colors.surface,
-    fontWeight: "600",
+    color: colors.textSecondary,
+    fontWeight: "500",
   },
   button: {
     backgroundColor: colors.primary,
     padding: spacing.md,
-    borderRadius: borderRadius.lg,
+    borderRadius: 12,
     alignItems: "center",
     marginTop: spacing.md,
     flexDirection: "row",
@@ -318,6 +345,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: colors.textInverse,
     fontSize: fontSize.md,
-    fontWeight: "600",
+    fontWeight: "700",
   },
 });
