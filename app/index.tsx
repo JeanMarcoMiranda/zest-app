@@ -1,3 +1,4 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -74,7 +75,15 @@ export default function HomeScreen() {
       <LinearGradient colors={gradients.header} style={styles.headerGradient}>
         <View style={styles.header}>
           <View style={styles.headerContent}>
-            <Text style={styles.title}>🍳 ChefHub</Text>
+            <View style={styles.titleRow}>
+              <MaterialIcons
+                name="restaurant"
+                size={32}
+                color={colors.textInverse}
+                style={styles.titleIcon}
+              />
+              <Text style={styles.title}>ChefHub</Text>
+            </View>
             <Text style={styles.subtitle}>Descubre recetas increíbles</Text>
           </View>
           {!loading && recipes.length > 0 && (
@@ -115,7 +124,12 @@ export default function HomeScreen() {
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyIcon}>🍽️</Text>
+              <MaterialIcons
+                name="restaurant"
+                size={64}
+                color={colors.textLight}
+                style={styles.emptyIcon}
+              />
               <Text style={styles.emptyTitle}>No hay recetas disponibles</Text>
               <Text style={styles.emptySubtitle}>
                 Desliza hacia abajo para recargar
@@ -145,6 +159,14 @@ const styles = StyleSheet.create({
   },
   headerContent: {
     flex: 1,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: spacing.xs,
+  },
+  titleIcon: {
+    marginRight: spacing.xs,
   },
   title: {
     fontSize: fontSize.xxxl,
@@ -191,7 +213,6 @@ const styles = StyleSheet.create({
     marginTop: spacing.xxl,
   },
   emptyIcon: {
-    fontSize: 64,
     marginBottom: spacing.md,
   },
   emptyTitle: {

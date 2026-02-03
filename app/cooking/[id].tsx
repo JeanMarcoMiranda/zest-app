@@ -1,10 +1,11 @@
 // app/cooking/[id].tsx
 
+import { MaterialIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -12,8 +13,16 @@ import {
   View,
 } from "react-native";
 import { ErrorView, LoadingSpinner } from "../../src/components/common";
+import { Step, VerticalStepper } from "../../src/components/cooking";
 import { getRecipeById } from "../../src/services/api";
-import { colors, fontSize, spacing } from "../../src/styles/theme";
+import {
+  borderRadius,
+  colors,
+  fontSize,
+  gradients,
+  shadows,
+  spacing,
+} from "../../src/styles/theme";
 import { Recipe } from "../../src/types/recipe.types";
 
 export default function CookingStepsScreen() {
@@ -25,6 +34,7 @@ export default function CookingStepsScreen() {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
   useEffect(() => {
     const loadRecipe = async () => {
@@ -63,7 +73,7 @@ export default function CookingStepsScreen() {
   }
 
   // Dividir instrucciones en pasos
-  const steps = recipe.instructions
+  const steps: Step[] = recipe.instructions
     .split("\n")
     .filter((step) => step.trim() !== "")
     .map((step, index) => ({
@@ -73,15 +83,15 @@ export default function CookingStepsScreen() {
 
   const totalSteps = steps.length;
 
-  const handleNextStep = () => {
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep(currentStep + 1);
-    }
+  const handleStepPress = (index: number) => {
+    setCurrentStep(index);
   };
 
-  const handlePrevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+  const handleStepComplete = (index: number) => {
+    if (completedSteps.includes(index)) {
+      setCompletedSteps(completedSteps.filter((i) => i !== index));
+    } else {
+      setCompletedSteps([...completedSteps, index]);
     }
   };
 
@@ -89,71 +99,73 @@ export default function CookingStepsScreen() {
     router.back();
   };
 
-  const progress = ((currentStep + 1) / totalSteps) * 100;
+  const progress = (completedSteps.length / totalSteps) * 100;
+  const allCompleted = completedSteps.length === totalSteps;
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.surface} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
 
-      <View style={styles.header}>
-        <Text style={styles.recipeTitle}>{recipe.title}</Text>
-        <Text style={styles.stepCounter}>
-          Paso {currentStep + 1} de {totalSteps}
-        </Text>
-      </View>
+      {/* Header con gradiente */}
+      <LinearGradient colors={gradients.header} style={styles.headerGradient}>
+        <View style={styles.header}>
+          <View style={styles.headerContent}>
+            <Text style={styles.recipeTitle} numberOfLines={1}>
+              {recipe.title}
+            </Text>
+            <View style={styles.progressInfo}>
+              <MaterialIcons
+                name="check-circle"
+                size={16}
+                color={colors.textInverse}
+              />
+              <Text style={styles.progressText}>
+                {completedSteps.length} de {totalSteps} completados
+              </Text>
+            </View>
+          </View>
 
-      {/* Barra de progreso */}
-      <View style={styles.progressBarContainer}>
-        <View style={[styles.progressBar, { width: `${progress}%` }]} />
-      </View>
-
-      {/* Contenido del paso actual */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
-      >
-        <View style={styles.stepCircle}>
-          <Text style={styles.stepNumber}>{currentStep + 1}</Text>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => router.back()}
+          >
+            <MaterialIcons name="close" size={24} color={colors.textInverse} />
+          </TouchableOpacity>
         </View>
 
-        <Text style={styles.stepText}>
-          {steps[currentStep]?.text || "No hay instrucciones disponibles"}
-        </Text>
-      </ScrollView>
+        {/* Barra de progreso */}
+        <View style={styles.progressBarContainer}>
+          <View style={[styles.progressBar, { width: `${progress}%` }]} />
+        </View>
+      </LinearGradient>
 
-      {/* Botones de navegación */}
-      <View style={styles.buttonContainer}>
+      {/* Vertical Stepper */}
+      <VerticalStepper
+        steps={steps}
+        currentStep={currentStep}
+        completedSteps={completedSteps}
+        onStepPress={handleStepPress}
+        onStepComplete={handleStepComplete}
+      />
+
+      {/* Botón de finalizar */}
+      <View style={styles.footer}>
         <TouchableOpacity
           style={[
-            styles.button,
-            styles.buttonSecondary,
-            currentStep === 0 && styles.buttonDisabled,
+            styles.finishButton,
+            allCompleted && styles.finishButtonActive,
           ]}
-          onPress={handlePrevStep}
-          disabled={currentStep === 0}
+          onPress={handleFinish}
         >
-          <Text
-            style={[
-              styles.buttonTextSecondary,
-              currentStep === 0 && styles.buttonTextDisabled,
-            ]}
-          >
-            ← Anterior
+          <MaterialIcons
+            name="check-circle"
+            size={24}
+            color={colors.textInverse}
+          />
+          <Text style={styles.finishButtonText}>
+            {allCompleted ? "¡Receta Completada!" : "Finalizar Receta"}
           </Text>
         </TouchableOpacity>
-
-        {currentStep < totalSteps - 1 ? (
-          <TouchableOpacity style={styles.button} onPress={handleNextStep}>
-            <Text style={styles.buttonText}>Siguiente →</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={[styles.button, styles.buttonSuccess]}
-            onPress={handleFinish}
-          >
-            <Text style={styles.buttonText}>✓ Finalizar</Text>
-          </TouchableOpacity>
-        )}
       </View>
     </SafeAreaView>
   );
@@ -164,96 +176,76 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  headerGradient: {
+    ...shadows.lg,
+  },
   header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.divider,
+    paddingTop: spacing.md,
+  },
+  headerContent: {
+    flex: 1,
+    marginRight: spacing.md,
   },
   recipeTitle: {
     fontSize: fontSize.lg,
-    fontWeight: "600",
-    color: colors.text,
+    fontWeight: "700",
+    color: colors.textInverse,
     marginBottom: spacing.xs,
   },
-  stepCounter: {
+  progressInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+  },
+  progressText: {
     fontSize: fontSize.sm,
-    color: colors.textSecondary,
+    color: colors.textInverse,
+    opacity: 0.9,
+    fontWeight: "500",
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: borderRadius.round,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   progressBarContainer: {
     height: 4,
-    backgroundColor: colors.divider,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
   },
   progressBar: {
     height: "100%",
-    backgroundColor: colors.primary,
+    backgroundColor: colors.textInverse,
   },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
+  footer: {
     padding: spacing.lg,
-    alignItems: "center",
-    minHeight: "100%",
-    justifyContent: "center",
-  },
-  stepCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.primary,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: spacing.xl,
-  },
-  stepNumber: {
-    fontSize: fontSize.xxxl,
-    fontWeight: "700",
-    color: colors.textInverse,
-  },
-  stepText: {
-    fontSize: fontSize.lg,
-    color: colors.text,
-    textAlign: "center",
-    lineHeight: 28,
-    paddingHorizontal: spacing.md,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    padding: spacing.lg,
-    gap: spacing.md,
     backgroundColor: colors.surface,
     borderTopWidth: 1,
     borderTopColor: colors.divider,
+    ...shadows.lg,
   },
-  button: {
-    flex: 1,
+  finishButton: {
     backgroundColor: colors.primary,
     padding: spacing.md,
-    borderRadius: 12,
+    borderRadius: borderRadius.lg,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    ...shadows.md,
   },
-  buttonText: {
-    color: colors.textInverse,
-    fontSize: fontSize.md,
-    fontWeight: "600",
-  },
-  buttonSecondary: {
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
-  buttonTextSecondary: {
-    color: colors.primary,
-  },
-  buttonSuccess: {
+  finishButtonActive: {
     backgroundColor: colors.success,
   },
-  buttonDisabled: {
-    borderColor: colors.border,
-    opacity: 0.5,
-  },
-  buttonTextDisabled: {
-    color: colors.textLight,
+  finishButtonText: {
+    color: colors.textInverse,
+    fontSize: fontSize.md,
+    fontWeight: "700",
   },
 });

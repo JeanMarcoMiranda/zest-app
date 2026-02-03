@@ -1,3 +1,4 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -12,7 +13,13 @@ import {
 } from "react-native";
 import { ErrorView, LoadingSpinner } from "../../src/components/common";
 import { getRecipeById } from "../../src/services/api";
-import { colors, fontSize, shadows, spacing } from "../../src/styles/theme";
+import {
+  borderRadius,
+  colors,
+  fontSize,
+  shadows,
+  spacing,
+} from "../../src/styles/theme";
 import { Recipe } from "../../src/types/recipe.types";
 
 export default function RecipeDetailScreen() {
@@ -38,6 +45,7 @@ export default function RecipeDetailScreen() {
 
   useEffect(() => {
     loadRecipe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const handleStartCooking = () => {
@@ -87,16 +95,35 @@ export default function RecipeDetailScreen() {
           {/* Tags */}
           <View style={styles.tagsContainer}>
             <View style={styles.tag}>
-              <Text style={styles.tagText}>📁 {recipe.category}</Text>
+              <MaterialIcons
+                name="category"
+                size={16}
+                color={colors.surface}
+                style={styles.tagIcon}
+              />
+              <Text style={styles.tagText}>{recipe.category}</Text>
             </View>
             <View style={styles.tag}>
-              <Text style={styles.tagText}>🌍 {recipe.area}</Text>
+              <MaterialIcons
+                name="public"
+                size={16}
+                color={colors.surface}
+                style={styles.tagIcon}
+              />
+              <Text style={styles.tagText}>{recipe.area}</Text>
             </View>
           </View>
 
           {/* Ingredientes */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>🥘 Ingredientes</Text>
+            <View style={styles.sectionTitleRow}>
+              <MaterialIcons
+                name="restaurant-menu"
+                size={20}
+                color={colors.text}
+              />
+              <Text style={styles.sectionTitle}>Ingredientes</Text>
+            </View>
             <View style={styles.card}>
               {recipe.ingredients.map((ingredient, index) => (
                 <View key={index} style={styles.ingredientRow}>
@@ -114,7 +141,10 @@ export default function RecipeDetailScreen() {
 
           {/* Vista previa de instrucciones */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>📝 Instrucciones</Text>
+            <View style={styles.sectionTitleRow}>
+              <MaterialIcons name="description" size={20} color={colors.text} />
+              <Text style={styles.sectionTitle}>Instrucciones</Text>
+            </View>
             <View style={styles.card}>
               <Text style={styles.instructionsPreview} numberOfLines={3}>
                 {recipe.instructions}
@@ -128,7 +158,14 @@ export default function RecipeDetailScreen() {
           {/* Tags adicionales */}
           {recipe.tags.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>🏷️ Etiquetas</Text>
+              <View style={styles.sectionTitleRow}>
+                <MaterialIcons
+                  name="local-offer"
+                  size={20}
+                  color={colors.text}
+                />
+                <Text style={styles.sectionTitle}>Etiquetas</Text>
+              </View>
               <View style={styles.tagsRow}>
                 {recipe.tags.map((tag, index) => (
                   <View key={index} style={styles.tagSmall}>
@@ -141,7 +178,12 @@ export default function RecipeDetailScreen() {
 
           {/* Botón de cocinar */}
           <TouchableOpacity style={styles.button} onPress={handleStartCooking}>
-            <Text style={styles.buttonText}>🔥 Comenzar a Cocinar</Text>
+            <MaterialIcons
+              name="whatshot"
+              size={24}
+              color={colors.textInverse}
+            />
+            <Text style={styles.buttonText}>Comenzar a Cocinar</Text>
           </TouchableOpacity>
 
           {/* Espacio inferior */}
@@ -185,6 +227,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  tagIcon: {
+    marginRight: spacing.xs,
   },
   tagText: {
     fontSize: fontSize.sm,
@@ -194,11 +241,16 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: spacing.lg,
   },
+  sectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    marginBottom: spacing.sm,
+  },
   sectionTitle: {
     fontSize: fontSize.lg,
     fontWeight: "600",
     color: colors.text,
-    marginBottom: spacing.sm,
   },
   card: {
     backgroundColor: colors.surface,
@@ -255,9 +307,12 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: colors.primary,
     padding: spacing.md,
-    borderRadius: 12,
+    borderRadius: borderRadius.lg,
     alignItems: "center",
     marginTop: spacing.md,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: spacing.sm,
     ...shadows.md,
   },
   buttonText: {

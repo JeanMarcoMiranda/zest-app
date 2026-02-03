@@ -1,3 +1,4 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useRef, useState } from "react";
 import {
@@ -84,7 +85,11 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
             onPress={handleFavoritePress}
             activeOpacity={0.7}
           >
-            <Text style={styles.favoriteIcon}>{isFavorite ? "❤️" : "🤍"}</Text>
+            <MaterialIcons
+              name={isFavorite ? "favorite" : "favorite-border"}
+              size={22}
+              color={isFavorite ? colors.favorite : colors.text}
+            />
           </TouchableOpacity>
         </View>
 
@@ -98,12 +103,24 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
           <View style={styles.infoRow}>
             {recipe.category && (
               <View style={styles.tag}>
-                <Text style={styles.tagText}>🏷️ {recipe.category}</Text>
+                <MaterialIcons
+                  name="label"
+                  size={14}
+                  color={colors.surface}
+                  style={styles.tagIcon}
+                />
+                <Text style={styles.tagText}>{recipe.category}</Text>
               </View>
             )}
             {recipe.area && (
               <View style={[styles.tag, styles.tagArea]}>
-                <Text style={styles.tagText}>🌍 {recipe.area}</Text>
+                <MaterialIcons
+                  name="public"
+                  size={14}
+                  color={colors.surface}
+                  style={styles.tagIcon}
+                />
+                <Text style={styles.tagText}>{recipe.area}</Text>
               </View>
             )}
           </View>
@@ -111,11 +128,19 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
           {/* Información adicional: tiempo y dificultad */}
           <View style={styles.metaRow}>
             <View style={styles.metaItem}>
-              <Text style={styles.metaIcon}>⏱️</Text>
+              <MaterialIcons
+                name="schedule"
+                size={16}
+                color={colors.textSecondary}
+              />
               <Text style={styles.metaText}>{estimatedTime} min</Text>
             </View>
             <View style={styles.metaItem}>
-              <Text style={styles.metaIcon}>📊</Text>
+              <MaterialIcons
+                name="bar-chart"
+                size={16}
+                color={colors.textSecondary}
+              />
               <View style={styles.difficultyContainer}>
                 {[...Array(3)].map((_, index) => (
                   <View
@@ -180,9 +205,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     ...shadows.md,
   },
-  favoriteIcon: {
-    fontSize: 20,
-  },
   content: {
     padding: spacing.md,
   },
@@ -204,9 +226,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.md,
+    flexDirection: "row",
+    alignItems: "center",
   },
   tagArea: {
     backgroundColor: colors.secondaryLight,
+  },
+  tagIcon: {
+    marginRight: 4,
   },
   tagText: {
     fontSize: fontSize.xs,
@@ -225,9 +252,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.xs,
-  },
-  metaIcon: {
-    fontSize: 14,
   },
   metaText: {
     fontSize: fontSize.sm,
