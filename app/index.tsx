@@ -1,18 +1,26 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    FlatList,
-    RefreshControl,
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    View,
+  FlatList,
+  RefreshControl,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
-import { ErrorView, LoadingSpinner } from "../src/components/common";
+import { ErrorView, RecipeCardSkeleton } from "../src/components/common";
 import { RecipeCardItem } from "../src/components/recipe";
 import { getRandomRecipes } from "../src/services/api";
-import { colors, fontSize, spacing } from "../src/styles/theme";
+import {
+  borderRadius,
+  colors,
+  fontSize,
+  gradients,
+  shadows,
+  spacing,
+} from "../src/styles/theme";
 import { RecipeCard } from "../src/types/recipe.types";
 
 export default function HomeScreen() {
@@ -49,10 +57,6 @@ export default function HomeScreen() {
     router.push(`/recipe/${recipeId}`);
   };
 
-  if (loading) {
-    return <LoadingSpinner message="Cargando recetas deliciosas..." />;
-  }
-
   if (error) {
     return (
       <ErrorView
@@ -64,40 +68,62 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>🍳 ChefHub</Text>
-        <Text style={styles.subtitle}>Descubre recetas increíbles</Text>
-      </View>
-
-      {/* Lista de recetas */}
-      <FlatList
-        data={recipes}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <RecipeCardItem
-            recipe={item}
-            onPress={() => handleRecipePress(item.id)}
-          />
-        )}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            colors={[colors.primary]}
-            tintColor={colors.primary}
-          />
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No hay recetas disponibles</Text>
+      {/* Header con gradiente */}
+      <LinearGradient colors={gradients.header} style={styles.headerGradient}>
+        <View style={styles.header}>
+          <View style={styles.headerContent}>
+            <Text style={styles.title}>🍳 ChefHub</Text>
+            <Text style={styles.subtitle}>Descubre recetas increíbles</Text>
           </View>
-        }
-      />
+          {!loading && recipes.length > 0 && (
+            <View style={styles.recipeBadge}>
+              <Text style={styles.recipeBadgeText}>{recipes.length}</Text>
+              <Text style={styles.recipeBadgeLabel}>recetas</Text>
+            </View>
+          )}
+        </View>
+      </LinearGradient>
+
+      {/* Lista de recetas con skeleton loaders */}
+      {loading ? (
+        <View style={styles.listContent}>
+          <RecipeCardSkeleton />
+          <RecipeCardSkeleton />
+          <RecipeCardSkeleton />
+        </View>
+      ) : (
+        <FlatList
+          data={recipes}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <RecipeCardItem
+              recipe={item}
+              onPress={() => handleRecipePress(item.id)}
+            />
+          )}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+            />
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyIcon}>🍽️</Text>
+              <Text style={styles.emptyTitle}>No hay recetas disponibles</Text>
+              <Text style={styles.emptySubtitle}>
+                Desliza hacia abajo para recargar
+              </Text>
+            </View>
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -107,21 +133,54 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  headerGradient: {
+    ...shadows.lg,
+  },
   header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: spacing.lg,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.divider,
+    paddingTop: spacing.md,
+  },
+  headerContent: {
+    flex: 1,
   },
   title: {
     fontSize: fontSize.xxxl,
     fontWeight: "700",
-    color: colors.primary,
+    color: colors.textInverse,
     marginBottom: spacing.xs,
+    textShadowColor: "rgba(0, 0, 0, 0.2)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   subtitle: {
     fontSize: fontSize.md,
-    color: colors.textSecondary,
+    color: colors.textInverse,
+    opacity: 0.9,
+    fontWeight: "500",
+  },
+  recipeBadge: {
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    borderRadius: borderRadius.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    alignItems: "center",
+    minWidth: 60,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+  },
+  recipeBadgeText: {
+    fontSize: fontSize.xxl,
+    fontWeight: "700",
+    color: colors.textInverse,
+  },
+  recipeBadgeLabel: {
+    fontSize: fontSize.xs,
+    color: colors.textInverse,
+    opacity: 0.9,
+    fontWeight: "600",
   },
   listContent: {
     padding: spacing.md,
@@ -129,9 +188,21 @@ const styles = StyleSheet.create({
   emptyContainer: {
     padding: spacing.xl,
     alignItems: "center",
+    marginTop: spacing.xxl,
   },
-  emptyText: {
+  emptyIcon: {
+    fontSize: 64,
+    marginBottom: spacing.md,
+  },
+  emptyTitle: {
+    fontSize: fontSize.xl,
+    fontWeight: "700",
+    color: colors.text,
+    marginBottom: spacing.xs,
+  },
+  emptySubtitle: {
     fontSize: fontSize.md,
     color: colors.textSecondary,
+    textAlign: "center",
   },
 });

@@ -40,6 +40,26 @@ export const colors = {
   // Overlay
   overlay: "rgba(0, 0, 0, 0.5)",
   overlayLight: "rgba(0, 0, 0, 0.3)",
+  overlayDark: "rgba(0, 0, 0, 0.7)",
+
+  // Glassmorphism
+  glass: "rgba(255, 255, 255, 0.9)",
+  glassDark: "rgba(255, 255, 255, 0.7)",
+
+  // Favoritos
+  favorite: "#FF4081",
+  favoriteLight: "#FF80AB",
+};
+
+// Gradientes predefinidos
+export const gradients = {
+  primary: ["#FF6B35", "#FF8C5F"] as const,
+  secondary: ["#4CAF50", "#66BB6A"] as const,
+  overlay: ["transparent", "rgba(0, 0, 0, 0.7)"] as const,
+  overlayTop: ["rgba(0, 0, 0, 0.5)", "transparent"] as const,
+  card: ["rgba(255, 255, 255, 0.95)", "rgba(255, 255, 255, 0.85)"] as const,
+  header: ["#FF6B35", "#FF8C5F", "#FFA07A"] as const,
 };
 
 export type Colors = typeof colors;
+export type Gradients = typeof gradients;

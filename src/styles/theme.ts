@@ -1,4 +1,4 @@
-import { colors } from "./colors";
+import { colors, gradients } from "./colors";
 
 export const spacing = {
   xs: 4,
@@ -14,6 +14,7 @@ export const borderRadius = {
   md: 8,
   lg: 12,
   xl: 16,
+  xxl: 20,
   round: 999,
 };
 
@@ -56,17 +57,45 @@ export const shadows = {
     shadowRadius: 8,
     elevation: 8,
   },
+  xl: {
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 12,
+  },
+};
+
+// Constantes de animación
+export const animation = {
+  duration: {
+    fast: 200,
+    normal: 300,
+    slow: 500,
+  },
+  easing: {
+    ease: "ease" as const,
+    easeIn: "ease-in" as const,
+    easeOut: "ease-out" as const,
+    easeInOut: "ease-in-out" as const,
+  },
+  scale: {
+    pressed: 0.95,
+    hover: 1.02,
+  },
 };
 
 export const theme = {
   colors,
+  gradients,
   spacing,
   borderRadius,
   fontSize,
   fontWeight,
   shadows,
+  animation,
 };
 
 export type Theme = typeof theme;
-export { colors };
+export { colors, gradients };
 
