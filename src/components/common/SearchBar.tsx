@@ -1,4 +1,5 @@
-import { colors, spacing, typography } from "@/src/theme";
+import { useTheme } from "@/src/hooks";
+import { spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -41,6 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onClear,
 }) => {
   const [query, setQuery] = useState("");
+  const { colors } = useTheme();
 
   const handleSearch = (text: string) => {
     setQuery(text);
@@ -57,8 +59,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
+    <View style={[styles.container, { backgroundColor: colors.surface }]}>
+      <View
+        style={[styles.searchContainer, { backgroundColor: colors.background }]}
+      >
         <Ionicons
           name="search"
           size={18}
@@ -66,7 +70,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           style={styles.searchIcon}
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: colors.text }]}
           placeholder={placeholder}
           placeholderTextColor={colors.textLight}
           value={query}
@@ -93,12 +97,10 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    backgroundColor: colors.surface,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.background,
     borderRadius: borderRadius.lg,
     paddingHorizontal: spacing.md,
     ...shadows.sm,
@@ -109,7 +111,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: fontSize.md,
-    color: colors.text,
     paddingVertical: Platform.OS === "ios" ? spacing.sm + 2 : spacing.sm,
   },
   clearButton: {

@@ -1,4 +1,5 @@
-import { colors, spacing, typography } from "@/src/theme";
+import { useTheme } from "@/src/hooks";
+import { spacing, typography } from "@/src/theme";
 import React from "react";
 import {
   ScrollView,
@@ -30,8 +31,15 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
   selectedCategory,
   onSelectCategory,
 }) => {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.surface, borderBottomColor: colors.divider },
+      ]}
+    >
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -41,7 +49,11 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
         <TouchableOpacity
           style={[
             styles.categoryButton,
-            selectedCategory === null && styles.categoryButtonActive,
+            { backgroundColor: colors.background, borderColor: colors.divider },
+            selectedCategory === null && {
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            },
           ]}
           onPress={() => onSelectCategory(null)}
           activeOpacity={0.7}
@@ -49,7 +61,11 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
           <Text
             style={[
               styles.categoryText,
-              selectedCategory === null && styles.categoryTextActive,
+              { color: colors.text },
+              selectedCategory === null && {
+                color: colors.textInverse,
+                fontWeight: "700",
+              },
             ]}
           >
             Todos
@@ -62,7 +78,14 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
             key={category}
             style={[
               styles.categoryButton,
-              selectedCategory === category && styles.categoryButtonActive,
+              {
+                backgroundColor: colors.background,
+                borderColor: colors.divider,
+              },
+              selectedCategory === category && {
+                backgroundColor: colors.primary,
+                borderColor: colors.primary,
+              },
             ]}
             onPress={() => onSelectCategory(category)}
             activeOpacity={0.7}
@@ -70,7 +93,11 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
             <Text
               style={[
                 styles.categoryText,
-                selectedCategory === category && styles.categoryTextActive,
+                { color: colors.text },
+                selectedCategory === category && {
+                  color: colors.textInverse,
+                  fontWeight: "700",
+                },
               ]}
             >
               {category}
@@ -84,9 +111,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.divider,
   },
   scrollContent: {
     paddingHorizontal: spacing.md,
@@ -97,22 +122,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.round,
-    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.divider,
-  },
-  categoryButtonActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
   },
   categoryText: {
     fontSize: fontSize.sm,
-    color: colors.text,
     fontWeight: "500",
-  },
-  categoryTextActive: {
-    color: colors.textInverse,
-    fontWeight: "700",
   },
 });
 

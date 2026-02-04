@@ -1,4 +1,5 @@
-import { colors, spacing, typography } from "@/src/theme";
+import { useTheme } from "@/src/hooks";
+import { spacing, typography } from "@/src/theme";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -17,13 +18,22 @@ const ErrorView: React.FC<ErrorViewProps> = ({
   message = "Algo salió mal. Por favor intenta de nuevo.",
   onRetry,
 }) => {
+  const { colors } = useTheme();
+
   return (
     <View style={styles.container}>
       <Text style={styles.emoji}>😕</Text>
-      <Text style={styles.message}>{message}</Text>
+      <Text style={[styles.message, { color: colors.textSecondary }]}>
+        {message}
+      </Text>
       {onRetry && (
-        <TouchableOpacity style={styles.button} onPress={onRetry}>
-          <Text style={styles.buttonText}>Reintentar</Text>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.primary }]}
+          onPress={onRetry}
+        >
+          <Text style={[styles.buttonText, { color: colors.textInverse }]}>
+            Reintentar
+          </Text>
         </TouchableOpacity>
       )}
     </View>
@@ -43,18 +53,15 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: fontSize.md,
-    color: colors.textSecondary,
     textAlign: "center",
     marginBottom: spacing.lg,
   },
   button: {
-    backgroundColor: colors.primary,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: 8,
   },
   buttonText: {
-    color: colors.textInverse,
     fontSize: fontSize.md,
     fontWeight: "600",
   },

@@ -1,56 +1,59 @@
-import { colors as baseColors } from "./colors";
+import { darkColors, lightColors } from "./colors";
 import { spacing } from "./spacing";
 import { typography } from "./typography";
 
 // Re-exportar spacing y typography tal cual
 export { spacing, typography };
 
-// Extender colors con propiedades simplificadas para acceso directo
+// Re-exportar paletas de colores
+  export { darkColors, lightColors };
+
+// Colores por defecto (modo claro) para compatibilidad con código existente
 export const colors = {
-  // Mantener acceso a paletas completas
-  primaryPalette: baseColors.primary,
-  secondaryPalette: baseColors.secondary,
-  neutralPalette: baseColors.neutral,
+  // Colores principales
+  primary: lightColors.primary,
+  primaryLight: lightColors.primaryLight,
+  primaryDark: lightColors.primaryDark,
 
-  // Colores principales como strings directos (valores por defecto)
-  primary: baseColors.primary[500],
-  primaryLight: baseColors.primary[100],
-  primaryDark: baseColors.primary[700],
+  secondary: lightColors.secondary,
+  secondaryLight: lightColors.secondaryLight,
+  secondaryDark: lightColors.secondaryDark,
 
-  secondary: baseColors.secondary[500],
-  secondaryLight: baseColors.secondary[50],
-  secondaryDark: baseColors.secondary[700],
+  accent: lightColors.accent,
+  accentLight: lightColors.accentLight,
+  accentDark: lightColors.accentDark,
 
-  // Colores de texto simplificados
-  text: baseColors.neutral[900],
-  textSecondary: baseColors.neutral[600],
-  textLight: baseColors.neutral[400],
-  textInverse: "#FFFFFF",
+  // Colores de texto
+  text: lightColors.text,
+  textSecondary: lightColors.textSecondary,
+  textLight: lightColors.textLight,
+  textInverse: lightColors.textInverse,
 
   // Colores de superficie
-  background: baseColors.background.light,
-  backgroundDark: baseColors.background.dark,
-  surface: "#FFFFFF",
-  divider: baseColors.neutral[200],
-  border: baseColors.neutral[300],
+  background: lightColors.background,
+  backgroundDark: darkColors.background,
+  surface: lightColors.surface,
+  surfaceVariant: lightColors.surfaceVariant,
+  divider: lightColors.divider,
+  border: lightColors.border,
 
   // Colores semánticos
-  success: baseColors.success,
-  warning: baseColors.warning,
-  error: baseColors.error,
-  info: baseColors.info,
+  success: lightColors.success,
+  warning: lightColors.warning,
+  error: lightColors.error,
+  info: lightColors.info,
 
-  // Mantener acceso a escala de grises
-  gray50: baseColors.neutral[50],
-  gray100: baseColors.neutral[100],
-  gray200: baseColors.neutral[200],
-  gray300: baseColors.neutral[300],
-  gray400: baseColors.neutral[400],
-  gray500: baseColors.neutral[500],
-  gray600: baseColors.neutral[600],
-  gray700: baseColors.neutral[700],
-  gray800: baseColors.neutral[800],
-  gray900: baseColors.neutral[900],
+  // Escala de grises (para compatibilidad)
+  gray50: lightColors.background,
+  gray100: lightColors.surface,
+  gray200: lightColors.surfaceVariant,
+  gray300: lightColors.border,
+  gray400: lightColors.textLight,
+  gray500: lightColors.textSecondary,
+  gray600: lightColors.textSecondary,
+  gray700: lightColors.text,
+  gray800: lightColors.text,
+  gray900: lightColors.text,
 };
 
 export const theme = {
