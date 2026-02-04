@@ -1,3 +1,7 @@
+import { LoadingSpinner } from "@/src/components/common";
+import { RecipeCardItem } from "@/src/components/recipe";
+import { useFavorites } from "@/src/hooks";
+import { colors, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -11,10 +15,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { LoadingSpinner } from "../src/components/common";
-import { RecipeCardItem } from "../src/components/recipe";
-import { useFavorites } from "../src/hooks";
-import { colors, fontSize, spacing } from "../src/styles/theme";
+
+const fontSize = {
+  xs: typography.fontSize.xs,
+  sm: typography.fontSize.sm,
+  md: typography.fontSize.base,
+  lg: typography.fontSize.lg,
+  xl: typography.fontSize.xl,
+};
 
 export default function FavoritesScreen() {
   const router = useRouter();

@@ -1,3 +1,4 @@
+import { colors, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useRef } from "react";
@@ -10,16 +11,58 @@ import {
   View,
 } from "react-native";
 import { useFavorites } from "../../hooks";
-import {
-  animation,
-  borderRadius,
-  colors,
-  fontSize,
-  gradients,
-  shadows,
-  spacing,
-} from "../../styles/theme";
 import { RecipeCard } from "../../types/recipe.types";
+
+// Constantes locales para compatibilidad
+const fontSize = {
+  xs: typography.fontSize.xs,
+  sm: typography.fontSize.sm,
+  md: typography.fontSize.base,
+  lg: typography.fontSize.lg,
+  xl: typography.fontSize.xl,
+};
+
+const borderRadius = {
+  sm: 4,
+  md: 8,
+  lg: 12,
+  xl: 16,
+  round: 9999,
+};
+
+const shadows = {
+  sm: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  lg: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+};
+
+const animation = {
+  scale: {
+    pressed: 0.97,
+  },
+};
+
+const gradients = {
+  overlay: ["transparent", "rgba(0,0,0,0.7)"] as const,
+};
 
 interface RecipeCardItemProps {
   recipe: RecipeCard;

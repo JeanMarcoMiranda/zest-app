@@ -1,3 +1,12 @@
+import {
+  ErrorView,
+  FavoriteButton,
+  LoadingSpinner,
+} from "@/src/components/common";
+import { useFavorites } from "@/src/hooks";
+import { getRecipeById } from "@/src/services";
+import { colors, spacing, typography } from "@/src/theme";
+import { Recipe } from "@/src/types/recipe.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -11,15 +20,32 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  ErrorView,
-  FavoriteButton,
-  LoadingSpinner,
-} from "../../src/components/common";
-import { useFavorites } from "../../src/hooks";
-import { getRecipeById } from "../../src/services/api";
-import { colors, fontSize, shadows, spacing } from "../../src/styles/theme";
-import { Recipe } from "../../src/types/recipe.types";
+
+const fontSize = {
+  xs: typography.fontSize.xs,
+  sm: typography.fontSize.sm,
+  md: typography.fontSize.base,
+  lg: typography.fontSize.lg,
+  xl: typography.fontSize.xl,
+  xxl: typography.fontSize["2xl"],
+};
+
+const shadows = {
+  sm: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+};
 
 export default function RecipeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

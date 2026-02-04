@@ -1,7 +1,7 @@
 // app/_layout.tsx
 
+import { colors } from "@/src/theme";
 import { Stack } from "expo-router";
-import { colors } from "../src/styles/colors";
 
 export default function RootLayout() {
   return (

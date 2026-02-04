@@ -1,6 +1,12 @@
+import { colors, spacing, typography } from "@/src/theme";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { colors, fontSize, spacing } from "../../styles/theme";
+
+const fontSize = {
+  md: typography.fontSize.base,
+  lg: typography.fontSize.lg,
+  xl: typography.fontSize.xl,
+};
 
 interface ErrorViewProps {
   message?: string;

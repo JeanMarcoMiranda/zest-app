@@ -1,4 +1,5 @@
 import {
+    MealDBCategoriesResponse,
     MealDBResponse,
     Recipe,
     RecipeCard,
@@ -44,4 +45,28 @@ export const getRandomRecipes = async (
       category: recipe.category,
       area: recipe.area,
     }));
+};
+
+export const getCategories = async (): Promise<string[]> => {
+  const { data } =
+    await apiClient.get<MealDBCategoriesResponse>("/categories.php");
+  return data.categories.map((cat) => cat.strCategory);
+};
+
+export const getRecipesByCategory = async (
+  category: string,
+): Promise<RecipeCard[]> => {
+  const { data } = await apiClient.get<MealDBResponse>("/filter.php", {
+    params: { c: category },
+  });
+
+  if (!data.meals) return [];
+
+  return data.meals.map((meal) => ({
+    id: meal.idMeal,
+    title: meal.strMeal,
+    thumbnail: meal.strMealThumb,
+    category: category,
+    area: "",
+  }));
 };

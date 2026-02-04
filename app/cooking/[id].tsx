@@ -1,29 +1,56 @@
 // app/cooking/[id].tsx
 
+import { ErrorView, LoadingSpinner } from "@/src/components/common";
+import { Step, StepItem } from "@/src/components/cooking";
+import { getRecipeById } from "@/src/services";
+import { colors, spacing, typography } from "@/src/theme";
+import { Recipe } from "@/src/types/recipe.types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { ErrorView, LoadingSpinner } from "../../src/components/common";
-import { Step, VerticalStepper } from "../../src/components/cooking";
-import { getRecipeById } from "../../src/services/api";
-import {
-  borderRadius,
-  colors,
-  fontSize,
-  gradients,
-  shadows,
-  spacing,
-} from "../../src/styles/theme";
-import { Recipe } from "../../src/types/recipe.types";
+
+const fontSize = {
+  xs: typography.fontSize.xs,
+  sm: typography.fontSize.sm,
+  md: typography.fontSize.base,
+  lg: typography.fontSize.lg,
+};
+
+const borderRadius = {
+  lg: 12,
+  round: 9999,
+};
+
+const shadows = {
+  lg: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  md: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+};
+
+const gradients = {
+  header: [colors.primary[500], "#FF8E53"] as const,
+};
 
 export default function CookingStepsScreen() {
   const { id, recipeData } = useLocalSearchParams<{
@@ -139,14 +166,21 @@ export default function CookingStepsScreen() {
         </View>
       </LinearGradient>
 
-      {/* Vertical Stepper */}
-      <VerticalStepper
-        steps={steps}
-        currentStep={currentStep}
-        completedSteps={completedSteps}
-        onStepPress={handleStepPress}
-        onStepComplete={handleStepComplete}
-      />
+      {/* Steps List */}
+      <ScrollView style={styles.stepsContainer}>
+        {steps.map((step, index) => (
+          <StepItem
+            key={step.number}
+            step={step}
+            index={index}
+            isActive={step.number === currentStep}
+            isCompleted={completedSteps.includes(step.number)}
+            isLast={index === steps.length - 1}
+            onPress={() => handleStepPress(step.number)}
+            onComplete={() => handleStepComplete(step.number)}
+          />
+        ))}
+      </ScrollView>
 
       {/* Botón de finalizar */}
       <View style={styles.footer}>
@@ -222,6 +256,10 @@ const styles = StyleSheet.create({
   progressBar: {
     height: "100%",
     backgroundColor: colors.textInverse,
+  },
+  stepsContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
   },
   footer: {
     padding: spacing.lg,

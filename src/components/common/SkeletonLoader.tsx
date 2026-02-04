@@ -1,6 +1,6 @@
+import { colors, spacing } from "@/src/theme";
 import React, { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
-import { colors, spacing } from "../../styles/theme";
 
 interface SkeletonLoaderProps {
   width?: number | string;

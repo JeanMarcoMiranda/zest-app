@@ -1,7 +1,17 @@
+import { colors } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Animated, StyleSheet, TouchableOpacity } from "react-native";
-import { colors, shadows } from "../../styles/theme";
+
+const shadows = {
+  md: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+};
 
 interface FavoriteButtonProps {
   isFavorite: boolean;

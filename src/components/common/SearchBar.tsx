@@ -1,19 +1,33 @@
+import { colors, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-    Platform,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Platform,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import {
-    borderRadius,
-    colors,
-    fontSize,
-    shadows,
-    spacing,
-} from "../../styles/theme";
+
+// Constantes locales para compatibilidad
+const fontSize = {
+  md: typography.fontSize.base,
+};
+
+const borderRadius = {
+  lg: 12,
+  round: 9999,
+};
+
+const shadows = {
+  sm: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+};
 
 interface SearchBarProps {
   placeholder?: string;

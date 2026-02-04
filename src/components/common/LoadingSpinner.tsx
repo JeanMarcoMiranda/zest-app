@@ -1,6 +1,11 @@
+import { colors, spacing, typography } from "@/src/theme";
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { colors, fontSize, spacing } from "../../styles/theme";
+
+const fontSize = {
+  md: typography.fontSize.base,
+  lg: typography.fontSize.lg,
+};
 
 interface LoadingSpinnerProps {
   message?: string;

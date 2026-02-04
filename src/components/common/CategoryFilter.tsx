@@ -1,12 +1,23 @@
+import { colors, spacing, typography } from "@/src/theme";
 import React from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { borderRadius, colors, fontSize, spacing } from "../../styles/theme";
+
+// Constantes locales para compatibilidad
+const fontSize = {
+  xs: typography.fontSize.xs,
+  sm: typography.fontSize.sm,
+  md: typography.fontSize.base,
+};
+
+const borderRadius = {
+  round: 9999,
+};
 
 interface CategoryFilterProps {
   categories: string[];

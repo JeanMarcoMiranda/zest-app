@@ -1,13 +1,35 @@
+import { colors, spacing, typography } from "@/src/theme";
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import {
-    borderRadius,
-    colors,
-    fontSize,
-    shadows,
-    spacing,
-} from "../../styles/theme";
+
+// Constantes locales para compatibilidad
+const fontSize = {
+  xs: typography.fontSize.xs,
+  md: typography.fontSize.base,
+  lg: typography.fontSize.lg,
+};
+
+const borderRadius = {
+  lg: 12,
+};
+
+const shadows = {
+  sm: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+};
 
 export interface Step {
   number: number;
