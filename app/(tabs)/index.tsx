@@ -15,7 +15,6 @@ import {
 import { spacing, typography } from "@/src/theme";
 import { RecipeCard } from "@/src/types/recipe.types";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -44,38 +43,14 @@ const borderRadius = {
   md: 8,
   lg: 12,
   xl: 16,
-  xxl: 20,
+  xxl: 24,
   round: 9999,
 };
 
-const shadows = {
-  sm: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  md: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  lg: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-};
-
 // Alturas del header (sin contar safe area)
-const HEADER_CONTENT_EXPANDED = 110;
-const HEADER_CONTENT_COLLAPSED = 56;
-const SCROLL_THRESHOLD = 50;
+const HEADER_CONTENT_EXPANDED = 120;
+const HEADER_CONTENT_COLLAPSED = 60;
+const SCROLL_THRESHOLD = 60;
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -230,7 +205,6 @@ export default function HomeScreen() {
     }, 500);
 
     return () => clearTimeout(delayDebounce);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, selectedCategory]);
 
   const handleRecipePress = (recipeId: string) => {
@@ -255,7 +229,7 @@ export default function HomeScreen() {
 
   const titleScale = scrollY.interpolate({
     inputRange: [0, SCROLL_THRESHOLD],
-    outputRange: [1, 0.92],
+    outputRange: [1, 0.9],
     extrapolate: "clamp",
   });
 
@@ -263,7 +237,9 @@ export default function HomeScreen() {
     if (searchQuery) return `"${searchQuery}"`;
     if (selectedCategory) return selectedCategory;
     if (favorites.length > 0) {
-      return `${favorites.length} ${favorites.length === 1 ? "favorito" : "favoritos"}`;
+      return `${favorites.length} ${
+        favorites.length === 1 ? "favorito" : "favoritos"
+      }`;
     }
     return "Explora nuevas recetas";
   };
@@ -275,11 +251,28 @@ export default function HomeScreen() {
     return "sparkles";
   };
 
+  const shadows = {
+    sm: {
+      shadowColor: colors.primaryDark,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    md: {
+      shadowColor: colors.primaryDark,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 4,
+    },
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* StatusBar con configuración apropiada */}
       <StatusBar
-        barStyle={isDark ? "light-content" : "dark-content"}
+        barStyle={isDark ? "light-content" : "light-content"}
         backgroundColor={colors.primary}
         translucent={false}
       />
@@ -294,9 +287,12 @@ export default function HomeScreen() {
           },
         ]}
       >
-        <LinearGradient
-          colors={[colors.primary, colors.primaryLight]}
-          style={styles.headerGradient}
+        <View
+          style={[
+            styles.headerGradient,
+            shadows.md,
+            { backgroundColor: colors.primary },
+          ]}
         >
           {/* Safe area top espaciado */}
           <View style={{ height: insets.top }} />
@@ -310,20 +306,34 @@ export default function HomeScreen() {
                 <View
                   style={[
                     styles.logoContainer,
-                    { backgroundColor: "rgba(255, 255, 255, 0.25)" },
+                    {
+                      backgroundColor: "rgba(255, 255, 255, 0.2)",
+                      borderColor: "rgba(255, 255, 255, 0.3)",
+                    },
                   ]}
                 >
-                  <Ionicons name="restaurant" size={24} color="#FFFFFF" />
+                  <Ionicons
+                    name="restaurant"
+                    size={28}
+                    color={colors.textInverse}
+                  />
                 </View>
                 <View style={styles.titleContent}>
-                  <Text style={styles.title}>ChefHub</Text>
+                  <Text style={[styles.title, { color: colors.textInverse }]}>
+                    ChefHub
+                  </Text>
                   <View style={styles.subtitleRow}>
                     <Ionicons
                       name={getHeaderIcon()}
                       size={14}
-                      color="rgba(255, 255, 255, 0.9)"
+                      color={colors.textInverse}
+                      style={{ opacity: 0.9 }}
                     />
-                    <Text style={styles.subtitle}>{getHeaderMessage()}</Text>
+                    <Text
+                      style={[styles.subtitle, { color: colors.textInverse }]}
+                    >
+                      {getHeaderMessage()}
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -331,37 +341,59 @@ export default function HomeScreen() {
               {/* Badge y botón de filtros */}
               <View style={styles.headerActions}>
                 {!loading && recipes.length > 0 && (
-                  <View style={styles.recipeBadge}>
-                    <Text style={styles.recipeBadgeText}>{recipes.length}</Text>
+                  <View
+                    style={[
+                      styles.recipeBadge,
+                      {
+                        backgroundColor: "rgba(255, 255, 255, 0.25)",
+                        borderColor: "rgba(255, 255, 255, 0.4)",
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.recipeBadgeText,
+                        { color: colors.textInverse },
+                      ]}
+                    >
+                      {recipes.length}
+                    </Text>
                   </View>
                 )}
                 <TouchableOpacity
                   onPress={toggleFilters}
-                  style={styles.filterToggle}
+                  style={[
+                    styles.filterToggle,
+                    {
+                      backgroundColor: "rgba(255, 255, 255, 0.15)",
+                      borderColor: "rgba(255, 255, 255, 0.25)",
+                    },
+                  ]}
                   activeOpacity={0.7}
                 >
                   <Ionicons
                     name={showFilters ? "chevron-up" : "funnel"}
-                    size={20}
-                    color="#FFFFFF"
+                    size={22}
+                    color={colors.textInverse}
                   />
                 </TouchableOpacity>
               </View>
             </Animated.View>
           </View>
-        </LinearGradient>
+        </View>
       </Animated.View>
 
       {/* Filtros Colapsables */}
       <Animated.View
         style={[
           styles.filtersContainer,
+          shadows.sm,
           {
             backgroundColor: colors.background,
             opacity: filterOpacity,
             maxHeight: filterHeight.interpolate({
               inputRange: [0, 1],
-              outputRange: [0, 300],
+              outputRange: [0, 320],
             }),
             transform: [
               {
@@ -406,7 +438,9 @@ export default function HomeScreen() {
           )}
           contentContainerStyle={[
             styles.listContent,
-            { paddingBottom: Math.max(insets.bottom, spacing.lg) },
+            {
+              paddingBottom: Math.max(insets.bottom + spacing.xl, spacing.xxl),
+            },
           ]}
           showsVerticalScrollIndicator={false}
           onScroll={handleScroll}
@@ -424,12 +458,13 @@ export default function HomeScreen() {
               <View
                 style={[
                   styles.emptyIconContainer,
+                  shadows.md,
                   { backgroundColor: colors.surface },
                 ]}
               >
                 <Ionicons
                   name={searchQuery ? "search-outline" : "restaurant-outline"}
-                  size={56}
+                  size={64}
                   color={colors.textLight}
                 />
               </View>
@@ -461,13 +496,11 @@ const styles = StyleSheet.create({
   },
   headerGradient: {
     flex: 1,
-    ...shadows.md,
   },
   header: {
     flex: 1,
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.md,
+    paddingVertical: spacing.md,
     justifyContent: "center",
   },
   headerTop: {
@@ -482,26 +515,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoContainer: {
-    width: 52,
-    height: 52,
+    width: 56,
+    height: 56,
     borderRadius: borderRadius.xl,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "rgba(255, 255, 255, 0.4)",
-    ...shadows.md,
+    borderWidth: 1.5,
   },
   titleContent: {
     flex: 1,
+    justifyContent: "center",
   },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: "800",
-    color: "#FFFFFF",
     letterSpacing: -0.5,
-    textShadowColor: "rgba(0, 0, 0, 0.2)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
     marginBottom: 2,
   },
   subtitleRow: {
@@ -511,8 +539,8 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: fontSize.sm,
-    color: "rgba(255, 255, 255, 0.95)",
     fontWeight: "600",
+    opacity: 0.95,
   },
   headerActions: {
     flexDirection: "row",
@@ -520,58 +548,53 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   recipeBadge: {
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
     borderRadius: borderRadius.round,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    minWidth: 48,
+    paddingVertical: 6,
+    minWidth: 44,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "rgba(255, 255, 255, 0.5)",
-    ...shadows.sm,
+    borderWidth: 1.5,
   },
   recipeBadgeText: {
-    fontSize: fontSize.lg,
+    fontSize: fontSize.md,
     fontWeight: "700",
-    color: "#FFFFFF",
   },
   filterToggle: {
-    width: 44,
-    height: 44,
+    width: 48,
+    height: 48,
     borderRadius: borderRadius.round,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "rgba(255, 255, 255, 0.3)",
+    borderWidth: 1.5,
   },
   filtersContainer: {
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-    ...shadows.sm,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+    borderBottomLeftRadius: borderRadius.xl,
+    borderBottomRightRadius: borderRadius.xl,
     zIndex: 999,
   },
   listContent: {
     padding: spacing.md,
-    paddingTop: spacing.lg,
+    paddingTop: spacing.xl,
+    gap: spacing.md,
   },
   emptyContainer: {
     alignItems: "center",
-    paddingTop: spacing.xxl * 3,
+    paddingTop: spacing.xxl * 2,
     paddingHorizontal: spacing.xl,
   },
   emptyIconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: borderRadius.xxl,
+    width: 140,
+    height: 140,
+    borderRadius: borderRadius.round,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: spacing.xl,
-    ...shadows.md,
   },
   emptyTitle: {
-    fontSize: fontSize.xxl,
+    fontSize: fontSize.xl,
     fontWeight: "700",
     marginBottom: spacing.sm,
     textAlign: "center",
@@ -579,7 +602,7 @@ const styles = StyleSheet.create({
   emptySubtitle: {
     fontSize: fontSize.md,
     textAlign: "center",
-    lineHeight: 24,
-    maxWidth: 280,
+    lineHeight: 22,
+    maxWidth: 260,
   },
 });
