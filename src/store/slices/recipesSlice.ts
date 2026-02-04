@@ -1,6 +1,7 @@
-import * as recipesApi from "@/src/services/api/recipes";
+import { recipesApi } from "@/src/services";
 import { Recipe, RecipeCard } from "@/src/types";
 import { StateCreator } from "zustand";
+
 export interface RecipesSlice {
   recipes: RecipeCard[];
   currentRecipe: Recipe | null;
@@ -13,6 +14,7 @@ export interface RecipesSlice {
   fetchRandomRecipes: (count?: number) => Promise<void>;
   clearError: () => void;
 }
+
 export const createRecipesSlice: StateCreator<RecipesSlice> = (set) => ({
   recipes: [],
   currentRecipe: null,

@@ -1,4 +1,4 @@
-import * as favoritesStorage from "@/src/services/storage/favorites";
+import { favoritesStorage } from "@/src/services/storage";
 import { FavoriteRecipe, RecipeCard } from "@/src/types";
 import { StateCreator } from "zustand";
 export interface FavoritesSlice {
