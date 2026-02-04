@@ -1,7 +1,7 @@
 import { LoadingSpinner } from "@/src/components/common";
 import { RecipeCardItem } from "@/src/components/recipe";
-import { useFavorites } from "@/src/hooks";
-import { colors, spacing, typography } from "@/src/theme";
+import { useFavorites, useTheme } from "@/src/hooks";
+import { spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -16,17 +16,10 @@ import {
   View,
 } from "react-native";
 
-const fontSize = {
-  xs: typography.fontSize.xs,
-  sm: typography.fontSize.sm,
-  md: typography.fontSize.base,
-  lg: typography.fontSize.lg,
-  xl: typography.fontSize.xl,
-};
-
 export default function FavoritesScreen() {
   const router = useRouter();
   const { favorites, loading, clearAllFavorites } = useFavorites();
+  const { colors, isDark } = useTheme();
 
   const handleRecipePress = (recipeId: string) => {
     router.push(`/recipe/${recipeId}` as any);
@@ -55,26 +48,43 @@ export default function FavoritesScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <StatusBar
+        barStyle={isDark ? "light-content" : "dark-content"}
+        backgroundColor={colors.background}
+      />
 
       {favorites.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons name="heart-outline" size={80} color={colors.textLight} />
-          <Text style={styles.emptyTitle}>No tienes favoritos</Text>
-          <Text style={styles.emptySubtitle}>
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>
+            No tienes favoritos
+          </Text>
+          <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
             Guarda tus recetas favoritas tocando el corazón
           </Text>
         </View>
       ) : (
         <>
           {/* Header con contador */}
-          <View style={styles.header}>
-            <Text style={styles.headerText}>
+          <View
+            style={[
+              styles.header,
+              {
+                backgroundColor: colors.surface,
+                borderBottomColor: colors.divider,
+              },
+            ]}
+          >
+            <Text style={[styles.headerText, { color: colors.textSecondary }]}>
               {favorites.length} {favorites.length === 1 ? "receta" : "recetas"}
             </Text>
             <TouchableOpacity onPress={handleClearAll}>
-              <Text style={styles.clearButton}>Eliminar todos</Text>
+              <Text style={[styles.clearButton, { color: colors.error }]}>
+                Eliminar todos
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -100,25 +110,20 @@ export default function FavoritesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: spacing.md,
-    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: colors.divider,
   },
   headerText: {
-    fontSize: fontSize.md,
-    color: colors.textSecondary,
+    fontSize: typography.fontSize.base,
     fontWeight: "500",
   },
   clearButton: {
-    fontSize: fontSize.sm,
-    color: colors.error,
+    fontSize: typography.fontSize.sm,
     fontWeight: "600",
   },
   listContent: {
@@ -131,16 +136,14 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
   },
   emptyTitle: {
-    fontSize: fontSize.xl,
+    fontSize: typography.fontSize.xl,
     fontWeight: "700",
-    color: colors.text,
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
     textAlign: "center",
   },
   emptySubtitle: {
-    fontSize: fontSize.md,
-    color: colors.textSecondary,
+    fontSize: typography.fontSize.base,
     textAlign: "center",
     lineHeight: 22,
   },

@@ -10,11 +10,6 @@ import {
   View,
 } from "react-native";
 
-// Constantes locales para compatibilidad
-const fontSize = {
-  md: typography.fontSize.base,
-};
-
 const borderRadius = {
   lg: 12,
   round: 9999,
@@ -110,7 +105,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: fontSize.md,
+    fontSize: typography.fontSize.base,
     paddingVertical: Platform.OS === "ios" ? spacing.sm + 2 : spacing.sm,
   },
   clearButton: {

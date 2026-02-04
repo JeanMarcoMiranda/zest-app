@@ -1,11 +1,7 @@
-import { colors, spacing, typography } from "@/src/theme";
+import { useTheme } from "@/src/hooks";
+import { spacing, typography } from "@/src/theme";
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-
-const fontSize = {
-  md: typography.fontSize.base,
-  lg: typography.fontSize.lg,
-};
 
 interface LoadingSpinnerProps {
   message?: string;
@@ -16,10 +12,16 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   message = "Cargando...",
   size = "large",
 }) => {
+  const { colors } = useTheme();
+
   return (
     <View style={styles.container}>
       <ActivityIndicator size={size} color={colors.primary} />
-      {message && <Text style={styles.message}>{message}</Text>}
+      {message && (
+        <Text style={[styles.message, { color: colors.textSecondary }]}>
+          {message}
+        </Text>
+      )}
     </View>
   );
 };
@@ -33,8 +35,7 @@ const styles = StyleSheet.create({
   },
   message: {
     marginTop: spacing.md,
-    fontSize: fontSize.md,
-    color: colors.textSecondary,
+    fontSize: typography.fontSize.base,
   },
 });
 

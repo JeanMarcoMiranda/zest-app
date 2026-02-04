@@ -1,34 +1,11 @@
-import { colors, spacing, typography } from "@/src/theme";
+import { useTheme } from "@/src/hooks";
+import { spacing, typography } from "@/src/theme";
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-// Constantes locales para compatibilidad
-const fontSize = {
-  xs: typography.fontSize.xs,
-  md: typography.fontSize.base,
-  lg: typography.fontSize.lg,
-};
-
 const borderRadius = {
   lg: 12,
-};
-
-const shadows = {
-  sm: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  md: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
 };
 
 export interface Step {
@@ -55,6 +32,8 @@ export const StepItem: React.FC<StepItemProps> = ({
   onPress,
   onComplete,
 }) => {
+  const { colors } = useTheme();
+
   const getCircleColor = () => {
     if (isCompleted) return colors.success;
     if (isActive) return colors.primary;
@@ -65,6 +44,23 @@ export const StepItem: React.FC<StepItemProps> = ({
     if (isCompleted) return "check-circle";
     if (isActive) return "radio-button-checked";
     return "radio-button-unchecked";
+  };
+
+  const shadows = {
+    sm: {
+      shadowColor: colors.primaryDark,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    md: {
+      shadowColor: colors.primaryDark,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 4,
+    },
   };
 
   return (
@@ -80,15 +76,28 @@ export const StepItem: React.FC<StepItemProps> = ({
         </View>
 
         {/* Línea conectora */}
-        {!isLast && <View style={styles.line} />}
+        {!isLast && (
+          <View style={[styles.line, { backgroundColor: colors.divider }]} />
+        )}
       </View>
 
       <View style={styles.rightColumn}>
         <TouchableOpacity
           style={[
             styles.stepCard,
-            isActive && styles.stepCardActive,
-            isCompleted && styles.stepCardCompleted,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.divider,
+            },
+            shadows.sm,
+            isActive && {
+              borderColor: colors.primary,
+              ...shadows.md,
+            },
+            isCompleted && {
+              borderColor: colors.success,
+              backgroundColor: colors.surface,
+            },
           ]}
           onPress={onPress}
           activeOpacity={0.7}
@@ -97,8 +106,14 @@ export const StepItem: React.FC<StepItemProps> = ({
             <Text
               style={[
                 styles.stepNumber,
-                isActive && styles.stepNumberActive,
-                isCompleted && styles.stepNumberCompleted,
+                { color: colors.textSecondary },
+                isActive && {
+                  color: colors.primary,
+                  fontSize: typography.fontSize.lg,
+                },
+                isCompleted && {
+                  color: colors.success,
+                },
               ]}
             >
               Paso {step.number}
@@ -119,14 +134,23 @@ export const StepItem: React.FC<StepItemProps> = ({
           </View>
 
           <Text
-            style={[styles.stepText, isCompleted && styles.stepTextCompleted]}
+            style={[
+              styles.stepText,
+              { color: colors.text },
+              isCompleted && {
+                color: colors.textSecondary,
+                textDecorationLine: "line-through",
+              },
+            ]}
             numberOfLines={isActive ? undefined : 2}
           >
             {step.text}
           </Text>
 
           {!isActive && (
-            <Text style={styles.tapToExpand}>Toca para ver más</Text>
+            <Text style={[styles.tapToExpand, { color: colors.textLight }]}>
+              Toca para ver más
+            </Text>
           )}
         </TouchableOpacity>
       </View>
@@ -152,27 +176,15 @@ const styles = StyleSheet.create({
   line: {
     width: 2,
     flex: 1,
-    backgroundColor: colors.divider,
     marginTop: spacing.xs,
   },
   rightColumn: {
     flex: 1,
   },
   stepCard: {
-    backgroundColor: colors.surface,
     padding: spacing.md,
     borderRadius: borderRadius.lg,
     borderWidth: 2,
-    borderColor: colors.divider,
-    ...shadows.sm,
-  },
-  stepCardActive: {
-    borderColor: colors.primary,
-    ...shadows.md,
-  },
-  stepCardCompleted: {
-    borderColor: colors.success,
-    backgroundColor: colors.surface,
   },
   stepHeader: {
     flexDirection: "row",
@@ -181,32 +193,18 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   stepNumber: {
-    fontSize: fontSize.md,
+    fontSize: typography.fontSize.base,
     fontWeight: "700",
-    color: colors.textSecondary,
-  },
-  stepNumberActive: {
-    color: colors.primary,
-    fontSize: fontSize.lg,
-  },
-  stepNumberCompleted: {
-    color: colors.success,
   },
   checkbox: {
     padding: spacing.xs,
   },
   stepText: {
-    fontSize: fontSize.md,
-    color: colors.text,
-    lineHeight: fontSize.md * 1.5,
-  },
-  stepTextCompleted: {
-    color: colors.textSecondary,
-    textDecorationLine: "line-through",
+    fontSize: typography.fontSize.base,
+    lineHeight: typography.fontSize.base * 1.5,
   },
   tapToExpand: {
-    fontSize: fontSize.xs,
-    color: colors.textLight,
+    fontSize: typography.fontSize.xs,
     fontStyle: "italic",
     marginTop: spacing.xs,
   },

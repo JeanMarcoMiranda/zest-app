@@ -9,13 +9,6 @@ import {
   View,
 } from "react-native";
 
-// Constantes locales para compatibilidad
-const fontSize = {
-  xs: typography.fontSize.xs,
-  sm: typography.fontSize.sm,
-  md: typography.fontSize.base,
-};
-
 const borderRadius = {
   round: 9999,
 };
@@ -125,7 +118,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   categoryText: {
-    fontSize: fontSize.sm,
+    fontSize: typography.fontSize.sm,
     fontWeight: "500",
   },
 });

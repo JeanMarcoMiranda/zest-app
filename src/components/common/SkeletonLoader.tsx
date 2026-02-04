@@ -1,4 +1,5 @@
-import { colors, spacing } from "@/src/theme";
+import { useTheme } from "@/src/hooks";
+import { spacing } from "@/src/theme";
 import React, { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 
@@ -15,6 +16,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
   borderRadius = 4,
   style,
 }) => {
+  const { colors } = useTheme();
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -48,6 +50,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
           height,
           borderRadius,
           opacity,
+          backgroundColor: colors.divider,
         },
         style,
       ]}
@@ -56,8 +59,10 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
 };
 
 export const RecipeCardSkeleton: React.FC = () => {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.surface }]}>
       <SkeletonLoader height={200} borderRadius={12} />
       <View style={styles.content}>
         <SkeletonLoader
@@ -90,10 +95,9 @@ export const RecipeCardSkeleton: React.FC = () => {
 
 const styles = StyleSheet.create({
   skeleton: {
-    backgroundColor: colors.divider,
+    // Background color handled dynamically
   },
   card: {
-    backgroundColor: colors.surface,
     borderRadius: 12,
     marginBottom: spacing.md,
     overflow: "hidden",

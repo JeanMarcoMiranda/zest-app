@@ -1,4 +1,5 @@
-import { colors, spacing, typography } from "@/src/theme";
+import { useTheme } from "@/src/hooks";
+import { spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useRef } from "react";
@@ -13,45 +14,12 @@ import {
 import { useFavorites } from "../../hooks";
 import { RecipeCard } from "../../types/recipe.types";
 
-// Constantes locales para compatibilidad
-const fontSize = {
-  xs: typography.fontSize.xs,
-  sm: typography.fontSize.sm,
-  md: typography.fontSize.base,
-  lg: typography.fontSize.lg,
-  xl: typography.fontSize.xl,
-};
-
 const borderRadius = {
   sm: 4,
   md: 8,
   lg: 12,
   xl: 16,
   round: 9999,
-};
-
-const shadows = {
-  sm: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  md: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  lg: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
-  },
 };
 
 const animation = {
@@ -71,6 +39,7 @@ interface RecipeCardItemProps {
 
 const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { colors } = useTheme();
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -94,10 +63,27 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
     toggleFavorite(recipe);
   };
 
+  const shadows = {
+    sm: {
+      shadowColor: colors.primaryDark,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    lg: {
+      shadowColor: colors.primaryDark,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+  };
+
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <TouchableOpacity
-        style={styles.card}
+        style={[styles.card, { backgroundColor: colors.surface }, shadows.lg]}
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -107,14 +93,14 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
         <View style={styles.imageContainer}>
           <Image
             source={{ uri: recipe.thumbnail }}
-            style={styles.image}
+            style={[styles.image, { backgroundColor: colors.divider }]}
             resizeMode="cover"
           />
           <LinearGradient colors={gradients.overlay} style={styles.gradient} />
 
           {/* Botón de favorito */}
           <TouchableOpacity
-            style={styles.favoriteButton}
+            style={[styles.favoriteButton, shadows.sm]}
             onPress={handleFavoritePress}
             activeOpacity={0.7}
           >
@@ -128,32 +114,47 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
 
         {/* Contenido */}
         <View style={styles.content}>
-          <Text style={styles.title} numberOfLines={2}>
+          <Text
+            style={[styles.title, { color: colors.text }]}
+            numberOfLines={2}
+          >
             {recipe.title}
           </Text>
 
           {/* Tags de categoría y área */}
           <View style={styles.infoRow}>
             {recipe.category && (
-              <View style={styles.tag}>
+              <View
+                style={[styles.tag, { backgroundColor: colors.primaryLight }]}
+              >
                 <Ionicons
                   name="pricetag"
                   size={12}
-                  color={colors.surface}
+                  color={colors.textInverse}
                   style={styles.tagIcon}
                 />
-                <Text style={styles.tagText}>{recipe.category}</Text>
+                <Text style={[styles.tagText, { color: colors.textInverse }]}>
+                  {recipe.category}
+                </Text>
               </View>
             )}
             {recipe.area && (
-              <View style={[styles.tag, styles.tagArea]}>
+              <View
+                style={[
+                  styles.tag,
+                  styles.tagArea,
+                  { backgroundColor: colors.secondaryLight },
+                ]}
+              >
                 <Ionicons
                   name="globe-outline"
                   size={12}
-                  color={colors.surface}
+                  color={colors.textSecondary}
                   style={styles.tagIcon}
                 />
-                <Text style={styles.tagText}>{recipe.area}</Text>
+                <Text style={[styles.tagText, { color: colors.textSecondary }]}>
+                  {recipe.area}
+                </Text>
               </View>
             )}
           </View>
@@ -165,11 +166,9 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
     borderRadius: borderRadius.lg,
     marginBottom: spacing.md,
     overflow: "hidden",
-    ...shadows.lg,
   },
   imageContainer: {
     position: "relative",
@@ -179,7 +178,6 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
-    backgroundColor: colors.divider,
   },
   gradient: {
     position: "absolute",
@@ -198,17 +196,15 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     alignItems: "center",
-    ...shadows.sm,
   },
   content: {
     padding: spacing.md,
   },
   title: {
-    fontSize: fontSize.lg,
+    fontSize: typography.fontSize.lg,
     fontWeight: "700",
-    color: colors.text,
     marginBottom: spacing.sm,
-    lineHeight: fontSize.lg * 1.3,
+    lineHeight: typography.fontSize.lg * 1.3,
   },
   infoRow: {
     flexDirection: "row",
@@ -216,7 +212,6 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   tag: {
-    backgroundColor: colors.primaryLight,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.md,
@@ -224,14 +219,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   tagArea: {
-    backgroundColor: colors.secondaryLight,
+    // Override if needed
   },
   tagIcon: {
     marginRight: 4,
   },
   tagText: {
-    fontSize: fontSize.xs,
-    color: colors.surface,
+    fontSize: typography.fontSize.xs,
     fontWeight: "600",
   },
 });

@@ -3,12 +3,6 @@ import { spacing, typography } from "@/src/theme";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const fontSize = {
-  md: typography.fontSize.base,
-  lg: typography.fontSize.lg,
-  xl: typography.fontSize.xl,
-};
-
 interface ErrorViewProps {
   message?: string;
   onRetry?: () => void;
@@ -52,7 +46,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   message: {
-    fontSize: fontSize.md,
+    fontSize: typography.fontSize.base,
     textAlign: "center",
     marginBottom: spacing.lg,
   },
@@ -62,7 +56,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   buttonText: {
-    fontSize: fontSize.md,
+    fontSize: typography.fontSize.base,
     fontWeight: "600",
   },
 });

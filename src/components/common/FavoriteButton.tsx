@@ -1,17 +1,7 @@
-import { colors } from "@/src/theme";
+import { useTheme } from "@/src/hooks";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Animated, StyleSheet, TouchableOpacity } from "react-native";
-
-const shadows = {
-  md: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-};
 
 interface FavoriteButtonProps {
   isFavorite: boolean;
@@ -24,6 +14,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   onPress,
   size = 24,
 }) => {
+  const { colors } = useTheme();
   const scaleValue = React.useRef(new Animated.Value(1)).current;
 
   const handlePress = () => {
@@ -44,9 +35,19 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     onPress();
   };
 
+  const shadows = {
+    md: {
+      shadowColor: colors.primaryDark,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 4,
+    },
+  };
+
   return (
     <TouchableOpacity
-      style={styles.button}
+      style={[styles.button, { backgroundColor: colors.surface }, shadows.md]}
       onPress={handlePress}
       activeOpacity={0.7}
     >
@@ -66,10 +67,8 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.surface,
     justifyContent: "center",
     alignItems: "center",
-    ...shadows.md,
   },
 });
 
