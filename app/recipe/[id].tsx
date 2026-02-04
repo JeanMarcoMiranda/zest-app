@@ -3,9 +3,9 @@ import {
   FavoriteButton,
   LoadingSpinner,
 } from "@/src/components/common";
-import { useFavorites } from "@/src/hooks";
+import { useFavorites, useTheme } from "@/src/hooks";
 import { getRecipeById } from "@/src/services";
-import { colors, spacing, typography } from "@/src/theme";
+import { spacing, typography } from "@/src/theme";
 import { Recipe } from "@/src/types/recipe.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -21,36 +21,11 @@ import {
   View,
 } from "react-native";
 
-const fontSize = {
-  xs: typography.fontSize.xs,
-  sm: typography.fontSize.sm,
-  md: typography.fontSize.base,
-  lg: typography.fontSize.lg,
-  xl: typography.fontSize.xl,
-  xxl: typography.fontSize["2xl"],
-};
-
-const shadows = {
-  sm: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  md: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-};
-
 export default function RecipeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { colors, isDark } = useTheme();
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
@@ -112,9 +87,31 @@ export default function RecipeDetailScreen() {
     );
   }
 
+  const shadows = {
+    sm: {
+      shadowColor: colors.primaryDark,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    md: {
+      shadowColor: colors.primaryDark,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 4,
+    },
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <StatusBar
+        barStyle={isDark ? "light-content" : "dark-content"}
+        backgroundColor={colors.background}
+      />
 
       <ScrollView
         style={styles.scrollView}
@@ -124,7 +121,7 @@ export default function RecipeDetailScreen() {
         <View style={styles.imageContainer}>
           <Image
             source={{ uri: recipe.thumbnail }}
-            style={styles.image}
+            style={[styles.image, { backgroundColor: colors.divider }]}
             resizeMode="cover"
           />
           <View style={styles.favoriteButtonContainer}>
@@ -137,27 +134,35 @@ export default function RecipeDetailScreen() {
 
         <View style={styles.content}>
           {/* Título */}
-          <Text style={styles.title}>{recipe.title}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>
+            {recipe.title}
+          </Text>
 
           {/* Tags */}
           <View style={styles.tagsContainer}>
-            <View style={styles.tag}>
+            <View
+              style={[styles.tag, { backgroundColor: colors.primaryLight }]}
+            >
               <Ionicons
                 name="pricetag"
                 size={14}
-                color={colors.surface}
+                color={colors.textInverse}
                 style={styles.tagIcon}
               />
-              <Text style={styles.tagText}>{recipe.category}</Text>
+              <Text style={[styles.tagText, { color: colors.textInverse }]}>
+                {recipe.category}
+              </Text>
             </View>
-            <View style={styles.tag}>
+            <View style={[styles.tag, { backgroundColor: colors.secondary }]}>
               <Ionicons
                 name="globe-outline"
                 size={14}
-                color={colors.surface}
+                color={colors.textSecondary}
                 style={styles.tagIcon}
               />
-              <Text style={styles.tagText}>{recipe.area}</Text>
+              <Text style={[styles.tagText, { color: colors.textSecondary }]}>
+                {recipe.area}
+              </Text>
             </View>
           </View>
 
@@ -169,14 +174,31 @@ export default function RecipeDetailScreen() {
                 size={20}
                 color={colors.primary}
               />
-              <Text style={styles.sectionTitle}>Ingredientes</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Ingredientes
+              </Text>
             </View>
-            <View style={styles.card}>
+            <View
+              style={[
+                styles.card,
+                { backgroundColor: colors.surface },
+                shadows.sm,
+              ]}
+            >
               {recipe.ingredients.map((ingredient, index) => (
                 <View key={index} style={styles.ingredientRow}>
-                  <Text style={styles.ingredientBullet}>•</Text>
-                  <Text style={styles.ingredientText}>
-                    <Text style={styles.ingredientMeasure}>
+                  <Text
+                    style={[styles.ingredientBullet, { color: colors.primary }]}
+                  >
+                    •
+                  </Text>
+                  <Text style={[styles.ingredientText, { color: colors.text }]}>
+                    <Text
+                      style={[
+                        styles.ingredientMeasure,
+                        { color: colors.primary },
+                      ]}
+                    >
                       {ingredient.measure}
                     </Text>{" "}
                     {ingredient.name}
@@ -194,14 +216,28 @@ export default function RecipeDetailScreen() {
                 size={20}
                 color={colors.primary}
               />
-              <Text style={styles.sectionTitle}>Instrucciones</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Instrucciones
+              </Text>
             </View>
-            <View style={styles.card}>
-              <Text style={styles.instructionsPreview} numberOfLines={3}>
+            <View
+              style={[
+                styles.card,
+                { backgroundColor: colors.surface },
+                shadows.sm,
+              ]}
+            >
+              <Text
+                style={[styles.instructionsPreview, { color: colors.text }]}
+                numberOfLines={3}
+              >
                 {recipe.instructions}
               </Text>
-              <Text style={styles.instructionsHint}>
-                Toca "Comenzar a Cocinar" para ver todas las instrucciones
+              <Text
+                style={[styles.instructionsHint, { color: colors.textLight }]}
+              >
+                Toca &quot;Comenzar a Cocinar&quot; para ver todas las
+                instrucciones
               </Text>
             </View>
           </View>
@@ -211,12 +247,30 @@ export default function RecipeDetailScreen() {
             <View style={styles.section}>
               <View style={styles.sectionTitleRow}>
                 <Ionicons name="pricetags" size={20} color={colors.primary} />
-                <Text style={styles.sectionTitle}>Etiquetas</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  Etiquetas
+                </Text>
               </View>
               <View style={styles.tagsRow}>
                 {recipe.tags.map((tag, index) => (
-                  <View key={index} style={styles.tagSmall}>
-                    <Text style={styles.tagSmallText}>{tag}</Text>
+                  <View
+                    key={index}
+                    style={[
+                      styles.tagSmall,
+                      {
+                        backgroundColor: colors.background,
+                        borderColor: colors.border,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.tagSmallText,
+                        { color: colors.textSecondary },
+                      ]}
+                    >
+                      {tag}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -224,9 +278,18 @@ export default function RecipeDetailScreen() {
           )}
 
           {/* Botón de cocinar */}
-          <TouchableOpacity style={styles.button} onPress={handleStartCooking}>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              { backgroundColor: colors.primary },
+              shadows.md,
+            ]}
+            onPress={handleStartCooking}
+          >
             <Ionicons name="flame" size={24} color={colors.textInverse} />
-            <Text style={styles.buttonText}>Comenzar a Cocinar</Text>
+            <Text style={[styles.buttonText, { color: colors.textInverse }]}>
+              Comenzar a Cocinar
+            </Text>
           </TouchableOpacity>
 
           {/* Espacio inferior */}
@@ -240,7 +303,6 @@ export default function RecipeDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   scrollView: {
     flex: 1,
@@ -251,7 +313,6 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: 300,
-    backgroundColor: colors.divider,
   },
   favoriteButtonContainer: {
     position: "absolute",
@@ -262,9 +323,8 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   title: {
-    fontSize: fontSize.xxl,
+    fontSize: typography.fontSize["2xl"],
     fontWeight: "700",
-    color: colors.text,
     marginBottom: spacing.md,
   },
   tagsContainer: {
@@ -274,7 +334,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   tag: {
-    backgroundColor: colors.primaryLight,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: 8,
@@ -285,8 +344,7 @@ const styles = StyleSheet.create({
     marginRight: spacing.xs,
   },
   tagText: {
-    fontSize: fontSize.sm,
-    color: colors.surface,
+    fontSize: typography.fontSize.sm,
     fontWeight: "600",
   },
   section: {
@@ -299,43 +357,35 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   sectionTitle: {
-    fontSize: fontSize.lg,
+    fontSize: typography.fontSize.lg,
     fontWeight: "600",
-    color: colors.text,
   },
   card: {
-    backgroundColor: colors.surface,
     padding: spacing.md,
     borderRadius: 12,
-    ...shadows.sm,
   },
   ingredientRow: {
     flexDirection: "row",
     marginBottom: spacing.sm,
   },
   ingredientBullet: {
-    fontSize: fontSize.md,
-    color: colors.primary,
+    fontSize: typography.fontSize.base,
     marginRight: spacing.sm,
     fontWeight: "700",
   },
   ingredientText: {
     flex: 1,
-    fontSize: fontSize.md,
-    color: colors.text,
+    fontSize: typography.fontSize.base,
   },
   ingredientMeasure: {
     fontWeight: "600",
-    color: colors.primary,
   },
   instructionsPreview: {
-    fontSize: fontSize.md,
-    color: colors.text,
+    fontSize: typography.fontSize.base,
     lineHeight: 22,
   },
   instructionsHint: {
-    fontSize: fontSize.sm,
-    color: colors.textLight,
+    fontSize: typography.fontSize.sm,
     fontStyle: "italic",
     marginTop: spacing.sm,
   },
@@ -345,20 +395,16 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   tagSmall: {
-    backgroundColor: colors.background,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: colors.border,
   },
   tagSmallText: {
-    fontSize: fontSize.xs,
-    color: colors.textSecondary,
+    fontSize: typography.fontSize.xs,
     fontWeight: "500",
   },
   button: {
-    backgroundColor: colors.primary,
     padding: spacing.md,
     borderRadius: 12,
     alignItems: "center",
@@ -366,11 +412,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     gap: spacing.sm,
-    ...shadows.md,
   },
   buttonText: {
-    color: colors.textInverse,
-    fontSize: fontSize.md,
+    fontSize: typography.fontSize.base,
     fontWeight: "700",
   },
 });

@@ -1,9 +1,11 @@
 // app/_layout.tsx
 
-import { colors } from "@/src/theme";
+import { useTheme } from "@/src/hooks";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
+  const { colors } = useTheme();
+
   return (
     <Stack
       screenOptions={{

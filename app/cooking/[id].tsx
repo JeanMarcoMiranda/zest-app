@@ -2,8 +2,9 @@
 
 import { ErrorView, LoadingSpinner } from "@/src/components/common";
 import { Step, StepItem } from "@/src/components/cooking";
+import { useTheme } from "@/src/hooks";
 import { getRecipeById } from "@/src/services";
-import { colors, spacing, typography } from "@/src/theme";
+import { spacing, typography } from "@/src/theme";
 import { Recipe } from "@/src/types/recipe.types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,45 +20,14 @@ import {
   View,
 } from "react-native";
 
-const fontSize = {
-  xs: typography.fontSize.xs,
-  sm: typography.fontSize.sm,
-  md: typography.fontSize.base,
-  lg: typography.fontSize.lg,
-};
-
-const borderRadius = {
-  lg: 12,
-  round: 9999,
-};
-
-const shadows = {
-  lg: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  md: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-};
-
-const gradients = {
-  header: [colors.primary, "#FF8E53"] as const,
-};
-
 export default function CookingStepsScreen() {
   const { id, recipeData } = useLocalSearchParams<{
     id: string;
     recipeData?: string;
   }>();
   const router = useRouter();
+  const { colors } = useTheme();
+
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
@@ -129,12 +99,36 @@ export default function CookingStepsScreen() {
   const progress = (completedSteps.length / totalSteps) * 100;
   const allCompleted = completedSteps.length === totalSteps;
 
+  const shadows = {
+    lg: {
+      shadowColor: colors.primaryDark,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+    md: {
+      shadowColor: colors.primaryDark,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 4,
+    },
+  };
+
+  const gradientColors = [colors.primary, colors.primaryLight] as const;
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
 
       {/* Header con gradiente */}
-      <LinearGradient colors={gradients.header} style={styles.headerGradient}>
+      <LinearGradient
+        colors={gradientColors}
+        style={[styles.headerGradient, shadows.lg]}
+      >
         <View style={styles.header}>
           <View style={styles.headerContent}>
             <Text style={styles.recipeTitle} numberOfLines={1}>
@@ -162,12 +156,19 @@ export default function CookingStepsScreen() {
 
         {/* Barra de progreso */}
         <View style={styles.progressBarContainer}>
-          <View style={[styles.progressBar, { width: `${progress}%` }]} />
+          <View
+            style={[
+              styles.progressBar,
+              { width: `${progress}%`, backgroundColor: colors.textInverse },
+            ]}
+          />
         </View>
       </LinearGradient>
 
       {/* Steps List */}
-      <ScrollView style={styles.stepsContainer}>
+      <ScrollView
+        style={[styles.stepsContainer, { backgroundColor: colors.background }]}
+      >
         {steps.map((step, index) => (
           <StepItem
             key={step.number}
@@ -183,11 +184,19 @@ export default function CookingStepsScreen() {
       </ScrollView>
 
       {/* Botón de finalizar */}
-      <View style={styles.footer}>
+      <View
+        style={[
+          styles.footer,
+          { backgroundColor: colors.surface, borderTopColor: colors.divider },
+          shadows.lg,
+        ]}
+      >
         <TouchableOpacity
           style={[
             styles.finishButton,
-            allCompleted && styles.finishButtonActive,
+            { backgroundColor: colors.primary },
+            allCompleted && { backgroundColor: colors.success },
+            shadows.md,
           ]}
           onPress={handleFinish}
         >
@@ -196,7 +205,9 @@ export default function CookingStepsScreen() {
             size={24}
             color={colors.textInverse}
           />
-          <Text style={styles.finishButtonText}>
+          <Text
+            style={[styles.finishButtonText, { color: colors.textInverse }]}
+          >
             {allCompleted ? "¡Receta Completada!" : "Finalizar Receta"}
           </Text>
         </TouchableOpacity>
@@ -208,10 +219,9 @@ export default function CookingStepsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   headerGradient: {
-    ...shadows.lg,
+    // shadow handled dynamically
   },
   header: {
     flexDirection: "row",
@@ -225,9 +235,9 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
   },
   recipeTitle: {
-    fontSize: fontSize.lg,
+    fontSize: typography.fontSize.lg,
     fontWeight: "700",
-    color: colors.textInverse,
+    color: "#FFFFFF",
     marginBottom: spacing.xs,
   },
   progressInfo: {
@@ -236,15 +246,15 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   progressText: {
-    fontSize: fontSize.sm,
-    color: colors.textInverse,
+    fontSize: typography.fontSize.sm,
+    color: "#FFFFFF",
     opacity: 0.9,
     fontWeight: "500",
   },
   closeButton: {
     width: 40,
     height: 40,
-    borderRadius: borderRadius.round,
+    borderRadius: 9999,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     justifyContent: "center",
     alignItems: "center",
@@ -255,35 +265,24 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: "100%",
-    backgroundColor: colors.textInverse,
   },
   stepsContainer: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   footer: {
     padding: spacing.lg,
-    backgroundColor: colors.surface,
     borderTopWidth: 1,
-    borderTopColor: colors.divider,
-    ...shadows.lg,
   },
   finishButton: {
-    backgroundColor: colors.primary,
     padding: spacing.md,
-    borderRadius: borderRadius.lg,
+    borderRadius: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: spacing.sm,
-    ...shadows.md,
-  },
-  finishButtonActive: {
-    backgroundColor: colors.success,
   },
   finishButtonText: {
-    color: colors.textInverse,
-    fontSize: fontSize.md,
+    fontSize: typography.fontSize.base,
     fontWeight: "700",
   },
 });

@@ -56,74 +56,69 @@ const palette = {
  * Colores semánticos para el Modo Claro (Light Mode)
  */
 export const lightColors = {
-  // Brand
   primary: palette.scarlet,
   primaryLight: palette.scarletLight,
   primaryDark: palette.scarletDark,
+  onPrimary: palette.offWhite,
 
   secondary: palette.warmBeige,
-  secondaryLight: palette.warmBeigeLight,
-  secondaryDark: palette.warmBeigeDark,
+  onSecondary: palette.charcoal,
 
   accent: palette.brown,
-  accentLight: palette.brownLight,
-  accentDark: palette.brownDark,
+  onAccent: palette.offWhite,
 
-  // Backgrounds
   background: palette.offWhite,
   surface: palette.cream,
   surfaceVariant: palette.lightGray,
+  card: palette.cream,
 
-  // Text
   text: palette.charcoal,
-  textSecondary: palette.brown,
+  textSecondary: palette.gray,
   textLight: palette.gray,
-  textInverse: palette.white,
+  textInverse: palette.offWhite,
 
-  // UI Elements
-  border: palette.warmBeige,
+  border: palette.lightGray,
   divider: palette.lightGray,
 
-  // Feedback
+  placeholder: palette.gray,
+  disabled: palette.warmBeigeDark,
+
   success: palette.green,
   warning: palette.orange,
   error: palette.red,
   info: palette.blue,
 };
-
 /**
  * Colores semánticos para el Modo Oscuro (Dark Mode)
  */
 export const darkColors = {
-  // Brand
   primary: palette.softRed,
   primaryLight: palette.softRedLight,
   primaryDark: palette.softRedDark,
+  onPrimary: palette.blackChocolate,
 
   secondary: palette.mutedBeige,
-  secondaryLight: palette.mutedBeigeLight,
-  secondaryDark: palette.mutedBeigeDark,
+  onSecondary: palette.blackChocolate,
 
-  accent: palette.mutedBeige,
-  accentLight: palette.grayLight,
-  accentDark: palette.mutedBeigeDark,
+  accent: palette.warmBeigeLight,
+  onAccent: palette.blackChocolate,
 
-  // Backgrounds
   background: palette.blackChocolate,
   surface: palette.darkBrown,
   surfaceVariant: palette.mediumBrown,
+  card: palette.darkBrown,
 
-  // Text
   text: palette.grayLight,
-  textSecondary: palette.mutedBeige,
+  textSecondary: palette.mutedBeigeLight,
   textLight: palette.mutedBeigeDark,
   textInverse: palette.charcoal,
 
-  // UI Elements
   border: palette.mediumBrown,
-  divider: palette.darkBrown,
+  divider: palette.mediumBrown,
 
-  // Feedback
+  placeholder: palette.mutedBeigeDark,
+  disabled: palette.mediumBrown,
+
   success: palette.greenLight,
   warning: palette.orangeLight,
   error: palette.redLight,
