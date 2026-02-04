@@ -74,7 +74,7 @@ const shadows = {
 };
 
 const gradients = {
-  header: [colors.primary[500], "#FF8E53"] as const,
+  header: [colors.primary, "#FF8E53"] as const,
   card: ["#FFFFFF", "#F8F9FA"] as const,
 };
 
@@ -107,8 +107,8 @@ export default function HomeScreen() {
         // Filtrar por categoría
         data = await getRecipesByCategory(selectedCategory);
       } else {
-        // Recetas aleatorias
-        data = await getRandomRecipes(10);
+        // Recetas aleatorias (reducido a 6 para mejor rendimiento)
+        data = await getRandomRecipes(6);
       }
 
       setRecipes(data);

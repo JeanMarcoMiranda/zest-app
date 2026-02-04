@@ -21,17 +21,20 @@ export default function RootLayout() {
         },
       }}
     >
+      {/* Tabs como pantalla principal */}
       <Stack.Screen
-        name="index"
+        name="(tabs)"
         options={{
           headerShown: false,
-          title: "Home",
         }}
       />
+
+      {/* Pantallas modales/detalle */}
       <Stack.Screen
         name="recipe/[id]"
         options={{
           title: "Detalle de Receta",
+          presentation: "card",
         }}
       />
       <Stack.Screen
@@ -39,12 +42,7 @@ export default function RootLayout() {
         options={{
           title: "Preparación",
           headerBackTitle: "Volver",
-        }}
-      />
-      <Stack.Screen
-        name="favorites"
-        options={{
-          title: "Mis Favoritos",
+          presentation: "card",
         }}
       />
     </Stack>

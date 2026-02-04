@@ -49,7 +49,7 @@ const shadows = {
 };
 
 const gradients = {
-  header: [colors.primary[500], "#FF8E53"] as const,
+  header: [colors.primary, "#FF8E53"] as const,
 };
 
 export default function CookingStepsScreen() {
