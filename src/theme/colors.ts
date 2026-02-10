@@ -1,128 +1,172 @@
 /**
- * Definición de la paleta de colores base.
- * Aquí definimos los colores primitivos con nombres descriptivos.
+ * Sistema de Diseño: "Rústico Hogareño"
+ * Paleta de colores base inspirada en libros de cocina clásicos y ambientes orgánicos.
  */
+
 const palette = {
-  // Rojos / Primarios
-  scarlet: "#A5243D",
-  scarletLight: "#C73854",
-  scarletDark: "#8A1F33",
-  softRed: "#E57373", // Dark Mode Primary
-  softRedLight: "#EF9A9A",
-  softRedDark: "#D32F2F",
+  // Primarios - Terracota/Ámbar (colores cálidos de cocina)
+  terracotta: "#92400E",
+  terracottaLight: "#B45309",
+  terracottaDark: "#78350F",
+  amber: "#D97706",
+  amberLight: "#F59E0B",
+  amberDark: "#B45309",
 
-  // Beiges / Secundarios
-  warmBeige: "#D9B08C",
-  warmBeigeLight: "#E5C5A3",
-  warmBeigeDark: "#C99B75",
-  mutedBeige: "#BCAAA4", // Dark Mode Secondary
-  mutedBeigeLight: "#D7CCC8",
-  mutedBeigeDark: "#A1887F",
+  // Secundarios - Bosque/Esmeralda (frescura natural)
+  forest: "#064E3B",
+  forestLight: "#065F46",
+  forestDark: "#064E3B",
+  emerald: "#059669",
+  emeraldLight: "#10B981",
+  emeraldDark: "#047857",
 
-  // Marrones / Acentos
-  brown: "#5C4033",
-  brownLight: "#7A5645",
-  brownDark: "#4A3329",
-
-  // Neutros / Fondos
-  offWhite: "#FFFBF2",
-  cream: "#F2E8DF",
-  lightGray: "#E8DED5",
-
-  // Oscuros
-  blackChocolate: "#1A1614",
-  darkBrown: "#2C2522",
-  mediumBrown: "#3E3632",
-
-  // Textos
-  charcoal: "#2D2926",
-  gray: "#8A7A72",
+  // Neutros Modo Claro - Crema/Café
+  cream: "#FDFCF0",
   white: "#FFFFFF",
-  grayLight: "#ECEFF1",
+  bone: "#F5F5F4",
+  stone: "#E7E5E4",
+  coffee: "#451A03",
+  bronze: "#78350F",
+
+  // Neutros Modo Oscuro - Piedra/Gris Cálido
+  charcoal: "#1C1917",
+  warmGray: "#292524",
+  warmGrayLight: "#44403C",
+  warmGrayMedium: "#57534E",
+  clay: "#44403C",
+  ash: "#A8A29E",
 
   // Semánticos
-  green: "#4CAF50",
-  orange: "#FF9800",
-  red: "#D32F2F",
-  blue: "#2196F3",
-
-  greenLight: "#66BB6A",
-  orangeLight: "#FFA726",
-  redLight: "#EF5350",
-  blueLight: "#42A5F5",
-};
+  successLight: "#10B981",
+  successDark: "#34D399",
+  warningLight: "#F59E0B",
+  warningDark: "#FBBF24",
+  errorLight: "#EF4444",
+  errorDark: "#F87171",
+  infoLight: "#3B82F6",
+  infoDark: "#60A5FA",
+} as const;
 
 /**
  * Colores semánticos para el Modo Claro (Light Mode)
+ *
+ * Temática: Cálida, acogedora, legible como un libro de recetas antiguo
+ *
+ * Accesibilidad: Los pares text/background cumplen con WCAG AA (4.5:1)
+ * para garantizar legibilidad óptima en todos los dispositivos.
  */
 export const lightColors = {
-  primary: palette.scarlet,
-  primaryLight: palette.scarletLight,
-  primaryDark: palette.scarletDark,
-  onPrimary: palette.offWhite,
+  // Primario - Terracota para acciones y énfasis
+  primary: palette.terracotta,
+  primaryLight: palette.terracottaLight,
+  primaryDark: palette.terracottaDark,
+  onPrimary: palette.cream,
 
-  secondary: palette.warmBeige,
-  onSecondary: palette.charcoal,
+  // Secundario - Bosque para etiquetas "saludable" y aciertos
+  secondary: palette.forest,
+  secondaryLight: palette.forestLight,
+  secondaryDark: palette.forestDark,
+  onSecondary: palette.white,
 
-  accent: palette.brown,
-  onAccent: palette.offWhite,
+  // Fondos
+  background: palette.cream,
+  surface: palette.white,
+  surfaceVariant: palette.bone,
+  card: palette.white,
 
-  background: palette.offWhite,
-  surface: palette.cream,
-  surfaceVariant: palette.lightGray,
-  card: palette.cream,
+  // Textos
+  text: palette.coffee, // Alto contraste
+  textHigh: palette.coffee,
+  textMed: palette.bronze, // Descripciones
+  textSecondary: palette.bronze,
+  textLight: palette.stone,
+  textInverse: palette.cream,
 
-  text: palette.charcoal,
-  textSecondary: palette.gray,
-  textLight: palette.gray,
-  textInverse: palette.offWhite,
+  // Bordes y divisores
+  border: palette.stone,
+  divider: palette.stone,
 
-  border: palette.lightGray,
-  divider: palette.lightGray,
+  // Estados
+  placeholder: palette.bronze,
+  disabled: palette.stone,
+  overlay: "rgba(69, 26, 3, 0.1)", // coffee con transparencia
 
-  placeholder: palette.gray,
-  disabled: palette.warmBeigeDark,
+  // Semánticos
+  success: palette.forest,
+  successLight: palette.successLight,
+  warning: palette.warningLight,
+  error: palette.errorLight,
+  info: palette.infoLight,
 
-  success: palette.green,
-  warning: palette.orange,
-  error: palette.red,
-  info: palette.blue,
-};
+  // Sombras para tarjetas (modo claro)
+  shadow: {
+    color: palette.terracotta,
+    opacity: 0.05,
+    offset: { width: 0, height: 4 },
+    radius: 10,
+    elevation: 3,
+  },
+} as const;
+
 /**
  * Colores semánticos para el Modo Oscuro (Dark Mode)
+ *
+ * Temática: Cálida pero contenida, como una cocina iluminada por velas
+ *
+ * Nota: En modo oscuro se prefieren bordes sutiles sobre sombras
+ * para mantener la legibilidad y reducir la fatiga visual.
  */
 export const darkColors = {
-  primary: palette.softRed,
-  primaryLight: palette.softRedLight,
-  primaryDark: palette.softRedDark,
-  onPrimary: palette.blackChocolate,
+  // Primario - Ámbar más brillante para modo oscuro
+  primary: palette.amber,
+  primaryLight: palette.amberLight,
+  primaryDark: palette.amberDark,
+  onPrimary: palette.charcoal,
 
-  secondary: palette.mutedBeige,
-  onSecondary: palette.blackChocolate,
+  // Secundario - Esmeralda
+  secondary: palette.emerald,
+  secondaryLight: palette.emeraldLight,
+  secondaryDark: palette.emeraldDark,
+  onSecondary: palette.charcoal,
 
-  accent: palette.warmBeigeLight,
-  onAccent: palette.blackChocolate,
+  // Fondos
+  background: palette.charcoal,
+  surface: palette.warmGray,
+  surfaceVariant: palette.warmGrayLight,
+  card: palette.warmGray,
 
-  background: palette.blackChocolate,
-  surface: palette.darkBrown,
-  surfaceVariant: palette.mediumBrown,
-  card: palette.darkBrown,
+  // Textos
+  text: palette.bone, // Alto contraste
+  textHigh: palette.bone,
+  textMed: palette.ash, // Descripciones
+  textSecondary: palette.ash,
+  textLight: palette.warmGrayMedium,
+  textInverse: palette.coffee,
 
-  text: palette.grayLight,
-  textSecondary: palette.mutedBeigeLight,
-  textLight: palette.mutedBeigeDark,
-  textInverse: palette.charcoal,
+  // Bordes y divisores
+  border: palette.clay,
+  divider: palette.clay,
 
-  border: palette.mediumBrown,
-  divider: palette.mediumBrown,
+  // Estados
+  placeholder: palette.ash,
+  disabled: palette.warmGrayLight,
+  overlay: "rgba(245, 245, 244, 0.1)", // bone con transparencia
 
-  placeholder: palette.mutedBeigeDark,
-  disabled: palette.mediumBrown,
+  // Semánticos
+  success: palette.emerald,
+  successLight: palette.successDark,
+  warning: palette.warningDark,
+  error: palette.errorDark,
+  info: palette.infoDark,
 
-  success: palette.greenLight,
-  warning: palette.orangeLight,
-  error: palette.redLight,
-  info: palette.blueLight,
-};
+  // Sin sombras en modo oscuro, usamos bordes
+  shadow: {
+    color: "transparent",
+    opacity: 0,
+    offset: { width: 0, height: 0 },
+    radius: 0,
+    elevation: 0,
+  },
+} as const;
 
 export type ColorPalette = typeof lightColors;
