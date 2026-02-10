@@ -12,6 +12,7 @@ export interface RecipesSlice {
   fetchRecipes: (query?: string) => Promise<void>;
   fetchRecipeById: (id: string) => Promise<void>;
   fetchRandomRecipes: (count?: number) => Promise<void>;
+  fetchRecipesByCategory: (category: string) => Promise<void>;
   clearError: () => void;
 }
 
@@ -51,6 +52,19 @@ export const createRecipesSlice: StateCreator<RecipesSlice> = (set) => ({
     set({ isLoading: true, error: null });
     try {
       const recipes = await recipesApi.getRandomRecipes(count);
+      set({ recipes, isLoading: false });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : "Error desconocido",
+        isLoading: false,
+      });
+    }
+  },
+
+  fetchRecipesByCategory: async (category: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const recipes = await recipesApi.getRecipesByCategory(category);
       set({ recipes, isLoading: false });
     } catch (error) {
       set({

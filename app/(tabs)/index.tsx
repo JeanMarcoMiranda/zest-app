@@ -5,15 +5,9 @@ import {
   SearchBar,
 } from "@/src/components/common";
 import { RecipeCardItem } from "@/src/components/recipe";
-import { useFavorites, useTheme } from "@/src/hooks";
-import {
-  getCategories,
-  getRandomRecipes,
-  getRecipesByCategory,
-  searchRecipes,
-} from "@/src/services";
+import { useFavorites, useRecipes, useTheme } from "@/src/hooks";
+import { getCategories } from "@/src/services";
 import { spacing, typography } from "@/src/theme";
-import { RecipeCard } from "@/src/types/recipe.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -58,12 +52,18 @@ export default function HomeScreen() {
   const { colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
 
-  const [recipes, setRecipes] = useState<RecipeCard[]>([]);
+  const {
+    recipes,
+    isLoading: loading,
+    error: storeError,
+    fetchRecipes,
+    fetchRecipesByCategory,
+    fetchRandomRecipes,
+  } = useRecipes();
+
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
 
@@ -80,25 +80,17 @@ export default function HomeScreen() {
     setCategories(cats);
   };
 
-  const loadRecipes = async () => {
-    try {
-      setError(false);
-      let data: RecipeCard[] = [];
-
-      if (searchQuery.trim() !== "") {
-        data = await searchRecipes(searchQuery);
-      } else if (selectedCategory) {
-        data = await getRecipesByCategory(selectedCategory);
-      } else {
-        data = await getRandomRecipes(6);
-      }
-
-      setRecipes(data);
-    } catch (err) {
-      console.error("Error loading recipes:", err);
-      setError(true);
-    } finally {
-      setLoading(false);
+  const loadRecipesData = async () => {
+    if (searchQuery.trim() !== "") {
+      await fetchRecipes(searchQuery);
+    } else if (selectedCategory) {
+      await fetchRecipesByCategory(selectedCategory);
+    } else {
+      // Si ya hay recetas y no es un refresh explícito, quizás no queramos recargar randoms siempre?
+      // Pero la lógica original recargaba. Mantenemos comportamiento original por ahora.
+      // Optimización: si recipes.length > 0 y no cambió nada, no recargar?
+      // La lógica original era: en mount loadRecipes().
+      await fetchRandomRecipes(6);
     }
   };
 

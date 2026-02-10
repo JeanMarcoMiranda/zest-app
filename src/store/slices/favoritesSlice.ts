@@ -9,6 +9,7 @@ export interface FavoritesSlice {
   addFavorite: (recipe: RecipeCard) => Promise<void>;
   removeFavorite: (id: string) => Promise<void>;
   isFavorite: (id: string) => boolean;
+  clearFavorites: () => Promise<void>;
 }
 export const createFavoritesSlice: StateCreator<FavoritesSlice> = (
   set,
@@ -40,5 +41,10 @@ export const createFavoritesSlice: StateCreator<FavoritesSlice> = (
 
   isFavorite: (id: string) => {
     return get().favorites.some((f) => f.id === id);
+  },
+
+  clearFavorites: async () => {
+    await favoritesStorage.clearFavorites();
+    set({ favorites: [] });
   },
 });

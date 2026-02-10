@@ -1,70 +1,34 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useStore } from "@/src/store";
 import { useCallback, useEffect, useState } from "react";
 import { RecipeCard } from "../types/recipe.types";
-
-const FAVORITES_KEY = "@chefhub_favorites";
 
 export interface FavoriteRecipe extends RecipeCard {
   savedAt: string;
 }
 
 export const useFavorites = () => {
-  const [favorites, setFavorites] = useState<FavoriteRecipe[]>([]);
+  const favorites = useStore((state) => state.favorites);
+  const loadFavorites = useStore((state) => state.loadFavorites);
+  const addFavorite = useStore((state) => state.addFavorite);
+  const removeFavorite = useStore((state) => state.removeFavorite);
+  const storeIsFavorite = useStore((state) => state.isFavorite);
+  const clearFavoritesAction = useStore((state) => state.clearFavorites);
+
   const [loading, setLoading] = useState(true);
 
-  // Cargar favoritos al iniciar
   useEffect(() => {
-    loadFavorites();
-  }, []);
-
-  const loadFavorites = async () => {
-    try {
-      const favoritesJson = await AsyncStorage.getItem(FAVORITES_KEY);
-      if (favoritesJson) {
-        const parsedFavorites = JSON.parse(favoritesJson);
-        setFavorites(parsedFavorites);
-      }
-    } catch (error) {
-      console.error("Error loading favorites:", error);
-    } finally {
+    const init = async () => {
+      await loadFavorites();
       setLoading(false);
-    }
-  };
-
-  const saveFavorites = async (newFavorites: FavoriteRecipe[]) => {
-    try {
-      await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));
-      setFavorites(newFavorites);
-    } catch (error) {
-      console.error("Error saving favorites:", error);
-    }
-  };
+    };
+    init();
+  }, [loadFavorites]);
 
   const isFavorite = useCallback(
     (recipeId: string): boolean => {
-      return favorites.some((fav) => fav.id === recipeId);
+      return storeIsFavorite(recipeId);
     },
-    [favorites],
-  );
-
-  const addFavorite = useCallback(
-    async (recipe: RecipeCard) => {
-      const newFavorite: FavoriteRecipe = {
-        ...recipe,
-        savedAt: new Date().toISOString(),
-      };
-      const newFavorites = [...favorites, newFavorite];
-      await saveFavorites(newFavorites);
-    },
-    [favorites],
-  );
-
-  const removeFavorite = useCallback(
-    async (recipeId: string) => {
-      const newFavorites = favorites.filter((fav) => fav.id !== recipeId);
-      await saveFavorites(newFavorites);
-    },
-    [favorites],
+    [storeIsFavorite],
   );
 
   const toggleFavorite = useCallback(
@@ -78,15 +42,6 @@ export const useFavorites = () => {
     [isFavorite, addFavorite, removeFavorite],
   );
 
-  const clearAllFavorites = useCallback(async () => {
-    try {
-      await AsyncStorage.removeItem(FAVORITES_KEY);
-      setFavorites([]);
-    } catch (error) {
-      console.error("Error clearing favorites:", error);
-    }
-  }, []);
-
   return {
     favorites,
     loading,
@@ -94,6 +49,6 @@ export const useFavorites = () => {
     addFavorite,
     removeFavorite,
     toggleFavorite,
-    clearAllFavorites,
+    clearAllFavorites: clearFavoritesAction,
   };
 };

@@ -19,6 +19,7 @@ export const useRecipes = () => {
     fetchRecipes,
     fetchRecipeById,
     fetchRandomRecipes,
+    fetchRecipesByCategory: useStore((state) => state.fetchRecipesByCategory),
     clearError,
   };
 };
