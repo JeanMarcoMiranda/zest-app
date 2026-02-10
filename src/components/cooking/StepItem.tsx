@@ -1,9 +1,13 @@
 import { useTheme } from "@/src/hooks";
-import { fontSize } from "@/src/theme";
 import { createShadow } from "@/src/utils";
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 export interface Step {
   number: number;
@@ -32,6 +36,10 @@ export const StepItem: React.FC<StepItemProps> = ({
   const theme = useTheme();
   const { colors } = theme;
 
+  // Animation values
+  const scale = useSharedValue(1);
+  const checkboxScale = useSharedValue(1);
+
   const getCircleColor = () => {
     if (isCompleted) return colors.success;
     if (isActive) return colors.primary;
@@ -44,57 +52,100 @@ export const StepItem: React.FC<StepItemProps> = ({
     return "radio-button-unchecked";
   };
 
+  // Animated styles for card press
+  const animatedCardStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  // Animated styles for checkbox press
+  const animatedCheckboxStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: checkboxScale.value }],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.98, {
+      damping: 15,
+      stiffness: 300,
+    });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, {
+      damping: 15,
+      stiffness: 300,
+    });
+  };
+
+  const handleCheckboxPressIn = () => {
+    checkboxScale.value = withSpring(0.9, {
+      damping: 15,
+      stiffness: 300,
+    });
+  };
+
+  const handleCheckboxPressOut = () => {
+    checkboxScale.value = withSpring(1, {
+      damping: 15,
+      stiffness: 300,
+    });
+  };
+
   return (
     <View
       style={{
         flexDirection: "row",
-        marginBottom: theme.spacing.md,
+        marginBottom: theme.spacing.lg,
+        paddingHorizontal: theme.screenMargins.horizontal,
       }}
     >
+      {/* Timeline Indicator */}
       <View
         style={{
           alignItems: "center",
           marginRight: theme.spacing.md,
         }}
       >
-        {/* Círculo del paso */}
+        {/* Step Circle Icon */}
         <View
           style={{
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             justifyContent: "center",
             alignItems: "center",
           }}
         >
           <MaterialIcons
             name={getIconName()}
-            size={32}
+            size={36}
             color={getCircleColor()}
           />
         </View>
 
-        {/* Línea conectora */}
+        {/* Connector Line */}
         {!isLast && (
           <View
             style={{
               width: 2,
               flex: 1,
+              minHeight: 24,
               marginTop: theme.spacing.xs,
-              backgroundColor: colors.divider,
+              backgroundColor: isCompleted ? colors.success : colors.divider,
+              opacity: isCompleted ? 0.4 : 1,
             }}
           />
         )}
       </View>
 
-      <View style={{ flex: 1 }}>
-        <TouchableOpacity
+      {/* Step Card */}
+      <Animated.View style={[{ flex: 1 }, animatedCardStyle]}>
+        <Pressable
           style={[
             {
-              padding: theme.spacing.md,
-              borderRadius: theme.borderRadius.lg,
+              padding: theme.spacing.lg,
+              borderRadius: theme.borderRadius.xl,
               borderWidth: 2,
               backgroundColor: colors.surface,
-              borderColor: colors.divider,
+              borderColor: colors.border,
               ...createShadow(theme as any, theme.elevation.low),
             },
             isActive && {
@@ -104,28 +155,32 @@ export const StepItem: React.FC<StepItemProps> = ({
             isCompleted && {
               borderColor: colors.success,
               backgroundColor: colors.surface,
+              opacity: 0.85,
             },
           ]}
           onPress={onPress}
-          activeOpacity={0.7}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
         >
+          {/* Header: Step Number + Checkbox */}
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: theme.spacing.sm,
+              marginBottom: theme.spacing.md,
             }}
           >
             <Text
               style={[
-                theme.typography.button,
+                isActive ? theme.typography.h3 : theme.typography.label,
                 {
                   color: colors.textSecondary,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
                 },
                 isActive && {
                   color: colors.primary,
-                  fontSize: fontSize.lg,
                 },
                 isCompleted && {
                   color: colors.success,
@@ -135,52 +190,78 @@ export const StepItem: React.FC<StepItemProps> = ({
               Paso {step.number}
             </Text>
 
-            {/* Checkbox para marcar como completado */}
-            <TouchableOpacity
-              onPress={onComplete}
-              style={{ padding: theme.spacing.xs }}
-              activeOpacity={0.7}
-            >
-              <MaterialIcons
-                name={isCompleted ? "check-box" : "check-box-outline-blank"}
-                size={24}
-                color={isCompleted ? colors.success : colors.textLight}
-              />
-            </TouchableOpacity>
+            {/* Checkbox with larger touch target */}
+            <Animated.View style={animatedCheckboxStyle}>
+              <Pressable
+                onPress={onComplete}
+                onPressIn={handleCheckboxPressIn}
+                onPressOut={handleCheckboxPressOut}
+                style={{
+                  padding: theme.spacing.sm,
+                  minWidth: 44,
+                  minHeight: 44,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                hitSlop={8}
+              >
+                <MaterialIcons
+                  name={isCompleted ? "check-box" : "check-box-outline-blank"}
+                  size={28}
+                  color={isCompleted ? colors.success : colors.textLight}
+                />
+              </Pressable>
+            </Animated.View>
           </View>
 
+          {/* Step Text - Cooking Mode Typography (20% larger) */}
           <Text
             style={[
-              theme.typography.bodyLg,
+              theme.typography.bodyLgCooking,
               {
-                color: colors.text,
+                color: colors.textHigh,
+                lineHeight: Math.round(19.2 * 1.7), // bodyLgCooking with relaxed line height
               },
               isCompleted && {
-                color: colors.textSecondary,
+                color: colors.textMed,
                 textDecorationLine: "line-through",
+                opacity: 0.7,
               },
             ]}
-            numberOfLines={isActive ? undefined : 2}
+            numberOfLines={isActive ? undefined : 3}
           >
             {step.text}
           </Text>
 
+          {/* Expand Hint for Collapsed Steps */}
           {!isActive && (
-            <Text
-              style={[
-                theme.typography.caption,
-                {
-                  color: colors.textLight,
-                  fontStyle: "italic",
-                  marginTop: theme.spacing.xs,
-                },
-              ]}
+            <View
+              style={{
+                marginTop: theme.spacing.md,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: theme.spacing.xs,
+              }}
             >
-              Toca para ver más
-            </Text>
+              <MaterialIcons
+                name="touch-app"
+                size={14}
+                color={colors.textLight}
+              />
+              <Text
+                style={[
+                  theme.typography.caption,
+                  {
+                    color: colors.textLight,
+                  },
+                ]}
+              >
+                Toca para expandir
+              </Text>
+            </View>
           )}
-        </TouchableOpacity>
-      </View>
+        </Pressable>
+      </Animated.View>
     </View>
   );
 };

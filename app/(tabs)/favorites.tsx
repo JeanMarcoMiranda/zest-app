@@ -1,24 +1,69 @@
 import { LoadingSpinner } from "@/src/components/common";
 import { RecipeCardItem } from "@/src/components/recipe";
 import { useFavorites, useTheme } from "@/src/hooks";
+import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Alert,
   FlatList,
-  SafeAreaView,
+  Pressable,
   StatusBar,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function FavoritesScreen() {
   const router = useRouter();
   const { favorites, loading, clearAllFavorites } = useFavorites();
   const theme = useTheme();
   const { colors, isDark } = theme;
+
+  // Animation values
+  const heartScale = useSharedValue(1);
+  const heartOpacity = useSharedValue(1);
+  const deleteButtonScale = useSharedValue(1);
+
+  // Pulse animation for empty state heart
+  useEffect(() => {
+    if (favorites.length === 0) {
+      heartScale.value = withRepeat(
+        withSequence(
+          withTiming(1.1, { duration: 1000 }),
+          withTiming(1, { duration: 1000 }),
+        ),
+        -1,
+        false,
+      );
+      heartOpacity.value = withRepeat(
+        withSequence(
+          withTiming(0.6, { duration: 1000 }),
+          withTiming(1, { duration: 1000 }),
+        ),
+        -1,
+        false,
+      );
+    }
+  }, [favorites.length, heartScale, heartOpacity]);
+
+  const animatedHeartStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: heartScale.value }],
+    opacity: heartOpacity.value,
+  }));
+
+  const animatedDeleteButtonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: deleteButtonScale.value }],
+  }));
 
   const handleRecipePress = (recipeId: string) => {
     router.push(`/recipe/${recipeId}` as any);
@@ -42,94 +87,151 @@ export default function FavoritesScreen() {
     );
   };
 
+  const handleDeletePressIn = () => {
+    deleteButtonScale.value = withSpring(0.95, {
+      damping: 15,
+      stiffness: 300,
+    });
+  };
+
+  const handleDeletePressOut = () => {
+    deleteButtonScale.value = withSpring(1, {
+      damping: 15,
+      stiffness: 300,
+    });
+  };
+
   if (loading) {
     return <LoadingSpinner message="Cargando favoritos..." />;
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      edges={["top", "bottom"]}
+    >
       <StatusBar
         barStyle={isDark ? "light-content" : "dark-content"}
         backgroundColor={colors.background}
       />
 
       {favorites.length === 0 ? (
+        // Enhanced Empty State
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            padding: theme.spacing.xl,
+            paddingHorizontal: theme.screenMargins.horizontal,
+            paddingVertical: theme.spacing.xl,
           }}
         >
-          <Ionicons name="heart-outline" size={80} color={colors.textLight} />
+          {/* Animated Heart Icon */}
+          <Animated.View style={animatedHeartStyle}>
+            <Ionicons
+              name="heart-outline"
+              size={100}
+              color={colors.primary}
+              style={{ marginBottom: theme.spacing.xl }}
+            />
+          </Animated.View>
+
+          {/* Main Message */}
           <Text
             style={[
-              theme.typography.h2,
+              theme.typography.h1,
               {
-                color: colors.text,
-                marginTop: theme.spacing.lg,
-                marginBottom: theme.spacing.sm,
+                color: colors.textHigh,
+                marginBottom: theme.spacing.md,
                 textAlign: "center",
               },
             ]}
           >
             No tienes favoritos
           </Text>
+
+          {/* Description */}
           <Text
             style={[
               theme.typography.bodyLg,
               {
-                color: colors.textSecondary,
+                color: colors.textMed,
                 textAlign: "center",
-                lineHeight: 22,
+                lineHeight: Math.round(16 * 1.7),
+                maxWidth: 320,
               },
             ]}
           >
-            Guarda tus recetas favoritas tocando el corazón
+            Explora recetas deliciosas y guarda tus favoritas tocando el corazón
           </Text>
         </View>
       ) : (
         <>
-          {/* Header con contador */}
+          {/* Enhanced Header */}
           <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: theme.spacing.md,
-              borderBottomWidth: 1,
-              backgroundColor: colors.surface,
-              borderBottomColor: colors.divider,
-            }}
+            style={[
+              {
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                paddingHorizontal: theme.screenMargins.horizontal,
+                paddingVertical: theme.spacing.lg,
+                backgroundColor: colors.surface,
+                borderBottomWidth: 1,
+                borderBottomColor: colors.border,
+              },
+              createShadow(theme as any, theme.elevation.low),
+            ]}
           >
+            {/* Recipe Count */}
             <Text
               style={[
-                theme.typography.bodyLg,
+                theme.typography.h3,
                 {
-                  color: colors.textSecondary,
-                  fontWeight: "500",
+                  color: colors.textHigh,
                 },
               ]}
             >
               {favorites.length} {favorites.length === 1 ? "receta" : "recetas"}
             </Text>
-            <TouchableOpacity onPress={handleClearAll}>
-              <Text
-                style={[
-                  theme.typography.bodySm,
-                  {
-                    color: colors.error,
-                    fontWeight: "600",
-                  },
-                ]}
+
+            {/* Delete All Button */}
+            <Animated.View style={animatedDeleteButtonStyle}>
+              <Pressable
+                onPress={handleClearAll}
+                onPressIn={handleDeletePressIn}
+                onPressOut={handleDeletePressOut}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: theme.spacing.xs,
+                  paddingVertical: theme.spacing.sm,
+                  paddingHorizontal: theme.spacing.md,
+                  borderRadius: theme.borderRadius.md,
+                  backgroundColor: `${colors.error}15`,
+                  minHeight: 44,
+                }}
               >
-                Eliminar todos
-              </Text>
-            </TouchableOpacity>
+                <Ionicons
+                  name="trash-outline"
+                  size={theme.iconSizes.sm}
+                  color={colors.error}
+                />
+                <Text
+                  style={[
+                    theme.typography.label,
+                    {
+                      color: colors.error,
+                    },
+                  ]}
+                >
+                  Eliminar
+                </Text>
+              </Pressable>
+            </Animated.View>
           </View>
 
-          {/* Lista de favoritos */}
+          {/* Favorites List */}
           <FlatList
             data={favorites}
             keyExtractor={(item) => item.id}
@@ -139,7 +241,11 @@ export default function FavoritesScreen() {
                 onPress={() => handleRecipePress(item.id)}
               />
             )}
-            contentContainerStyle={{ padding: theme.spacing.md }}
+            contentContainerStyle={{
+              paddingHorizontal: theme.screenMargins.horizontal,
+              paddingTop: theme.spacing.lg,
+              paddingBottom: theme.spacing.xl,
+            }}
             showsVerticalScrollIndicator={false}
           />
         </>

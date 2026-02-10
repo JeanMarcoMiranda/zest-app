@@ -9,20 +9,25 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 export default function CookingStepsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const theme = useTheme();
   const { colors } = theme;
-  const { currentRecipe, isLoading, error, fetchRecipeById } = useRecipes();
+  const { currentRecipe, isLoading, fetchRecipeById } = useRecipes();
 
   // Si tenemos la receta en el store y coincide con el ID, la usamos.
   // Si no, la buscamos.
@@ -32,30 +37,41 @@ export default function CookingStepsScreen() {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
+  // Animation for progress bar
+  const progressWidth = useSharedValue(0);
+
   useEffect(() => {
     if (!recipe && id) {
       fetchRecipeById(id);
     }
   }, [id, recipe, fetchRecipeById]);
 
-  if (loading) {
-    return <LoadingSpinner message="Preparando la cocina..." />;
-  }
-
-  if (!recipe) {
-    return <ErrorView message="No pudimos cargar las instrucciones." />;
-  }
-
   // Dividir instrucciones en pasos
-  const steps: Step[] = recipe.instructions
-    .split("\n")
-    .filter((step) => step.trim() !== "")
-    .map((step, index) => ({
-      number: index + 1,
-      text: step.trim(),
-    }));
+  const steps: Step[] = recipe
+    ? recipe.instructions
+        .split("\n")
+        .filter((step) => step.trim() !== "")
+        .map((step, index) => ({
+          number: index + 1,
+          text: step.trim(),
+        }))
+    : [];
 
   const totalSteps = steps.length;
+  const progress =
+    totalSteps > 0 ? (completedSteps.length / totalSteps) * 100 : 0;
+  const allCompleted = completedSteps.length === totalSteps && totalSteps > 0;
+
+  // Animate progress bar
+  useEffect(() => {
+    progressWidth.value = withTiming(progress, {
+      duration: 400,
+    });
+  }, [progress, progressWidth]);
+
+  const animatedProgressStyle = useAnimatedStyle(() => ({
+    width: `${progressWidth.value}%`,
+  }));
 
   const handleStepPress = (index: number) => {
     setCurrentStep(index);
@@ -73,8 +89,13 @@ export default function CookingStepsScreen() {
     router.back();
   };
 
-  const progress = (completedSteps.length / totalSteps) * 100;
-  const allCompleted = completedSteps.length === totalSteps;
+  if (loading) {
+    return <LoadingSpinner message="Preparando la cocina..." />;
+  }
+
+  if (!recipe) {
+    return <ErrorView message="No pudimos cargar las instrucciones." />;
+  }
 
   const gradientColors = [colors.primary, colors.primaryLight] as const;
 
@@ -92,10 +113,12 @@ export default function CookingStepsScreen() {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: theme.spacing.lg,
+            paddingHorizontal: theme.screenMargins.horizontal,
+            paddingVertical: theme.spacing.lg,
             paddingTop: theme.spacing.md,
           }}
         >
+          {/* Recipe Title & Progress Info */}
           <View
             style={{
               flex: 1,
@@ -104,13 +127,13 @@ export default function CookingStepsScreen() {
           >
             <Text
               style={[
-                theme.typography.h3,
+                theme.typography.h2,
                 {
-                  color: "#FFFFFF",
+                  color: colors.textInverse,
                   marginBottom: theme.spacing.xs,
                 },
               ]}
-              numberOfLines={1}
+              numberOfLines={2}
             >
               {recipe.title}
             </Text>
@@ -123,16 +146,15 @@ export default function CookingStepsScreen() {
             >
               <MaterialIcons
                 name="check-circle"
-                size={16}
+                size={theme.iconSizes.sm}
                 color={colors.textInverse}
               />
               <Text
                 style={[
                   theme.typography.bodySm,
                   {
-                    color: "#FFFFFF",
-                    opacity: 0.9,
-                    fontWeight: "500",
+                    color: colors.textInverse,
+                    opacity: 0.95,
                   },
                 ]}
               >
@@ -141,40 +163,57 @@ export default function CookingStepsScreen() {
             </View>
           </View>
 
-          <TouchableOpacity
+          {/* Close Button - Glassmorphism */}
+          <Pressable
             style={{
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               borderRadius: theme.borderRadius.full,
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              backgroundColor: "rgba(255, 255, 255, 0.25)",
               justifyContent: "center",
               alignItems: "center",
+              borderWidth: 1,
+              borderColor: "rgba(255, 255, 255, 0.3)",
             }}
             onPress={() => router.back()}
           >
-            <MaterialIcons name="close" size={24} color={colors.textInverse} />
-          </TouchableOpacity>
+            <MaterialIcons
+              name="close"
+              size={theme.iconSizes.md}
+              color={colors.textInverse}
+            />
+          </Pressable>
         </View>
 
-        {/* Barra de progreso */}
+        {/* Progress Bar - Enhanced */}
         <View
           style={{
-            height: 4,
-            backgroundColor: "rgba(255, 255, 255, 0.3)",
+            height: 6,
+            backgroundColor: "rgba(255, 255, 255, 0.25)",
+            overflow: "hidden",
           }}
         >
-          <View
-            style={{
-              height: "100%",
-              width: `${progress}%`,
-              backgroundColor: colors.textInverse,
-            }}
+          <Animated.View
+            style={[
+              animatedProgressStyle,
+              {
+                height: "100%",
+                backgroundColor: colors.textInverse,
+              },
+            ]}
           />
         </View>
       </LinearGradient>
 
       {/* Steps List */}
-      <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: colors.background }}
+        contentContainerStyle={{
+          paddingTop: theme.spacing.lg,
+          paddingBottom: theme.spacing.xl,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
         {steps.map((step, index) => (
           <StepItem
             key={step.number}
@@ -189,36 +228,39 @@ export default function CookingStepsScreen() {
         ))}
       </ScrollView>
 
-      {/* Botón de finalizar */}
+      {/* Finish Button - Fixed Bottom */}
       <View
         style={[
           {
-            padding: theme.spacing.lg,
+            paddingHorizontal: theme.screenMargins.horizontal,
+            paddingVertical: theme.spacing.lg,
             borderTopWidth: 1,
             backgroundColor: colors.surface,
-            borderTopColor: colors.divider,
+            borderTopColor: colors.border,
           },
           createShadow(theme as any, theme.elevation.high),
         ]}
       >
-        <TouchableOpacity
+        <Pressable
           style={[
             {
-              padding: theme.spacing.md,
+              paddingVertical: theme.spacing.md,
+              paddingHorizontal: theme.spacing.lg,
               borderRadius: theme.borderRadius.md,
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
               gap: theme.spacing.sm,
               backgroundColor: allCompleted ? colors.success : colors.primary,
+              minHeight: 56,
             },
             createShadow(theme as any, theme.elevation.medium),
           ]}
           onPress={handleFinish}
         >
           <MaterialIcons
-            name="check-circle"
-            size={24}
+            name={allCompleted ? "celebration" : "check-circle"}
+            size={theme.iconSizes.md}
             color={colors.textInverse}
           />
           <Text
@@ -231,7 +273,7 @@ export default function CookingStepsScreen() {
           >
             {allCompleted ? "¡Receta Completada!" : "Finalizar Receta"}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
