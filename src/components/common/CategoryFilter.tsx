@@ -1,5 +1,5 @@
 import { useTheme } from "@/src/hooks";
-import { spacing, typography } from "@/src/theme";
+import { borderRadius, spacing } from "@/src/theme";
 import React from "react";
 import {
   ScrollView,
@@ -8,10 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-const borderRadius = {
-  round: 9999,
-};
 
 interface CategoryFilterProps {
   categories: string[];
@@ -102,6 +98,15 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
   );
 };
 
+// Extraer valores del tema para usar en StyleSheet.create()
+const labelStyles = {
+  fontFamily: "Inter-SemiBold",
+  fontSize: 14,
+  fontWeight: "600" as const,
+  lineHeight: 1.5,
+  letterSpacing: 0,
+};
+
 const styles = StyleSheet.create({
   container: {
     borderBottomWidth: 1,
@@ -114,12 +119,11 @@ const styles = StyleSheet.create({
   categoryButton: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    borderRadius: borderRadius.round,
+    borderRadius: borderRadius.full,
     borderWidth: 1,
   },
   categoryText: {
-    fontSize: typography.fontSize.sm,
-    fontWeight: "500",
+    ...labelStyles,
   },
 });
 

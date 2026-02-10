@@ -1,7 +1,7 @@
 import { LoadingSpinner } from "@/src/components/common";
 import { RecipeCardItem } from "@/src/components/recipe";
 import { useFavorites, useTheme } from "@/src/hooks";
-import { spacing, typography } from "@/src/theme";
+import { fontSize, spacing } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -119,11 +119,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerText: {
-    fontSize: typography.fontSize.base,
+    fontSize: fontSize.base,
     fontWeight: "500",
   },
   clearButton: {
-    fontSize: typography.fontSize.sm,
+    fontSize: fontSize.sm,
     fontWeight: "600",
   },
   listContent: {
@@ -136,14 +136,14 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
   },
   emptyTitle: {
-    fontSize: typography.fontSize.xl,
+    fontSize: fontSize.xl,
     fontWeight: "700",
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
     textAlign: "center",
   },
   emptySubtitle: {
-    fontSize: typography.fontSize.base,
+    fontSize: fontSize.base,
     textAlign: "center",
     lineHeight: 22,
   },

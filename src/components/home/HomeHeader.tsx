@@ -1,5 +1,5 @@
 import { useTheme } from "@/src/hooks";
-import { spacing, typography } from "@/src/theme";
+import { borderRadius, fontSize, spacing } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -23,16 +23,6 @@ interface HomeHeaderProps {
   showFilters: boolean;
   onToggleFilters: () => void;
 }
-
-const fontSize = {
-  sm: typography.fontSize.sm,
-  md: typography.fontSize.base,
-};
-
-const borderRadius = {
-  round: 9999,
-  xl: 16,
-};
 
 export const HomeHeader: React.FC<HomeHeaderProps> = ({
   headerHeight,
@@ -186,6 +176,23 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
   );
 };
 
+// Valores del tema extraídos para usar en StyleSheet.create()
+const h1Styles = {
+  fontFamily: "PlayfairDisplay-Bold",
+  fontSize: 32,
+  fontWeight: "700" as const,
+  lineHeight: 1.2,
+  letterSpacing: -0.5,
+};
+
+const captionStyles = {
+  fontFamily: "Inter-Medium",
+  fontSize: 12,
+  fontWeight: "500" as const,
+  lineHeight: 1.4,
+  letterSpacing: 0.2,
+};
+
 const styles = StyleSheet.create({
   headerContainer: {
     overflow: "hidden",
@@ -214,7 +221,7 @@ const styles = StyleSheet.create({
   logoContainer: {
     width: 56,
     height: 56,
-    borderRadius: borderRadius.xl,
+    borderRadius: borderRadius.md,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1.5,
@@ -224,9 +231,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontSize: 28,
-    fontWeight: "800",
-    letterSpacing: -0.5,
+    ...h1Styles,
     marginBottom: 2,
   },
   subtitleRow: {
@@ -235,8 +240,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   subtitle: {
-    fontSize: fontSize.sm,
-    fontWeight: "600",
+    ...captionStyles,
     opacity: 0.95,
   },
   headerActions: {
@@ -245,7 +249,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   recipeBadge: {
-    borderRadius: borderRadius.round,
+    borderRadius: borderRadius.full,
     paddingHorizontal: spacing.md,
     paddingVertical: 6,
     minWidth: 44,
@@ -254,13 +258,13 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
   },
   recipeBadgeText: {
-    fontSize: fontSize.md,
+    fontSize: fontSize.base,
     fontWeight: "700",
   },
   filterToggle: {
     width: 48,
     height: 48,
-    borderRadius: borderRadius.round,
+    borderRadius: borderRadius.full,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1.5,

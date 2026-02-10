@@ -1,5 +1,5 @@
 import { useTheme } from "@/src/hooks";
-import { spacing, typography } from "@/src/theme";
+import { borderRadius, spacing } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -9,21 +9,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-const borderRadius = {
-  lg: 12,
-  round: 9999,
-};
-
-const shadows = {
-  sm: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-};
 
 interface SearchBarProps {
   placeholder?: string;
@@ -88,6 +73,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
   );
 };
 
+// Extraer valores del tema para usar en StyleSheet.create()
+const bodyLgStyles = {
+  fontFamily: "Inter-Regular",
+  fontSize: 16,
+  fontWeight: "500" as const,
+  lineHeight: 1.5,
+  letterSpacing: 0,
+};
+
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: spacing.md,
@@ -96,16 +90,15 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.md,
     paddingHorizontal: spacing.md,
-    ...shadows.sm,
   },
   searchIcon: {
     marginRight: spacing.sm,
   },
   input: {
     flex: 1,
-    fontSize: typography.fontSize.base,
+    ...bodyLgStyles,
     paddingVertical: Platform.OS === "ios" ? spacing.sm + 2 : spacing.sm,
   },
   clearButton: {

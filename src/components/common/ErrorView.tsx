@@ -1,5 +1,5 @@
 import { useTheme } from "@/src/hooks";
-import { spacing, typography } from "@/src/theme";
+import { borderRadius, spacing } from "@/src/theme";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -34,6 +34,23 @@ const ErrorView: React.FC<ErrorViewProps> = ({
   );
 };
 
+// Extraer valores del tema para usar en StyleSheet.create()
+const bodyLgStyles = {
+  fontFamily: "Inter-Regular",
+  fontSize: 16,
+  fontWeight: "500" as const,
+  lineHeight: 1.5,
+  letterSpacing: 0,
+};
+
+const buttonStyles = {
+  fontFamily: "Inter-Bold",
+  fontSize: 16,
+  fontWeight: "700" as const,
+  lineHeight: 1.5,
+  letterSpacing: 0,
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -46,18 +63,17 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   message: {
-    fontSize: typography.fontSize.base,
+    ...bodyLgStyles,
     textAlign: "center",
     marginBottom: spacing.lg,
   },
   button: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    borderRadius: 8,
+    borderRadius: borderRadius.md,
   },
   buttonText: {
-    fontSize: typography.fontSize.base,
-    fontWeight: "600",
+    ...buttonStyles,
   },
 });
 

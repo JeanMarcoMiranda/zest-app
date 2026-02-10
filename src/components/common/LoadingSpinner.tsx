@@ -1,5 +1,5 @@
 import { useTheme } from "@/src/hooks";
-import { spacing, typography } from "@/src/theme";
+import { spacing } from "@/src/theme";
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
@@ -26,6 +26,15 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   );
 };
 
+// Extraer valores del tema para usar en StyleSheet.create()
+const bodyLgStyles = {
+  fontFamily: "Inter-Regular",
+  fontSize: 16,
+  fontWeight: "500" as const,
+  lineHeight: 1.5,
+  letterSpacing: 0,
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -35,7 +44,7 @@ const styles = StyleSheet.create({
   },
   message: {
     marginTop: spacing.md,
-    fontSize: typography.fontSize.base,
+    ...bodyLgStyles,
   },
 });
 

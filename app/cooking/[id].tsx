@@ -3,7 +3,7 @@
 import { ErrorView, LoadingSpinner } from "@/src/components/common";
 import { Step, StepItem } from "@/src/components/cooking";
 import { useRecipes, useTheme } from "@/src/hooks";
-import { spacing, typography } from "@/src/theme";
+import { borderRadius, fontSize, spacing } from "@/src/theme";
 import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
   },
   recipeTitle: {
-    fontSize: typography.fontSize.lg,
+    fontSize: fontSize.lg,
     fontWeight: "700",
     color: "#FFFFFF",
     marginBottom: spacing.xs,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   progressText: {
-    fontSize: typography.fontSize.sm,
+    fontSize: fontSize.sm,
     color: "#FFFFFF",
     opacity: 0.9,
     fontWeight: "500",
@@ -252,14 +252,14 @@ const styles = StyleSheet.create({
   },
   finishButton: {
     padding: spacing.md,
-    borderRadius: 12,
+    borderRadius: borderRadius.md,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: spacing.sm,
   },
   finishButtonText: {
-    fontSize: typography.fontSize.base,
+    fontSize: fontSize.base,
     fontWeight: "700",
   },
 });

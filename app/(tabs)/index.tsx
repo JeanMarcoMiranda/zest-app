@@ -3,7 +3,7 @@ import { FilterSection, HomeHeader } from "@/src/components/home";
 import { RecipeCardItem } from "@/src/components/recipe";
 import { useFavorites, useRecipes, useTheme } from "@/src/hooks";
 import { getCategories } from "@/src/services";
-import { spacing, typography } from "@/src/theme";
+import { borderRadius, iconSizes, spacing, typography } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -16,25 +16,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const fontSize = {
-  xs: typography.fontSize.xs,
-  sm: typography.fontSize.sm,
-  md: typography.fontSize.base,
-  lg: typography.fontSize.lg,
-  xl: typography.fontSize.xl,
-  xxl: typography.fontSize["2xl"],
-  xxxl: typography.fontSize["3xl"],
-};
-
-const borderRadius = {
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  xxl: 24,
-  round: 9999,
-};
 
 // Alturas del header (sin contar safe area)
 const HEADER_CONTENT_EXPANDED = 120;
@@ -221,15 +202,26 @@ export default function HomeScreen() {
     extrapolate: "clamp",
   });
 
-  const shadows = {
-    md: {
-      shadowColor: colors.primaryDark,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 12,
-      elevation: 4,
-    },
-  };
+  // Sombras según especificación del tema
+  const shadows = isDark
+    ? {
+        md: {
+          shadowColor: "transparent",
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0,
+          shadowRadius: 0,
+          elevation: 0,
+        },
+      }
+    : {
+        md: {
+          shadowColor: colors.primary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.05,
+          shadowRadius: 10,
+          elevation: 3,
+        },
+      };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -304,12 +296,16 @@ export default function HomeScreen() {
                 style={[
                   styles.emptyIconContainer,
                   shadows.md,
-                  { backgroundColor: colors.surface },
+                  {
+                    backgroundColor: colors.surface,
+                    borderWidth: isDark ? 1 : 0,
+                    borderColor: colors.border,
+                  },
                 ]}
               >
                 <Ionicons
                   name={searchQuery ? "search-outline" : "restaurant-outline"}
-                  size={64}
+                  size={iconSizes.xl}
                   color={colors.textLight}
                 />
               </View>
@@ -348,21 +344,19 @@ const styles = StyleSheet.create({
   emptyIconContainer: {
     width: 140,
     height: 140,
-    borderRadius: borderRadius.round,
+    borderRadius: borderRadius.full,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: spacing.xl,
   },
   emptyTitle: {
-    fontSize: fontSize.xl,
-    fontWeight: "700",
+    ...typography.h2,
     marginBottom: spacing.sm,
     textAlign: "center",
   },
   emptySubtitle: {
-    fontSize: fontSize.md,
+    ...typography.bodySm,
     textAlign: "center",
-    lineHeight: 22,
     maxWidth: 260,
   },
 });

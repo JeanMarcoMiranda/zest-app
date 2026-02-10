@@ -1,5 +1,5 @@
 import { useFavorites, useTheme } from "@/src/hooks";
-import { spacing, typography } from "@/src/theme";
+import { borderRadius, spacing } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,21 +16,11 @@ import {
 
 import { RecipeCard } from "../../types/recipe.types";
 
-const borderRadius = {
-  md: 8,
-  lg: 12,
-  xl: 16,
-  xxl: 24,
-  round: 9999,
-};
+// Constantes de animación
+const ANIMATION_SCALE_PRESSED = 0.96;
+const ANIMATION_SCALE_FAVORITE = 1.4;
 
-const animation = {
-  scale: {
-    pressed: 0.96,
-    favorite: 1.4, // Más pop
-  },
-};
-
+// Gradientes para overlays
 const gradients = {
   overlay: ["transparent", "rgba(0,0,0,0.7)"] as const,
   overlayLight: ["transparent", "rgba(0,0,0,0.5)"] as const,
@@ -51,7 +41,7 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
-      toValue: animation.scale.pressed,
+      toValue: ANIMATION_SCALE_PRESSED,
       useNativeDriver: true,
       tension: 100,
       friction: 7,
@@ -78,7 +68,7 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
         useNativeDriver: true,
       }),
       Animated.spring(favoriteScaleAnim, {
-        toValue: isFav ? 1 : animation.scale.favorite, // Pop si se activa
+        toValue: isFav ? 1 : ANIMATION_SCALE_FAVORITE, // Pop si se activa
         friction: 3,
         tension: 100,
         useNativeDriver: true,
@@ -202,10 +192,7 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
         <View style={styles.content}>
           <View style={styles.titleRow}>
             <Text
-              style={[
-                styles.title,
-                { color: colors.text, fontSize: typography.fontSize.lg },
-              ]}
+              style={[styles.title, { color: colors.text }]}
               numberOfLines={2}
             >
               {recipe.title}
@@ -247,25 +234,48 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
   );
 };
 
+// Extraer valores del tema para usar en StyleSheet.create()
+const h2Styles = {
+  fontFamily: "PlayfairDisplay-Bold",
+  fontSize: 24,
+  fontWeight: "700" as const,
+  lineHeight: 1.2,
+  letterSpacing: 0,
+};
+
+const bodySmStyles = {
+  fontFamily: "Inter-Regular",
+  fontSize: 14,
+  fontWeight: "400" as const,
+  lineHeight: 1.7,
+  letterSpacing: 0,
+};
+
+const captionStyles = {
+  fontFamily: "Inter-Bold",
+  fontSize: 12,
+  fontWeight: "700" as const,
+  lineHeight: 1.5,
+  letterSpacing: 0.1,
+  textTransform: "uppercase" as const,
+};
+
 const styles = StyleSheet.create({
   cardWrapper: {
     marginBottom: spacing.lg,
     paddingHorizontal: spacing.xs, // Para dar espacio a la sombra lateral
   },
   card: {
-    borderRadius: borderRadius.xxl,
-    overflow: Platform.OS === "android" ? "hidden" : "visible", // En iOS shadows fuera, en Android dentro si overflow hidden (trick)
-    // Pero si usamos overflow hidden para la imagen, perdemos sombra en Android en el mismo container.
-    // Solución: Wrapper externo para layout, inner para radius. Simplificamos:
-    // Mantenemos overflow hidden para que la imagen no se salga.
+    borderRadius: borderRadius.xl,
+    overflow: Platform.OS === "android" ? "hidden" : "visible",
   },
   imageContainer: {
     height: 220,
     width: "100%",
     position: "relative",
-    borderTopLeftRadius: borderRadius.xxl,
-    borderTopRightRadius: borderRadius.xxl,
-    overflow: "hidden", // Recorta la imagen
+    borderTopLeftRadius: borderRadius.xl,
+    borderTopRightRadius: borderRadius.xl,
+    overflow: "hidden",
   },
   placeholder: {
     ...StyleSheet.absoluteFillObject,
@@ -293,21 +303,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: spacing.sm + 2,
     paddingVertical: spacing.xs + 2,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.md,
   },
   categoryText: {
     color: "#FFFFFF",
-    fontSize: typography.fontSize.xs,
-    fontWeight: "700",
+    ...captionStyles,
     letterSpacing: 0.5,
-    textTransform: "uppercase",
   },
   favoriteContainer: {
     position: "absolute",
     top: spacing.md,
     right: spacing.md,
-    borderRadius: borderRadius.round,
-    overflow: "hidden", // Necesario para que BlurView respete el borde
+    borderRadius: borderRadius.full,
+    overflow: "hidden",
     ...Platform.select({
       android: { elevation: 4 },
       ios: {
@@ -329,14 +337,14 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.lg,
     paddingTop: spacing.md,
-    borderBottomLeftRadius: borderRadius.xxl,
-    borderBottomRightRadius: borderRadius.xxl,
+    borderBottomLeftRadius: borderRadius.xl,
+    borderBottomRightRadius: borderRadius.xl,
   },
   titleRow: {
     marginBottom: spacing.sm,
   },
   title: {
-    fontWeight: "800",
+    ...h2Styles,
     letterSpacing: -0.4,
     lineHeight: 24,
   },
@@ -351,7 +359,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   detailText: {
-    fontSize: typography.fontSize.sm,
+    ...bodySmStyles,
     fontWeight: "500",
   },
   separator: {

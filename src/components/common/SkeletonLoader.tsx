@@ -1,5 +1,5 @@
 import { useTheme } from "@/src/hooks";
-import { spacing } from "@/src/theme";
+import { borderRadius, spacing } from "@/src/theme";
 import React, { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 
@@ -93,12 +93,15 @@ export const RecipeCardSkeleton: React.FC = () => {
   );
 };
 
+// Extraer valor del tema para usar en StyleSheet.create()
+const cardBorderRadius = borderRadius.md;
+
 const styles = StyleSheet.create({
   skeleton: {
     // Background color handled dynamically
   },
   card: {
-    borderRadius: 12,
+    borderRadius: cardBorderRadius,
     marginBottom: spacing.md,
     overflow: "hidden",
   },

@@ -4,7 +4,7 @@ import {
   LoadingSpinner,
 } from "@/src/components/common";
 import { useFavorites, useRecipes, useTheme } from "@/src/hooks";
-import { spacing, typography } from "@/src/theme";
+import { borderRadius, fontSize, spacing } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect } from "react";
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   title: {
-    fontSize: typography.fontSize["2xl"],
+    fontSize: fontSize["2xl"],
     fontWeight: "700",
     marginBottom: spacing.md,
   },
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
   tag: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    borderRadius: 8,
+    borderRadius: borderRadius.sm,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     marginRight: spacing.xs,
   },
   tagText: {
-    fontSize: typography.fontSize.sm,
+    fontSize: fontSize.sm,
     fontWeight: "600",
   },
   section: {
@@ -341,35 +341,35 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   sectionTitle: {
-    fontSize: typography.fontSize.lg,
+    fontSize: fontSize.lg,
     fontWeight: "600",
   },
   card: {
     padding: spacing.md,
-    borderRadius: 12,
+    borderRadius: borderRadius.md,
   },
   ingredientRow: {
     flexDirection: "row",
     marginBottom: spacing.sm,
   },
   ingredientBullet: {
-    fontSize: typography.fontSize.base,
+    fontSize: fontSize.base,
     marginRight: spacing.sm,
     fontWeight: "700",
   },
   ingredientText: {
     flex: 1,
-    fontSize: typography.fontSize.base,
+    fontSize: fontSize.base,
   },
   ingredientMeasure: {
     fontWeight: "600",
   },
   instructionsPreview: {
-    fontSize: typography.fontSize.base,
+    fontSize: fontSize.base,
     lineHeight: 22,
   },
   instructionsHint: {
-    fontSize: typography.fontSize.sm,
+    fontSize: fontSize.sm,
     fontStyle: "italic",
     marginTop: spacing.sm,
   },
@@ -381,16 +381,16 @@ const styles = StyleSheet.create({
   tagSmall: {
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-    borderRadius: 6,
+    borderRadius: borderRadius.xs,
     borderWidth: 1,
   },
   tagSmallText: {
-    fontSize: typography.fontSize.xs,
+    fontSize: fontSize.xs,
     fontWeight: "500",
   },
   button: {
     padding: spacing.md,
-    borderRadius: 12,
+    borderRadius: borderRadius.md,
     alignItems: "center",
     marginTop: spacing.md,
     flexDirection: "row",
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   buttonText: {
-    fontSize: typography.fontSize.base,
+    fontSize: fontSize.base,
     fontWeight: "700",
   },
 });
