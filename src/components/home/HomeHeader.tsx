@@ -1,227 +1,200 @@
 import { useTheme } from "@/src/hooks";
-import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import {
-  Animated,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Animated, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface HomeHeaderProps {
-  headerHeight: Animated.Value | Animated.AnimatedAddition<number>;
-  headerOpacity: Animated.AnimatedInterpolation<number>;
-  titleScale: Animated.AnimatedInterpolation<number>;
+  scrollY: Animated.Value;
   searchQuery: string;
   selectedCategory: string | null;
   favoritesCount: number;
   recipesCount: number;
   loading: boolean;
-  showFilters: boolean;
-  onToggleFilters: () => void;
 }
 
 export const HomeHeader: React.FC<HomeHeaderProps> = ({
-  headerHeight,
-  headerOpacity,
-  titleScale,
+  scrollY,
   searchQuery,
   selectedCategory,
   favoritesCount,
   recipesCount,
   loading,
-  showFilters,
-  onToggleFilters,
 }) => {
   const theme = useTheme();
-  const { colors } = theme;
+  const { colors, isDark } = theme;
   const insets = useSafeAreaInsets();
 
-  const getHeaderMessage = () => {
+  // El fondo se vuelve más opaco al hacer scroll
+  const headerBgOpacity = scrollY.interpolate({
+    inputRange: [0, 80],
+    outputRange: [0, isDark ? 0.9 : 0.85],
+    extrapolate: "clamp",
+  });
+
+  const getContextLabel = () => {
     if (searchQuery) return `"${searchQuery}"`;
     if (selectedCategory) return selectedCategory;
-    if (favoritesCount > 0) {
-      return `${favoritesCount} ${
-        favoritesCount === 1 ? "favorito" : "favoritos"
-      }`;
-    }
-    return "Explora nuevas recetas";
+    return "Descubre";
   };
 
-  const getHeaderIcon = () => {
+  const getContextIcon = (): keyof typeof Ionicons.glyphMap => {
     if (searchQuery) return "search-outline";
     if (selectedCategory) return "restaurant";
-    if (favoritesCount > 0) return "heart";
     return "sparkles";
   };
 
   return (
-    <Animated.View
-      style={[
-        styles.headerContainer,
-        {
-          height: headerHeight,
-          opacity: headerOpacity,
-        },
-      ]}
+    <View
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+        paddingTop: insets.top,
+      }}
     >
-      <View
-        style={[
-          styles.headerGradient,
-          {
-            backgroundColor: colors.primary,
-            ...createShadow(theme as any, theme.elevation.medium),
-          },
-        ]}
-      >
-        <View style={{ height: insets.top }} />
+      {/* Fondo animado que aparece al scroll */}
+      <Animated.View
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: isDark ? "rgba(28,25,23,1)" : "rgba(253,252,240,1)",
+          opacity: headerBgOpacity,
+          borderBottomWidth: 1,
+          borderBottomColor: isDark
+            ? "rgba(68,64,60,0.3)"
+            : "rgba(231,229,228,0.5)",
+        }}
+      />
 
+      {/* Contenido del header */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingHorizontal: theme.spacing.lg,
+          paddingVertical: theme.spacing.sm + 2,
+        }}
+      >
+        {/* Logo / Nombre */}
         <View
           style={{
-            flex: 1,
-            paddingHorizontal: theme.spacing.lg,
-            paddingVertical: theme.spacing.md,
-            justifyContent: "center",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: theme.spacing.sm,
           }}
         >
-          <Animated.View
-            style={[
-              {
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                transform: [{ scale: titleScale }],
-              },
-            ]}
+          <View
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: theme.borderRadius.sm,
+              backgroundColor: colors.primary,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
+            <Ionicons name="restaurant" size={18} color={colors.onPrimary} />
+          </View>
+          <View>
+            <Text
+              style={[
+                theme.typography.h3,
+                { color: colors.text, lineHeight: 20 },
+              ]}
+            >
+              ChefHub
+            </Text>
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                gap: theme.spacing.md,
-                flex: 1,
+                gap: 3,
               }}
             >
-              <View
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: theme.borderRadius.md,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderWidth: 1.5,
-                  backgroundColor: "rgba(255, 255, 255, 0.2)",
-                  borderColor: "rgba(255, 255, 255, 0.3)",
-                }}
+              <Ionicons
+                name={getContextIcon()}
+                size={10}
+                color={colors.primary}
+              />
+              <Text
+                style={[
+                  theme.typography.caption,
+                  { color: colors.textSecondary, fontSize: 10 },
+                ]}
               >
-                <Ionicons
-                  name="restaurant"
-                  size={28}
-                  color={colors.textInverse}
-                />
-              </View>
-              <View style={{ flex: 1, justifyContent: "center" }}>
-                <Text
-                  style={[
-                    theme.typography.h1,
-                    { color: colors.textInverse, marginBottom: 2 },
-                  ]}
-                >
-                  ChefHub
-                </Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: theme.spacing.xs,
-                  }}
-                >
-                  <Ionicons
-                    name={getHeaderIcon()}
-                    size={14}
-                    color={colors.textInverse}
-                    style={{ opacity: 0.9 }}
-                  />
-                  <Text
-                    style={[
-                      theme.typography.caption,
-                      { color: colors.textInverse, opacity: 0.95 },
-                    ]}
-                  >
-                    {getHeaderMessage()}
-                  </Text>
-                </View>
-              </View>
+                {getContextLabel()}
+              </Text>
             </View>
+          </View>
+        </View>
 
+        {/* Badges derecha */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: theme.spacing.sm,
+          }}
+        >
+          {favoritesCount > 0 && (
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                gap: theme.spacing.sm,
+                gap: 3,
+                paddingHorizontal: theme.spacing.sm,
+                paddingVertical: theme.spacing.xs,
+                borderRadius: theme.borderRadius.full,
+                backgroundColor: isDark
+                  ? "rgba(255,71,87,0.15)"
+                  : "rgba(255,71,87,0.1)",
               }}
             >
-              {!loading && recipesCount > 0 && (
-                <View
-                  style={{
-                    borderRadius: theme.borderRadius.full,
-                    paddingHorizontal: theme.spacing.md,
-                    paddingVertical: 6,
-                    minWidth: 44,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderWidth: 1.5,
-                    backgroundColor: "rgba(255, 255, 255, 0.25)",
-                    borderColor: "rgba(255, 255, 255, 0.4)",
-                  }}
-                >
-                  <Text
-                    style={[
-                      theme.typography.button,
-                      { color: colors.textInverse },
-                    ]}
-                  >
-                    {recipesCount}
-                  </Text>
-                </View>
-              )}
-              <TouchableOpacity
-                onPress={onToggleFilters}
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: theme.borderRadius.full,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderWidth: 1.5,
-                  backgroundColor: "rgba(255, 255, 255, 0.15)",
-                  borderColor: "rgba(255, 255, 255, 0.25)",
-                }}
-                activeOpacity={0.7}
+              <Ionicons name="heart" size={12} color="#FF4757" />
+              <Text
+                style={[
+                  theme.typography.caption,
+                  { color: "#FF4757", fontWeight: "700", fontSize: 11 },
+                ]}
               >
-                <Ionicons
-                  name={showFilters ? "chevron-up" : "funnel"}
-                  size={22}
-                  color={colors.textInverse}
-                />
-              </TouchableOpacity>
+                {favoritesCount}
+              </Text>
             </View>
-          </Animated.View>
+          )}
+          {!loading && recipesCount > 0 && (
+            <View
+              style={{
+                paddingHorizontal: theme.spacing.sm + 2,
+                paddingVertical: theme.spacing.xs,
+                borderRadius: theme.borderRadius.full,
+                backgroundColor: isDark
+                  ? "rgba(217,119,6,0.15)"
+                  : "rgba(146,64,14,0.1)",
+              }}
+            >
+              <Text
+                style={[
+                  theme.typography.caption,
+                  {
+                    color: colors.primary,
+                    fontWeight: "700",
+                    fontSize: 11,
+                  },
+                ]}
+              >
+                {recipesCount}
+              </Text>
+            </View>
+          )}
         </View>
       </View>
-    </Animated.View>
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  headerContainer: {
-    overflow: "hidden",
-    zIndex: 1000,
-  },
-  headerGradient: {
-    flex: 1,
-  },
-});

@@ -1,8 +1,7 @@
 import { CategoryFilter, SearchBar } from "@/src/components/common";
 import { useTheme } from "@/src/hooks";
-import { createShadow } from "@/src/utils";
 import React from "react";
-import { Animated } from "react-native";
+import { Animated, View } from "react-native";
 
 interface FilterSectionProps {
   showFilters: boolean;
@@ -26,46 +25,59 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
   onSelectCategory,
 }) => {
   const theme = useTheme();
-  const { colors } = theme;
+  const { isDark } = theme;
 
   return (
     <Animated.View
-      style={[
-        {
-          paddingTop: theme.spacing.lg,
-          paddingBottom: theme.spacing.md,
-          borderBottomLeftRadius: theme.borderRadius.xl,
-          borderBottomRightRadius: theme.borderRadius.xl,
-          zIndex: 999,
-          backgroundColor: colors.background,
-          opacity: filterOpacity,
-          maxHeight: filterHeight.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0, 320],
-          }),
-          transform: [
-            {
-              translateY: filterHeight.interpolate({
-                inputRange: [0, 1],
-                outputRange: [-20, 0],
-              }),
-            },
-          ],
-          ...createShadow(theme as any, theme.elevation.low),
-        },
-      ]}
+      style={{
+        paddingTop: theme.spacing.sm,
+        paddingBottom: theme.spacing.sm,
+        zIndex: 999,
+        opacity: filterOpacity,
+        maxHeight: filterHeight.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 320],
+        }),
+        transform: [
+          {
+            translateY: filterHeight.interpolate({
+              inputRange: [0, 1],
+              outputRange: [-10, 0],
+            }),
+          },
+        ],
+        overflow: "hidden",
+      }}
       pointerEvents={showFilters ? "auto" : "none"}
     >
-      <SearchBar
-        placeholder="Buscar recetas..."
-        onSearch={onSearch}
-        onClear={onClear}
-      />
-      <CategoryFilter
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={onSelectCategory}
-      />
+      {/* SearchBar con fondo translúcido */}
+      <View
+        style={{
+          marginHorizontal: theme.spacing.md,
+          borderRadius: theme.borderRadius.md,
+          overflow: "hidden",
+          backgroundColor: isDark
+            ? "rgba(41,37,36,0.7)"
+            : "rgba(255,255,255,0.8)",
+          borderWidth: 1,
+          borderColor: isDark ? "rgba(68,64,60,0.4)" : "rgba(231,229,228,0.6)",
+        }}
+      >
+        <SearchBar
+          placeholder="Buscar recetas..."
+          onSearch={onSearch}
+          onClear={onClear}
+        />
+      </View>
+
+      {/* Category pills */}
+      <View style={{ marginTop: theme.spacing.sm }}>
+        <CategoryFilter
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={onSelectCategory}
+        />
+      </View>
     </Animated.View>
   );
 };

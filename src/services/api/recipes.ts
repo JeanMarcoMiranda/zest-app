@@ -1,3 +1,4 @@
+import { MOCK_RECIPES } from "@/src/data/mockRecipes";
 import {
   Recipe,
   RecipeCard,
@@ -8,20 +9,38 @@ import {
 } from "@/src/types";
 import { apiClient } from "./client";
 
-export const searchRecipes = async (query: string): Promise<RecipeCard[]> => {
-  const { data } = await apiClient.get<SpoonacularSearchResponse>(
-    "/recipes/complexSearch",
-    {
-      params: {
-        query: query,
-        addRecipeInformation: true, // Para obtener imagen y otros detalles
-        number: 10,
-      },
-    },
-  );
+const getMockRecipeCards = (): RecipeCard[] => {
+  return MOCK_RECIPES.map((recipe) => ({
+    id: recipe.id,
+    title: recipe.title,
+    thumbnail: recipe.thumbnail,
+    category: recipe.category,
+    area: recipe.area,
+  }));
+};
 
-  if (!data.results) return [];
-  return data.results.map(convertSpoonacularToRecipeCard);
+export const searchRecipes = async (query: string): Promise<RecipeCard[]> => {
+  try {
+    const { data } = await apiClient.get<SpoonacularSearchResponse>(
+      "/recipes/complexSearch",
+      {
+        params: {
+          query: query,
+          addRecipeInformation: true, // Para obtener imagen y otros detalles
+          number: 10,
+        },
+      },
+    );
+
+    if (!data.results) return [];
+    return data.results.map(convertSpoonacularToRecipeCard);
+  } catch (error) {
+    console.error("Error searching recipes (using mock data):", error);
+    const lowerQuery = query.toLowerCase();
+    return getMockRecipeCards().filter((recipe) =>
+      recipe.title.toLowerCase().includes(lowerQuery),
+    );
+  }
 };
 
 export const getRecipeById = async (id: string): Promise<Recipe | null> => {
@@ -31,8 +50,8 @@ export const getRecipeById = async (id: string): Promise<Recipe | null> => {
     );
     return convertSpoonacularToRecipe(data);
   } catch (error) {
-    console.error("Error fetching recipe by ID:", error);
-    return null;
+    console.error("Error fetching recipe by ID (using mock data):", error);
+    return MOCK_RECIPES.find((r) => r.id === id) || null;
   }
 };
 
@@ -50,8 +69,8 @@ export const getRandomRecipes = async (
     if (!data.recipes) return [];
     return data.recipes.map(convertSpoonacularToRecipeCard);
   } catch (error) {
-    console.error("Error fetching random recipes:", error);
-    return [];
+    console.error("Error fetching random recipes (using mock data):", error);
+    return getMockRecipeCards();
   }
 };
 
@@ -80,17 +99,29 @@ export const getCategories = async (): Promise<string[]> => {
 export const getRecipesByCategory = async (
   category: string,
 ): Promise<RecipeCard[]> => {
-  const { data } = await apiClient.get<SpoonacularSearchResponse>(
-    "/recipes/complexSearch",
-    {
-      params: {
-        cuisine: category, // Asumimos que la categoría es una cocina
-        addRecipeInformation: true,
-        number: 10,
+  try {
+    const { data } = await apiClient.get<SpoonacularSearchResponse>(
+      "/recipes/complexSearch",
+      {
+        params: {
+          cuisine: category, // Asumimos que la categoría es una cocina
+          addRecipeInformation: true,
+          number: 10,
+        },
       },
-    },
-  );
+    );
 
-  if (!data.results) return [];
-  return data.results.map(convertSpoonacularToRecipeCard);
+    if (!data.results) return [];
+    return data.results.map(convertSpoonacularToRecipeCard);
+  } catch (error) {
+    console.error(
+      "Error fetching recipes by category (using mock data):",
+      error,
+    );
+    return getMockRecipeCards().filter(
+      (r) =>
+        r.category.toLowerCase() === category.toLowerCase() ||
+        r.area.toLowerCase() === category.toLowerCase(),
+    );
+  }
 };

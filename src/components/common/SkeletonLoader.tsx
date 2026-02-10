@@ -99,3 +99,42 @@ export const RecipeCardSkeleton: React.FC = () => {
     </View>
   );
 };
+
+export const BentoGridSkeleton: React.FC = () => {
+  const theme = useTheme();
+  const { colors } = theme;
+
+  const SkeletonCell: React.FC<{ flex: number; height: number }> = ({
+    flex,
+    height,
+  }) => (
+    <View style={{ flex }}>
+      <SkeletonLoader
+        height={height}
+        borderRadius={theme.borderRadius.lg}
+        style={{ backgroundColor: colors.surfaceVariant }}
+      />
+    </View>
+  );
+
+  return (
+    <View style={{ gap: theme.spacing.sm }}>
+      {/* Row 1: 1 large + 1 small */}
+      <View style={{ flexDirection: "row", gap: theme.spacing.sm }}>
+        <SkeletonCell flex={2} height={280} />
+        <SkeletonCell flex={1} height={280} />
+      </View>
+      {/* Row 2: 3 small */}
+      <View style={{ flexDirection: "row", gap: theme.spacing.sm }}>
+        <SkeletonCell flex={1} height={180} />
+        <SkeletonCell flex={1} height={180} />
+        <SkeletonCell flex={1} height={180} />
+      </View>
+      {/* Row 3: 1 small + 1 large */}
+      <View style={{ flexDirection: "row", gap: theme.spacing.sm }}>
+        <SkeletonCell flex={1} height={280} />
+        <SkeletonCell flex={2} height={280} />
+      </View>
+    </View>
+  );
+};
