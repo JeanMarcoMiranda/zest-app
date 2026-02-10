@@ -224,4 +224,21 @@ export const textTransform = {
   none: "none" as const,
 } as const;
 
+/**
+ * Tipos TypeScript para mejor autocompletado y type-safety
+ */
+export type FontFamily = typeof fontFamily;
+export type FontWeight = typeof fontWeight;
+export type FontSize = typeof fontSize;
+export type LineHeight = typeof lineHeight;
+export type LetterSpacing = typeof letterSpacing;
+export type TextTransform = typeof textTransform;
 export type Typography = typeof typography;
+
+// Helper types para keys
+export type FontFamilyKey = keyof typeof fontFamily;
+export type FontWeightKey = keyof typeof fontWeight;
+export type FontSizeKey = keyof typeof fontSize;
+export type LineHeightKey = keyof typeof lineHeight;
+export type LetterSpacingKey = keyof typeof letterSpacing;
+export type TypographyStyle = keyof typeof typography;

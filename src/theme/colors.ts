@@ -169,4 +169,43 @@ export const darkColors = {
   },
 } as const;
 
+/**
+ * Gradientes predefinidos para uso en componentes.
+ * Cada gradiente es un array de colores [inicio, fin].
+ *
+ * Uso con LinearGradient:
+ * <LinearGradient colors={gradients.primary} ... />
+ */
+export const gradients = {
+  /** Gradiente primario - Terracota */
+  primary: [palette.terracotta, palette.terracottaLight],
+  /** Gradiente primario oscuro - Ámbar (dark mode) */
+  primaryDark: [palette.amber, palette.amberLight],
+  /** Gradiente secundario - Bosque */
+  secondary: [palette.forest, palette.forestLight],
+  /** Gradiente secundario oscuro - Esmeralda (dark mode) */
+  secondaryDark: [palette.emerald, palette.emeraldLight],
+  /** Gradiente cálido - Ámbar */
+  warm: [palette.amberLight, palette.amber],
+  /** Overlay oscuro - Para modales y overlays */
+  overlay: ["rgba(0,0,0,0)", "rgba(0,0,0,0.6)"],
+  /** Overlay claro - Para modales en dark mode */
+  overlayLight: ["rgba(255,255,255,0)", "rgba(255,255,255,0.8)"],
+} as const;
+
+/**
+ * Niveles de opacidad estándar.
+ * Útil para aplicar transparencia consistente a colores.
+ */
+export const opacity = {
+  transparent: 0,
+  low: 0.1,
+  medium: 0.5,
+  high: 0.7,
+  opaque: 1,
+} as const;
+
+export type Palette = typeof palette;
 export type ColorPalette = typeof lightColors;
+export type Gradients = typeof gradients;
+export type Opacity = typeof opacity;

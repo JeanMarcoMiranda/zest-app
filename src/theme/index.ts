@@ -6,14 +6,24 @@
  * y proporciona el objeto de tema completo para usar en la aplicación.
  */
 
-import { animations, duration, easing, gestures } from "./animations";
-import { darkColors, lightColors, type ColorPalette } from "./colors";
+import {
+  animations,
+  customEasing,
+  duration,
+  easing,
+  gestures,
+  spring,
+} from "./animations";
+import { darkColors, gradients, lightColors, opacity } from "./colors";
 import {
   borderRadius,
+  breakpoints,
+  elevation,
   iconSizes,
   iconStroke,
   screenMargins,
   spacing,
+  zIndex,
 } from "./spacing";
 import {
   fontFamily,
@@ -25,22 +35,44 @@ import {
 } from "./typography";
 
 /**
- * Exportaciones individuales de tokens
+ * Exportaciones individuales de todos los tokens
+ * Permite importar solo lo necesario para mejor tree-shaking
  */
 export {
+
   // Animaciones
-  animations, borderRadius,
-  // Colores
-  darkColors, duration,
-  easing, fontFamily,
-  fontSize,
-  fontWeight, gestures, iconSizes,
-  iconStroke, letterSpacing, lightColors, lineHeight, screenMargins,
-  // Espaciado
-  spacing,
+  animations, borderRadius, breakpoints, customEasing, darkColors, duration,
+  easing, elevation,
   // Tipografía
-  typography, type ColorPalette
+  fontFamily,
+  fontSize,
+  fontWeight, gestures, gradients, iconSizes,
+  iconStroke, letterSpacing,
+  // Colores
+  lightColors, lineHeight, opacity, screenMargins,
+  // Espaciado
+  spacing, spring, typography, zIndex
 };
+
+/**
+ * Exportar todos los tipos TypeScript
+ */
+  export type { ColorPalette, Gradients, Opacity, Palette } from "./colors";
+
+export type {
+  BorderRadius, BorderRadiusKey, BreakpointKey, Breakpoints, Elevation, ElevationKey, IconSizeKey, IconSizes,
+  IconStroke, ScreenMargins, Spacing, SpacingKey, ZIndex, ZIndexKey
+} from "./spacing";
+
+export type {
+  FontFamily, FontFamilyKey, FontSize, FontSizeKey, FontWeight, FontWeightKey, LetterSpacing, LetterSpacingKey, LineHeight, LineHeightKey, TextTransform,
+  Typography, TypographyStyle
+} from "./typography";
+
+export type {
+  AnimationKey, Animations, CustomEasing, Duration, DurationKey, Easing, EasingKey, Gestures,
+  Spring, SpringKey
+} from "./animations";
 
 /**
  * Tema completo en Modo Claro (Light Mode)
@@ -48,15 +80,22 @@ export {
  */
 export const lightTheme = {
   colors: lightColors,
+  gradients,
+  opacity,
   spacing,
   screenMargins,
   borderRadius,
+  elevation,
+  zIndex,
+  breakpoints,
   iconSizes,
   iconStroke,
   typography,
   animations,
+  spring,
   duration,
   easing,
+  customEasing,
   gestures,
   mode: "light" as const,
 } as const;
@@ -66,15 +105,22 @@ export const lightTheme = {
  */
 export const darkTheme = {
   colors: darkColors,
+  gradients,
+  opacity,
   spacing,
   screenMargins,
   borderRadius,
+  elevation,
+  zIndex,
+  breakpoints,
   iconSizes,
   iconStroke,
   typography,
   animations,
+  spring,
   duration,
   easing,
+  customEasing,
   gestures,
   mode: "dark" as const,
 } as const;
@@ -85,20 +131,19 @@ export const darkTheme = {
 export type Theme = typeof lightTheme;
 
 /**
- * Tema por defecto (exportación para compatibilidad)
- */
-export const theme = lightTheme;
-
-/**
- * Exportación legacy para compatibilidad con código existente
- * NOTA: Preferir usar `lightTheme` o `darkTheme` explícitamente,
- * o usar el hook `useTheme()` para obtener el tema dinámico según el modo.
- */
-export const colors = lightColors;
-
-/**
  * Helper para obtener el tema correcto según el esquema de color
  */
 export const getTheme = (colorScheme: "light" | "dark"): Theme => {
   return colorScheme === "dark" ? darkTheme : lightTheme;
 };
+
+/**
+ * Exportaciones legacy para compatibilidad con código existente
+ * @deprecated Use lightTheme o darkTheme explícitamente, o usa el hook useTheme()
+ */
+export const theme = lightTheme;
+
+/**
+ * @deprecated Use lightColors o darkColors según el modo, o usa el hook useColors()
+ */
+export const colors = lightColors;

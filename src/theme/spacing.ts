@@ -84,3 +84,76 @@ export const iconStroke = {
   /** Grosor grueso para énfasis */
   bold: 2.5,
 } as const;
+
+/**
+ * Sistema de elevaciones para sombras y capas.
+ * Valores de 0-4 que se multiplican con la configuración de shadow del theme.
+ */
+export const elevation = {
+  /** Sin elevación */
+  none: 0,
+  /** Elevación baja - Botones, chips */
+  low: 1,
+  /** Elevación media - Cards, inputs elevados */
+  medium: 2,
+  /** Elevación alta - Modales, sheets */
+  high: 3,
+  /** Elevación máxima - Tooltips, popovers */
+  highest: 4,
+} as const;
+
+/**
+ * Z-index para capas de UI.
+ * Mantiene un orden consistente de elementos superpuestos.
+ */
+export const zIndex = {
+  /** Capa base - Contenido normal */
+  base: 0,
+  /** Dropdowns y menús desplegables */
+  dropdown: 1000,
+  /** Headers y navegación sticky */
+  sticky: 1020,
+  /** Modales y dialogs */
+  modal: 1030,
+  /** Popovers y menús contextuales */
+  popover: 1040,
+  /** Tooltips (siempre visibles) */
+  tooltip: 1050,
+} as const;
+
+/**
+ * Breakpoints para diseño responsive.
+ * Valores en píxeles para diferentes tamaños de pantalla.
+ *
+ * Uso: Para adaptar layouts en tablets y dispositivos grandes.
+ */
+export const breakpoints = {
+  /** 0px - Móviles (por defecto) */
+  mobile: 0,
+  /** 768px - Tablets */
+  tablet: 768,
+  /** 1024px - Desktop pequeño */
+  desktop: 1024,
+  /** 1440px - Desktop grande */
+  wide: 1440,
+} as const;
+
+/**
+ * Tipos TypeScript para mejor autocompletado
+ */
+export type Spacing = typeof spacing;
+export type ScreenMargins = typeof screenMargins;
+export type BorderRadius = typeof borderRadius;
+export type IconSizes = typeof iconSizes;
+export type IconStroke = typeof iconStroke;
+export type Elevation = typeof elevation;
+export type ZIndex = typeof zIndex;
+export type Breakpoints = typeof breakpoints;
+
+// Helper types para keys
+export type SpacingKey = keyof typeof spacing;
+export type BorderRadiusKey = keyof typeof borderRadius;
+export type IconSizeKey = keyof typeof iconSizes;
+export type ElevationKey = keyof typeof elevation;
+export type ZIndexKey = keyof typeof zIndex;
+export type BreakpointKey = keyof typeof breakpoints;

@@ -99,4 +99,62 @@ export const gestures = {
   swipeVelocity: 300,
 } as const;
 
+/**
+ * Configuraciones de spring para animaciones con física.
+ * Compatible con React Native Reanimated.
+ *
+ * Uso: withSpring(value, spring.bouncy)
+ */
+export const spring = {
+  /** Spring suave y natural */
+  gentle: {
+    damping: 20,
+    stiffness: 90,
+    mass: 1,
+  },
+  /** Spring con rebote (para elementos interactivos) */
+  bouncy: {
+    damping: 10,
+    stiffness: 100,
+    mass: 1,
+  },
+  /** Spring rígido (para transiciones rápidas) */
+  stiff: {
+    damping: 15,
+    stiffness: 200,
+    mass: 1,
+  },
+} as const;
+
+/**
+ * Curvas de animación cubic-bezier personalizadas.
+ * Valores como arrays [x1, y1, x2, y2] para CSS o bibliotecas de animación.
+ *
+ * Basadas en Material Design motion guidelines.
+ */
+export const customEasing = {
+  /** Curva suave estándar - Uso general */
+  smooth: [0.4, 0.0, 0.2, 1] as const,
+  /** Curva enfatizada - Para elementos importantes */
+  emphasized: [0.0, 0.0, 0.2, 1] as const,
+  /** Curva desacelerada - Para elementos que aparecen */
+  decelerated: [0.0, 0.0, 0.2, 1] as const,
+  /** Curva acelerada - Para elementos que desaparecen */
+  accelerated: [0.4, 0.0, 1, 1] as const,
+} as const;
+
+/**
+ * Tipos TypeScript para animaciones
+ */
+export type Duration = typeof duration;
+export type Easing = typeof easing;
 export type Animations = typeof animations;
+export type Gestures = typeof gestures;
+export type Spring = typeof spring;
+export type CustomEasing = typeof customEasing;
+
+// Helper types para keys
+export type DurationKey = keyof typeof duration;
+export type EasingKey = keyof typeof easing;
+export type AnimationKey = keyof typeof animations;
+export type SpringKey = keyof typeof spring;
