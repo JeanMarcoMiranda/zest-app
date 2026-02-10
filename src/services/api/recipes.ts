@@ -1,99 +1,96 @@
 import {
-  MealDBCategoriesResponse,
-  MealDBResponse,
   Recipe,
   RecipeCard,
-  convertMealDBToRecipe,
-  convertMealDBToRecipeCard,
+  SpoonacularRecipe,
+  SpoonacularSearchResponse,
+  convertSpoonacularToRecipe,
+  convertSpoonacularToRecipeCard,
 } from "@/src/types";
 import { apiClient } from "./client";
 
 export const searchRecipes = async (query: string): Promise<RecipeCard[]> => {
-  const { data } = await apiClient.get<MealDBResponse>("/search.php", {
-    params: { s: query },
-  });
+  const { data } = await apiClient.get<SpoonacularSearchResponse>(
+    "/recipes/complexSearch",
+    {
+      params: {
+        query: query,
+        addRecipeInformation: true, // Para obtener imagen y otros detalles
+        number: 10,
+      },
+    },
+  );
 
-  if (!data.meals) return [];
-  return data.meals.map(convertMealDBToRecipeCard);
+  if (!data.results) return [];
+  return data.results.map(convertSpoonacularToRecipeCard);
 };
 
 export const getRecipeById = async (id: string): Promise<Recipe | null> => {
-  const { data } = await apiClient.get<MealDBResponse>("/lookup.php", {
-    params: { i: id },
-  });
-
-  if (!data.meals || data.meals.length === 0) return null;
-  return convertMealDBToRecipe(data.meals[0]);
+  try {
+    const { data } = await apiClient.get<SpoonacularRecipe>(
+      `/recipes/${id}/information`,
+    );
+    return convertSpoonacularToRecipe(data);
+  } catch (error) {
+    console.error("Error fetching recipe by ID:", error);
+    return null;
+  }
 };
 
 export const getRandomRecipes = async (
   count: number = 10,
 ): Promise<RecipeCard[]> => {
-  const recipes: RecipeCard[] = [];
-  const maxRetries = 2;
+  try {
+    const { data } = await apiClient.get<{ recipes: SpoonacularRecipe[] }>(
+      "/recipes/random",
+      {
+        params: { number: count },
+      },
+    );
 
-  // Hacer peticiones secuenciales para evitar sobrecargar la red
-  for (let i = 0; i < count; i++) {
-    let retries = 0;
-    let success = false;
-
-    while (retries < maxRetries && !success) {
-      try {
-        const { data } = await apiClient.get<MealDBResponse>("/random.php");
-
-        if (data.meals?.[0]) {
-          const recipe = convertMealDBToRecipe(data.meals[0]);
-          recipes.push({
-            id: recipe.id,
-            title: recipe.title,
-            thumbnail: recipe.thumbnail,
-            category: recipe.category,
-            area: recipe.area,
-          });
-          success = true;
-        }
-
-        // Pequeño delay entre peticiones para no sobrecargar
-        if (i < count - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 100));
-        }
-      } catch (error) {
-        retries++;
-        if (retries < maxRetries) {
-          console.log(`Retry ${retries} for recipe ${i + 1}`);
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        } else {
-          console.error(
-            `Failed to fetch recipe ${i + 1} after ${maxRetries} retries`,
-          );
-        }
-      }
-    }
+    if (!data.recipes) return [];
+    return data.recipes.map(convertSpoonacularToRecipeCard);
+  } catch (error) {
+    console.error("Error fetching random recipes:", error);
+    return [];
   }
-
-  return recipes;
 };
 
+// Spoonacular no tiene un endpoint simple de "categorías" como MealDB.
+// Devolvemos una lista estática de Cocinas/Tipos comunes para mantener la funcionalidad.
 export const getCategories = async (): Promise<string[]> => {
-  const { data } =
-    await apiClient.get<MealDBCategoriesResponse>("/categories.php");
-  return data.categories.map((cat) => cat.strCategory);
+  return [
+    "Italian",
+    "Mexican",
+    "Chinese",
+    "Japanese",
+    "American",
+    "French",
+    "Indian",
+    "Thai",
+    "Mediterranean",
+    "Greek",
+    "Spanish",
+    "Korean",
+    "Vietnamese",
+    "Middle Eastern",
+    "Caribbean",
+  ];
 };
 
 export const getRecipesByCategory = async (
   category: string,
 ): Promise<RecipeCard[]> => {
-  const { data } = await apiClient.get<MealDBResponse>("/filter.php", {
-    params: { c: category },
-  });
+  const { data } = await apiClient.get<SpoonacularSearchResponse>(
+    "/recipes/complexSearch",
+    {
+      params: {
+        cuisine: category, // Asumimos que la categoría es una cocina
+        addRecipeInformation: true,
+        number: 10,
+      },
+    },
+  );
 
-  if (!data.meals) return [];
-
-  return data.meals.map((meal) => ({
-    id: meal.idMeal,
-    title: meal.strMeal,
-    thumbnail: meal.strMealThumb,
-    category: category,
-    area: "",
-  }));
+  if (!data.results) return [];
+  return data.results.map(convertSpoonacularToRecipeCard);
 };

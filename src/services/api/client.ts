@@ -1,10 +1,13 @@
 import axios from "axios";
 
+const SPOONACULAR_API_KEY = "dbe4d8306b754f5b838e3951c4b400f6"; // TODO: Reemplazar con la API Key real
+
 export const apiClient = axios.create({
-  baseURL: "https://www.themealdb.com/api/json/v1/1",
-  timeout: 30000, // Aumentado a 30 segundos
+  baseURL: "https://api.spoonacular.com",
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
+    "x-api-key": SPOONACULAR_API_KEY,
   },
 });
 

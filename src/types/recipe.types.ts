@@ -151,3 +151,121 @@ export const convertMealDBToRecipeCard = (meal: MealDBRecipe): RecipeCard => {
     area: meal.strArea,
   };
 };
+
+export interface SpoonacularIngredient {
+  id: number;
+  aisle: string;
+  image: string;
+  consistency: string;
+  name: string;
+  nameClean: string;
+  original: string;
+  originalName: string;
+  amount: number;
+  unit: string;
+  meta: string[];
+  measures: {
+    us: { amount: number; unitShort: string; unitLong: string };
+    metric: { amount: number; unitShort: string; unitLong: string };
+  };
+}
+
+export interface SpoonacularInstructionStep {
+  number: number;
+  step: string;
+  ingredients: {
+    id: number;
+    name: string;
+    localizedName: string;
+    image: string;
+  }[];
+  equipment: {
+    id: number;
+    name: string;
+    localizedName: string;
+    image: string;
+  }[];
+}
+
+export interface SpoonacularInstruction {
+  name: string;
+  steps: SpoonacularInstructionStep[];
+}
+
+export interface SpoonacularRecipe {
+  id: number;
+  title: string;
+  image: string;
+  imageType: string;
+  servings: number;
+  readyInMinutes: number;
+  license: string;
+  sourceName: string;
+  sourceUrl: string;
+  spoonacularSourceUrl: string;
+  healthScore: number;
+  spoonacularScore: number;
+  pricePerServing: number;
+  analyzedInstructions: SpoonacularInstruction[];
+  cheap: boolean;
+  creditsText: string;
+  cuisines: string[];
+  dairyFree: boolean;
+  diets: string[];
+  gaps: string;
+  glutenFree: boolean;
+  instructions: string;
+  ketogenic: boolean;
+  lowFodmap: boolean;
+  occasions: string[];
+  sustainable: boolean;
+  vegan: boolean;
+  vegetarian: boolean;
+  veryHealthy: boolean;
+  veryPopular: boolean;
+  whole30: boolean;
+  weightWatcherSmartPoints: number;
+  dishTypes: string[];
+  extendedIngredients: SpoonacularIngredient[];
+  summary: string;
+  winePairing: any;
+}
+
+export interface SpoonacularSearchResponse {
+  results: SpoonacularRecipe[];
+  offset: number;
+  number: number;
+  totalResults: number;
+}
+
+export const convertSpoonacularToRecipe = (data: SpoonacularRecipe): Recipe => {
+  return {
+    id: data.id.toString(),
+    title: data.title,
+    category: data.dishTypes?.[0] || (data.cuisines?.[0] ?? "General"),
+    area: data.cuisines?.[0] || "International",
+    instructions:
+      data.instructions || data.summary || "No instructions provided.",
+    thumbnail: data.image,
+    tags: [...(data.diets || []), ...(data.dishTypes || [])],
+    youtube: "",
+    ingredients:
+      data.extendedIngredients?.map((ing) => ({
+        name: ing.nameClean || ing.name,
+        measure: `${ing.amount} ${ing.unit}`,
+      })) || [],
+    source: data.sourceUrl,
+  };
+};
+
+export const convertSpoonacularToRecipeCard = (
+  data: SpoonacularRecipe,
+): RecipeCard => {
+  return {
+    id: data.id.toString(),
+    title: data.title,
+    thumbnail: data.image,
+    category: data.dishTypes?.[0] || (data.cuisines?.[0] ?? "General"),
+    area: data.cuisines?.[0] || "International",
+  };
+};
