@@ -1,9 +1,5 @@
-import {
-  CategoryFilter,
-  ErrorView,
-  RecipeCardSkeleton,
-  SearchBar,
-} from "@/src/components/common";
+import { ErrorView, RecipeCardSkeleton } from "@/src/components/common";
+import { FilterSection, HomeHeader } from "@/src/components/home";
 import { RecipeCardItem } from "@/src/components/recipe";
 import { useFavorites, useRecipes, useTheme } from "@/src/hooks";
 import { getCategories } from "@/src/services";
@@ -17,7 +13,6 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -226,32 +221,7 @@ export default function HomeScreen() {
     extrapolate: "clamp",
   });
 
-  const getHeaderMessage = () => {
-    if (searchQuery) return `"${searchQuery}"`;
-    if (selectedCategory) return selectedCategory;
-    if (favorites.length > 0) {
-      return `${favorites.length} ${
-        favorites.length === 1 ? "favorito" : "favoritos"
-      }`;
-    }
-    return "Explora nuevas recetas";
-  };
-
-  const getHeaderIcon = () => {
-    if (searchQuery) return "search-outline";
-    if (selectedCategory) return "restaurant";
-    if (favorites.length > 0) return "heart";
-    return "sparkles";
-  };
-
   const shadows = {
-    sm: {
-      shadowColor: colors.primaryDark,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 2,
-    },
     md: {
       shadowColor: colors.primaryDark,
       shadowOffset: { width: 0, height: 4 },
@@ -270,147 +240,29 @@ export default function HomeScreen() {
         translucent={false}
       />
 
-      {/* Header Animado Colapsable con SafeArea */}
-      <Animated.View
-        style={[
-          styles.headerContainer,
-          {
-            height: Animated.add(headerHeight, insets.top),
-            opacity: headerOpacity,
-          },
-        ]}
-      >
-        <View
-          style={[
-            styles.headerGradient,
-            shadows.md,
-            { backgroundColor: colors.primary },
-          ]}
-        >
-          {/* Safe area top espaciado */}
-          <View style={{ height: insets.top }} />
+      <HomeHeader
+        headerHeight={Animated.add(headerHeight, insets.top)}
+        headerOpacity={headerOpacity}
+        titleScale={titleScale}
+        searchQuery={searchQuery}
+        selectedCategory={selectedCategory}
+        favoritesCount={favorites.length}
+        recipesCount={recipes.length}
+        loading={loading}
+        showFilters={showFilters}
+        onToggleFilters={toggleFilters}
+      />
 
-          <View style={styles.header}>
-            {/* Parte superior del header */}
-            <Animated.View
-              style={[styles.headerTop, { transform: [{ scale: titleScale }] }]}
-            >
-              <View style={styles.titleContainer}>
-                <View
-                  style={[
-                    styles.logoContainer,
-                    {
-                      backgroundColor: "rgba(255, 255, 255, 0.2)",
-                      borderColor: "rgba(255, 255, 255, 0.3)",
-                    },
-                  ]}
-                >
-                  <Ionicons
-                    name="restaurant"
-                    size={28}
-                    color={colors.textInverse}
-                  />
-                </View>
-                <View style={styles.titleContent}>
-                  <Text style={[styles.title, { color: colors.textInverse }]}>
-                    ChefHub
-                  </Text>
-                  <View style={styles.subtitleRow}>
-                    <Ionicons
-                      name={getHeaderIcon()}
-                      size={14}
-                      color={colors.textInverse}
-                      style={{ opacity: 0.9 }}
-                    />
-                    <Text
-                      style={[styles.subtitle, { color: colors.textInverse }]}
-                    >
-                      {getHeaderMessage()}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-
-              {/* Badge y botón de filtros */}
-              <View style={styles.headerActions}>
-                {!loading && recipes.length > 0 && (
-                  <View
-                    style={[
-                      styles.recipeBadge,
-                      {
-                        backgroundColor: "rgba(255, 255, 255, 0.25)",
-                        borderColor: "rgba(255, 255, 255, 0.4)",
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.recipeBadgeText,
-                        { color: colors.textInverse },
-                      ]}
-                    >
-                      {recipes.length}
-                    </Text>
-                  </View>
-                )}
-                <TouchableOpacity
-                  onPress={toggleFilters}
-                  style={[
-                    styles.filterToggle,
-                    {
-                      backgroundColor: "rgba(255, 255, 255, 0.15)",
-                      borderColor: "rgba(255, 255, 255, 0.25)",
-                    },
-                  ]}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons
-                    name={showFilters ? "chevron-up" : "funnel"}
-                    size={22}
-                    color={colors.textInverse}
-                  />
-                </TouchableOpacity>
-              </View>
-            </Animated.View>
-          </View>
-        </View>
-      </Animated.View>
-
-      {/* Filtros Colapsables */}
-      <Animated.View
-        style={[
-          styles.filtersContainer,
-          shadows.sm,
-          {
-            backgroundColor: colors.background,
-            opacity: filterOpacity,
-            maxHeight: filterHeight.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0, 320],
-            }),
-            transform: [
-              {
-                translateY: filterHeight.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-20, 0],
-                }),
-              },
-            ],
-          },
-        ]}
-        pointerEvents={showFilters ? "auto" : "none"}
-      >
-        <SearchBar
-          placeholder="Buscar recetas..."
-          onSearch={handleSearch}
-          onClear={handleClearSearch}
-        />
-        <CategoryFilter
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onSelectCategory={handleSelectCategory}
-        />
-      </Animated.View>
+      <FilterSection
+        showFilters={showFilters}
+        filterOpacity={filterOpacity}
+        filterHeight={filterHeight}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onSearch={handleSearch}
+        onClear={handleClearSearch}
+        onSelectCategory={handleSelectCategory}
+      />
 
       {/* Lista de recetas con safe area bottom */}
       {loading && recipes.length === 0 ? (
@@ -482,91 +334,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  headerContainer: {
-    overflow: "hidden",
-    zIndex: 1000,
-  },
-  headerGradient: {
-    flex: 1,
-  },
-  header: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    justifyContent: "center",
-  },
-  headerTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    flex: 1,
-  },
-  logoContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: borderRadius.xl,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1.5,
-  },
-  titleContent: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-    letterSpacing: -0.5,
-    marginBottom: 2,
-  },
-  subtitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  subtitle: {
-    fontSize: fontSize.sm,
-    fontWeight: "600",
-    opacity: 0.95,
-  },
-  headerActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-  },
-  recipeBadge: {
-    borderRadius: borderRadius.round,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 6,
-    minWidth: 44,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1.5,
-  },
-  recipeBadgeText: {
-    fontSize: fontSize.md,
-    fontWeight: "700",
-  },
-  filterToggle: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.round,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1.5,
-  },
-  filtersContainer: {
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
-    borderBottomLeftRadius: borderRadius.xl,
-    borderBottomRightRadius: borderRadius.xl,
-    zIndex: 999,
   },
   listContent: {
     padding: spacing.md,
