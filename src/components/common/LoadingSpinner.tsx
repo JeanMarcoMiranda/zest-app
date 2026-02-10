@@ -1,7 +1,6 @@
 import { useTheme } from "@/src/hooks";
-import { spacing } from "@/src/theme";
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 
 interface LoadingSpinnerProps {
   message?: string;
@@ -12,40 +11,31 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   message = "Cargando...",
   size = "large",
 }) => {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
 
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: theme.spacing.lg,
+      }}
+    >
       <ActivityIndicator size={size} color={colors.primary} />
       {message && (
-        <Text style={[styles.message, { color: colors.textSecondary }]}>
+        <Text
+          style={[
+            theme.typography.bodyLg,
+            { color: colors.textSecondary, marginTop: theme.spacing.md },
+          ]}
+        >
           {message}
         </Text>
       )}
     </View>
   );
 };
-
-// Extraer valores del tema para usar en StyleSheet.create()
-const bodyLgStyles = {
-  fontFamily: "Inter-Regular",
-  fontSize: 16,
-  fontWeight: "500" as const,
-  lineHeight: 1.5,
-  letterSpacing: 0,
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: spacing.lg,
-  },
-  message: {
-    marginTop: spacing.md,
-    ...bodyLgStyles,
-  },
-});
 
 export default LoadingSpinner;

@@ -1,7 +1,6 @@
 import { useTheme } from "@/src/hooks";
-import { borderRadius, spacing } from "@/src/theme";
 import React, { useEffect, useRef } from "react";
-import { Animated, StyleSheet, View } from "react-native";
+import { Animated, View } from "react-native";
 
 interface SkeletonLoaderProps {
   width?: number | string;
@@ -16,7 +15,8 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
   borderRadius = 4,
   style,
 }) => {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -24,17 +24,17 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
       Animated.sequence([
         Animated.timing(shimmerAnim, {
           toValue: 1,
-          duration: 1000,
+          duration: theme.duration.slow,
           useNativeDriver: true,
         }),
         Animated.timing(shimmerAnim, {
           toValue: 0,
-          duration: 1000,
+          duration: theme.duration.slow,
           useNativeDriver: true,
         }),
       ]),
     ).start();
-  }, [shimmerAnim]);
+  }, [shimmerAnim, theme.duration.slow]);
 
   const opacity = shimmerAnim.interpolate({
     inputRange: [0, 1],
@@ -44,7 +44,6 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
   return (
     <Animated.View
       style={[
-        styles.skeleton,
         {
           width,
           height,
@@ -59,61 +58,44 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
 };
 
 export const RecipeCardSkeleton: React.FC = () => {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.surface }]}>
-      <SkeletonLoader height={200} borderRadius={12} />
-      <View style={styles.content}>
+    <View
+      style={{
+        borderRadius: theme.borderRadius.md,
+        marginBottom: theme.spacing.md,
+        overflow: "hidden",
+        backgroundColor: colors.surface,
+      }}
+    >
+      <SkeletonLoader height={200} borderRadius={theme.borderRadius.md} />
+      <View style={{ padding: theme.spacing.md }}>
         <SkeletonLoader
           height={24}
           width="80%"
-          style={{ marginBottom: spacing.sm }}
+          style={{ marginBottom: theme.spacing.sm }}
         />
-        <View style={styles.tagRow}>
+        <View style={{ flexDirection: "row", marginBottom: theme.spacing.sm }}>
           <SkeletonLoader height={24} width={80} borderRadius={6} />
           <SkeletonLoader
             height={24}
             width={100}
             borderRadius={6}
-            style={{ marginLeft: spacing.xs }}
+            style={{ marginLeft: theme.spacing.xs }}
           />
         </View>
-        <View style={styles.infoRow}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <SkeletonLoader height={16} width={60} borderRadius={4} />
           <SkeletonLoader
             height={16}
             width={80}
             borderRadius={4}
-            style={{ marginLeft: spacing.sm }}
+            style={{ marginLeft: theme.spacing.sm }}
           />
         </View>
       </View>
     </View>
   );
 };
-
-// Extraer valor del tema para usar en StyleSheet.create()
-const cardBorderRadius = borderRadius.md;
-
-const styles = StyleSheet.create({
-  skeleton: {
-    // Background color handled dynamically
-  },
-  card: {
-    borderRadius: cardBorderRadius,
-    marginBottom: spacing.md,
-    overflow: "hidden",
-  },
-  content: {
-    padding: spacing.md,
-  },
-  tagRow: {
-    flexDirection: "row",
-    marginBottom: spacing.sm,
-  },
-  infoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-});

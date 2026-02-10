@@ -1,5 +1,4 @@
 import { useTheme } from "@/src/hooks";
-import { borderRadius, spacing } from "@/src/theme";
 import React from "react";
 import {
   ScrollView,
@@ -20,7 +19,8 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
   selectedCategory,
   onSelectCategory,
 }) => {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
 
   return (
     <View
@@ -32,13 +32,23 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{
+          paddingHorizontal: theme.spacing.md,
+          paddingVertical: theme.spacing.sm,
+          gap: theme.spacing.sm,
+        }}
       >
         {/* Botón "Todos" */}
         <TouchableOpacity
           style={[
-            styles.categoryButton,
-            { backgroundColor: colors.background, borderColor: colors.divider },
+            {
+              paddingHorizontal: theme.spacing.md,
+              paddingVertical: theme.spacing.sm,
+              borderRadius: theme.borderRadius.full,
+              borderWidth: 1,
+              backgroundColor: colors.background,
+              borderColor: colors.divider,
+            },
             selectedCategory === null && {
               backgroundColor: colors.primary,
               borderColor: colors.primary,
@@ -49,7 +59,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
         >
           <Text
             style={[
-              styles.categoryText,
+              theme.typography.label,
               { color: colors.text },
               selectedCategory === null && {
                 color: colors.textInverse,
@@ -66,8 +76,11 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
           <TouchableOpacity
             key={category}
             style={[
-              styles.categoryButton,
               {
+                paddingHorizontal: theme.spacing.md,
+                paddingVertical: theme.spacing.sm,
+                borderRadius: theme.borderRadius.full,
+                borderWidth: 1,
                 backgroundColor: colors.background,
                 borderColor: colors.divider,
               },
@@ -81,7 +94,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
           >
             <Text
               style={[
-                styles.categoryText,
+                theme.typography.label,
                 { color: colors.text },
                 selectedCategory === category && {
                   color: colors.textInverse,
@@ -98,32 +111,9 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
   );
 };
 
-// Extraer valores del tema para usar en StyleSheet.create()
-const labelStyles = {
-  fontFamily: "Inter-SemiBold",
-  fontSize: 14,
-  fontWeight: "600" as const,
-  lineHeight: 1.5,
-  letterSpacing: 0,
-};
-
 const styles = StyleSheet.create({
   container: {
     borderBottomWidth: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    gap: spacing.sm,
-  },
-  categoryButton: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.full,
-    borderWidth: 1,
-  },
-  categoryText: {
-    ...labelStyles,
   },
 });
 

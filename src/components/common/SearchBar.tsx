@@ -1,14 +1,8 @@
 import { useTheme } from "@/src/hooks";
-import { borderRadius, spacing } from "@/src/theme";
+import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import {
-  Platform,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Platform, TextInput, TouchableOpacity, View } from "react-native";
 
 interface SearchBarProps {
   placeholder?: string;
@@ -22,7 +16,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onClear,
 }) => {
   const [query, setQuery] = useState("");
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
 
   const handleSearch = (text: string) => {
     setQuery(text);
@@ -39,18 +34,39 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.surface }]}>
+    <View
+      style={{
+        paddingHorizontal: theme.spacing.md,
+        paddingVertical: theme.spacing.sm,
+        backgroundColor: colors.surface,
+      }}
+    >
       <View
-        style={[styles.searchContainer, { backgroundColor: colors.background }]}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          borderRadius: theme.borderRadius.md,
+          paddingHorizontal: theme.spacing.md,
+          backgroundColor: colors.background,
+          ...createShadow(theme as any, theme.elevation.low),
+        }}
       >
         <Ionicons
           name="search"
           size={18}
           color={colors.textSecondary}
-          style={styles.searchIcon}
+          style={{ marginRight: theme.spacing.sm }}
         />
         <TextInput
-          style={[styles.input, { color: colors.text }]}
+          style={[
+            theme.typography.bodyLg,
+            {
+              flex: 1,
+              color: colors.text,
+              paddingVertical:
+                Platform.OS === "ios" ? theme.spacing.sm + 2 : theme.spacing.sm,
+            },
+          ]}
           placeholder={placeholder}
           placeholderTextColor={colors.textLight}
           value={query}
@@ -60,7 +76,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
           returnKeyType="search"
         />
         {query.length > 0 && (
-          <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
+          <TouchableOpacity
+            onPress={handleClear}
+            style={{ padding: theme.spacing.xs }}
+          >
             <Ionicons
               name="close-circle"
               size={18}
@@ -72,38 +91,5 @@ const SearchBar: React.FC<SearchBarProps> = ({
     </View>
   );
 };
-
-// Extraer valores del tema para usar en StyleSheet.create()
-const bodyLgStyles = {
-  fontFamily: "Inter-Regular",
-  fontSize: 16,
-  fontWeight: "500" as const,
-  lineHeight: 1.5,
-  letterSpacing: 0,
-};
-
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md,
-  },
-  searchIcon: {
-    marginRight: spacing.sm,
-  },
-  input: {
-    flex: 1,
-    ...bodyLgStyles,
-    paddingVertical: Platform.OS === "ios" ? spacing.sm + 2 : spacing.sm,
-  },
-  clearButton: {
-    padding: spacing.xs,
-  },
-});
 
 export default SearchBar;

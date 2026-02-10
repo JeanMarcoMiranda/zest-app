@@ -1,7 +1,6 @@
 import { useTheme } from "@/src/hooks";
-import { borderRadius, spacing } from "@/src/theme";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 interface ErrorViewProps {
   message?: string;
@@ -12,20 +11,44 @@ const ErrorView: React.FC<ErrorViewProps> = ({
   message = "Algo salió mal. Por favor intenta de nuevo.",
   onRetry,
 }) => {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.emoji}>😕</Text>
-      <Text style={[styles.message, { color: colors.textSecondary }]}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: theme.spacing.lg,
+      }}
+    >
+      <Text style={{ fontSize: 64, marginBottom: theme.spacing.md }}>😕</Text>
+      <Text
+        style={[
+          theme.typography.bodyLg,
+          {
+            color: colors.textSecondary,
+            textAlign: "center",
+            marginBottom: theme.spacing.lg,
+          },
+        ]}
+      >
         {message}
       </Text>
       {onRetry && (
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.primary }]}
+          style={{
+            paddingHorizontal: theme.spacing.lg,
+            paddingVertical: theme.spacing.md,
+            borderRadius: theme.borderRadius.md,
+            backgroundColor: colors.primary,
+          }}
           onPress={onRetry}
         >
-          <Text style={[styles.buttonText, { color: colors.textInverse }]}>
+          <Text
+            style={[theme.typography.button, { color: colors.textInverse }]}
+          >
             Reintentar
           </Text>
         </TouchableOpacity>
@@ -33,48 +56,5 @@ const ErrorView: React.FC<ErrorViewProps> = ({
     </View>
   );
 };
-
-// Extraer valores del tema para usar en StyleSheet.create()
-const bodyLgStyles = {
-  fontFamily: "Inter-Regular",
-  fontSize: 16,
-  fontWeight: "500" as const,
-  lineHeight: 1.5,
-  letterSpacing: 0,
-};
-
-const buttonStyles = {
-  fontFamily: "Inter-Bold",
-  fontSize: 16,
-  fontWeight: "700" as const,
-  lineHeight: 1.5,
-  letterSpacing: 0,
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: spacing.lg,
-  },
-  emoji: {
-    fontSize: 64,
-    marginBottom: spacing.md,
-  },
-  message: {
-    ...bodyLgStyles,
-    textAlign: "center",
-    marginBottom: spacing.lg,
-  },
-  button: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.md,
-  },
-  buttonText: {
-    ...buttonStyles,
-  },
-});
 
 export default ErrorView;

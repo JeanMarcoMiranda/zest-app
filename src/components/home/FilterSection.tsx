@@ -1,8 +1,8 @@
 import { CategoryFilter, SearchBar } from "@/src/components/common";
 import { useTheme } from "@/src/hooks";
-import { spacing } from "@/src/theme";
+import { createShadow } from "@/src/utils";
 import React from "react";
-import { Animated, StyleSheet } from "react-native";
+import { Animated } from "react-native";
 
 interface FilterSectionProps {
   showFilters: boolean;
@@ -15,10 +15,6 @@ interface FilterSectionProps {
   onSelectCategory: (category: string | null) => void;
 }
 
-const borderRadius = {
-  xl: 16,
-};
-
 export const FilterSection: React.FC<FilterSectionProps> = ({
   showFilters,
   filterOpacity,
@@ -29,24 +25,18 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
   onClear,
   onSelectCategory,
 }) => {
-  const { colors } = useTheme();
-
-  const shadows = {
-    sm: {
-      shadowColor: colors.primaryDark,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 2,
-    },
-  };
+  const theme = useTheme();
+  const { colors } = theme;
 
   return (
     <Animated.View
       style={[
-        styles.filtersContainer,
-        shadows.sm,
         {
+          paddingTop: theme.spacing.lg,
+          paddingBottom: theme.spacing.md,
+          borderBottomLeftRadius: theme.borderRadius.xl,
+          borderBottomRightRadius: theme.borderRadius.xl,
+          zIndex: 999,
           backgroundColor: colors.background,
           opacity: filterOpacity,
           maxHeight: filterHeight.interpolate({
@@ -61,6 +51,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
               }),
             },
           ],
+          ...createShadow(theme as any, theme.elevation.low),
         },
       ]}
       pointerEvents={showFilters ? "auto" : "none"}
@@ -78,13 +69,3 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
     </Animated.View>
   );
 };
-
-const styles = StyleSheet.create({
-  filtersContainer: {
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
-    borderBottomLeftRadius: borderRadius.xl,
-    borderBottomRightRadius: borderRadius.xl,
-    zIndex: 999,
-  },
-});

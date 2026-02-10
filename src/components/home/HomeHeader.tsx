@@ -1,5 +1,5 @@
 import { useTheme } from "@/src/hooks";
-import { borderRadius, fontSize, spacing } from "@/src/theme";
+import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -36,7 +36,8 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
   showFilters,
   onToggleFilters,
 }) => {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const insets = useSafeAreaInsets();
 
   const getHeaderMessage = () => {
@@ -57,16 +58,6 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
     return "sparkles";
   };
 
-  const shadows = {
-    md: {
-      shadowColor: colors.primaryDark,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 12,
-      elevation: 4,
-    },
-  };
-
   return (
     <Animated.View
       style={[
@@ -80,29 +71,51 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
       <View
         style={[
           styles.headerGradient,
-          shadows.md,
-          { backgroundColor: colors.primary },
+          {
+            backgroundColor: colors.primary,
+            ...createShadow(theme as any, theme.elevation.medium),
+          },
         ]}
       >
-        {/* Safe area top espaciado (handled by parent or here? Parent passes animated height adding insets, 
-            but we need actual padding view inside if we want to push content down. 
-            Actually index.tsx added insets.top to height. 
-            We should probably handle the spacer here to match original structure) */}
         <View style={{ height: insets.top }} />
 
-        <View style={styles.header}>
+        <View
+          style={{
+            flex: 1,
+            paddingHorizontal: theme.spacing.lg,
+            paddingVertical: theme.spacing.md,
+            justifyContent: "center",
+          }}
+        >
           <Animated.View
-            style={[styles.headerTop, { transform: [{ scale: titleScale }] }]}
+            style={[
+              {
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                transform: [{ scale: titleScale }],
+              },
+            ]}
           >
-            <View style={styles.titleContainer}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: theme.spacing.md,
+                flex: 1,
+              }}
+            >
               <View
-                style={[
-                  styles.logoContainer,
-                  {
-                    backgroundColor: "rgba(255, 255, 255, 0.2)",
-                    borderColor: "rgba(255, 255, 255, 0.3)",
-                  },
-                ]}
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: theme.borderRadius.md,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderWidth: 1.5,
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  borderColor: "rgba(255, 255, 255, 0.3)",
+                }}
               >
                 <Ionicons
                   name="restaurant"
@@ -110,11 +123,22 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                   color={colors.textInverse}
                 />
               </View>
-              <View style={styles.titleContent}>
-                <Text style={[styles.title, { color: colors.textInverse }]}>
+              <View style={{ flex: 1, justifyContent: "center" }}>
+                <Text
+                  style={[
+                    theme.typography.h1,
+                    { color: colors.textInverse, marginBottom: 2 },
+                  ]}
+                >
                   ChefHub
                 </Text>
-                <View style={styles.subtitleRow}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: theme.spacing.xs,
+                  }}
+                >
                   <Ionicons
                     name={getHeaderIcon()}
                     size={14}
@@ -122,7 +146,10 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                     style={{ opacity: 0.9 }}
                   />
                   <Text
-                    style={[styles.subtitle, { color: colors.textInverse }]}
+                    style={[
+                      theme.typography.caption,
+                      { color: colors.textInverse, opacity: 0.95 },
+                    ]}
                   >
                     {getHeaderMessage()}
                   </Text>
@@ -130,20 +157,30 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
               </View>
             </View>
 
-            <View style={styles.headerActions}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: theme.spacing.sm,
+              }}
+            >
               {!loading && recipesCount > 0 && (
                 <View
-                  style={[
-                    styles.recipeBadge,
-                    {
-                      backgroundColor: "rgba(255, 255, 255, 0.25)",
-                      borderColor: "rgba(255, 255, 255, 0.4)",
-                    },
-                  ]}
+                  style={{
+                    borderRadius: theme.borderRadius.full,
+                    paddingHorizontal: theme.spacing.md,
+                    paddingVertical: 6,
+                    minWidth: 44,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderWidth: 1.5,
+                    backgroundColor: "rgba(255, 255, 255, 0.25)",
+                    borderColor: "rgba(255, 255, 255, 0.4)",
+                  }}
                 >
                   <Text
                     style={[
-                      styles.recipeBadgeText,
+                      theme.typography.button,
                       { color: colors.textInverse },
                     ]}
                   >
@@ -153,13 +190,16 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
               )}
               <TouchableOpacity
                 onPress={onToggleFilters}
-                style={[
-                  styles.filterToggle,
-                  {
-                    backgroundColor: "rgba(255, 255, 255, 0.15)",
-                    borderColor: "rgba(255, 255, 255, 0.25)",
-                  },
-                ]}
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: theme.borderRadius.full,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderWidth: 1.5,
+                  backgroundColor: "rgba(255, 255, 255, 0.15)",
+                  borderColor: "rgba(255, 255, 255, 0.25)",
+                }}
                 activeOpacity={0.7}
               >
                 <Ionicons
@@ -176,23 +216,6 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
   );
 };
 
-// Valores del tema extraídos para usar en StyleSheet.create()
-const h1Styles = {
-  fontFamily: "PlayfairDisplay-Bold",
-  fontSize: 32,
-  fontWeight: "700" as const,
-  lineHeight: 1.2,
-  letterSpacing: -0.5,
-};
-
-const captionStyles = {
-  fontFamily: "Inter-Medium",
-  fontSize: 12,
-  fontWeight: "500" as const,
-  lineHeight: 1.4,
-  letterSpacing: 0.2,
-};
-
 const styles = StyleSheet.create({
   headerContainer: {
     overflow: "hidden",
@@ -200,73 +223,5 @@ const styles = StyleSheet.create({
   },
   headerGradient: {
     flex: 1,
-  },
-  header: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    justifyContent: "center",
-  },
-  headerTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    flex: 1,
-  },
-  logoContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: borderRadius.md,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1.5,
-  },
-  titleContent: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  title: {
-    ...h1Styles,
-    marginBottom: 2,
-  },
-  subtitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  subtitle: {
-    ...captionStyles,
-    opacity: 0.95,
-  },
-  headerActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-  },
-  recipeBadge: {
-    borderRadius: borderRadius.full,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 6,
-    minWidth: 44,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1.5,
-  },
-  recipeBadgeText: {
-    fontSize: fontSize.base,
-    fontWeight: "700",
-  },
-  filterToggle: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.full,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1.5,
   },
 });

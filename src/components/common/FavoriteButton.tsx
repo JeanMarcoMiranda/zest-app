@@ -1,7 +1,8 @@
 import { useTheme } from "@/src/hooks";
+import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Animated, StyleSheet, TouchableOpacity } from "react-native";
+import { Animated, TouchableOpacity } from "react-native";
 
 interface FavoriteButtonProps {
   isFavorite: boolean;
@@ -14,7 +15,8 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   onPress,
   size = 24,
 }) => {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const scaleValue = React.useRef(new Animated.Value(1)).current;
 
   const handlePress = () => {
@@ -22,12 +24,12 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     Animated.sequence([
       Animated.timing(scaleValue, {
         toValue: 1.3,
-        duration: 100,
+        duration: theme.duration.fast,
         useNativeDriver: true,
       }),
       Animated.timing(scaleValue, {
         toValue: 1,
-        duration: 100,
+        duration: theme.duration.fast,
         useNativeDriver: true,
       }),
     ]).start();
@@ -35,19 +37,17 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     onPress();
   };
 
-  const shadows = {
-    md: {
-      shadowColor: colors.primaryDark,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 4,
-    },
-  };
-
   return (
     <TouchableOpacity
-      style={[styles.button, { backgroundColor: colors.surface }, shadows.md]}
+      style={{
+        width: 44,
+        height: 44,
+        borderRadius: theme.borderRadius.full,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: colors.surface,
+        ...createShadow(theme as any, theme.elevation.low),
+      }}
       onPress={handlePress}
       activeOpacity={0.7}
     >
@@ -61,15 +61,5 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
 
 export default FavoriteButton;
