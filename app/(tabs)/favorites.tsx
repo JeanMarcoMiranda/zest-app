@@ -1,7 +1,5 @@
-import { LoadingSpinner } from "@/src/components/common";
 import { RecipeCardItem } from "@/src/components/recipe";
 import { useFavorites, useTheme } from "@/src/hooks";
-import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
@@ -21,13 +19,17 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+// Sync with tab bar layout
+const TAB_BAR_HEIGHT = 48;
 
 export default function FavoritesScreen() {
   const router = useRouter();
   const { favorites, loading, clearAllFavorites } = useFavorites();
   const theme = useTheme();
   const { colors, isDark } = theme;
+  const insets = useSafeAreaInsets();
 
   // Animation values
   const heartScale = useSharedValue(1);
@@ -102,47 +104,65 @@ export default function FavoritesScreen() {
   };
 
   if (loading) {
-    return <LoadingSpinner message="Cargando favoritos..." />;
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text
+          style={[theme.typography.bodySm, { color: colors.textSecondary }]}
+        >
+          Cargando favoritos...
+        </Text>
+      </View>
+    );
   }
 
+  const tabBarTotalHeight =
+    TAB_BAR_HEIGHT +
+    Math.max(insets.bottom, theme.spacing.sm) +
+    theme.spacing.sm;
+
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: colors.background }}
-      edges={["top", "bottom"]}
-    >
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      {/* Edge-to-edge StatusBar */}
       <StatusBar
         barStyle={isDark ? "light-content" : "dark-content"}
-        backgroundColor={colors.background}
+        backgroundColor="transparent"
+        translucent={true}
       />
 
       {favorites.length === 0 ? (
-        // Enhanced Empty State
+        // Empty State — centered with insets
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            paddingHorizontal: theme.screenMargins.horizontal,
-            paddingVertical: theme.spacing.xl,
+            paddingHorizontal: theme.spacing.xl,
+            paddingTop: insets.top,
+            paddingBottom: tabBarTotalHeight,
           }}
         >
-          {/* Animated Heart Icon */}
           <Animated.View style={animatedHeartStyle}>
             <Ionicons
               name="heart-outline"
-              size={100}
+              size={80}
               color={colors.primary}
-              style={{ marginBottom: theme.spacing.xl }}
+              style={{ marginBottom: theme.spacing.lg }}
             />
           </Animated.View>
 
-          {/* Main Message */}
           <Text
             style={[
-              theme.typography.h1,
+              theme.typography.h2,
               {
-                color: colors.textHigh,
-                marginBottom: theme.spacing.md,
+                color: colors.text,
+                marginBottom: theme.spacing.sm,
                 textAlign: "center",
               },
             ]}
@@ -150,15 +170,13 @@ export default function FavoritesScreen() {
             No tienes favoritos
           </Text>
 
-          {/* Description */}
           <Text
             style={[
-              theme.typography.bodyLg,
+              theme.typography.bodySm,
               {
-                color: colors.textMed,
+                color: colors.textSecondary,
                 textAlign: "center",
-                lineHeight: Math.round(16 * 1.7),
-                maxWidth: 320,
+                maxWidth: 280,
               },
             ]}
           >
@@ -166,90 +184,85 @@ export default function FavoritesScreen() {
           </Text>
         </View>
       ) : (
-        <>
-          {/* Enhanced Header */}
-          <View
-            style={[
-              {
+        <FlatList
+          data={favorites}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <RecipeCardItem
+              recipe={item}
+              onPress={() => handleRecipePress(item.id)}
+            />
+          )}
+          ListHeaderComponent={
+            <View
+              style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
-                paddingHorizontal: theme.screenMargins.horizontal,
-                paddingVertical: theme.spacing.lg,
-                backgroundColor: colors.surface,
-                borderBottomWidth: 1,
-                borderBottomColor: colors.border,
-              },
-              createShadow(theme as any, theme.elevation.low),
-            ]}
-          >
-            {/* Recipe Count */}
-            <Text
-              style={[
-                theme.typography.h3,
-                {
-                  color: colors.textHigh,
-                },
-              ]}
+                paddingTop: insets.top + theme.spacing.md,
+                paddingBottom: theme.spacing.sm,
+                paddingHorizontal: theme.spacing.sm + 4,
+              }}
             >
-              {favorites.length} {favorites.length === 1 ? "receta" : "recetas"}
-            </Text>
-
-            {/* Delete All Button */}
-            <Animated.View style={animatedDeleteButtonStyle}>
-              <Pressable
-                onPress={handleClearAll}
-                onPressIn={handleDeletePressIn}
-                onPressOut={handleDeletePressOut}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: theme.spacing.xs,
-                  paddingVertical: theme.spacing.sm,
-                  paddingHorizontal: theme.spacing.md,
-                  borderRadius: theme.borderRadius.md,
-                  backgroundColor: `${colors.error}15`,
-                  minHeight: 44,
-                }}
+              {/* Count */}
+              <Text
+                style={[
+                  theme.typography.label,
+                  { color: colors.textSecondary },
+                ]}
               >
-                <Ionicons
-                  name="trash-outline"
-                  size={theme.iconSizes.sm}
-                  color={colors.error}
-                />
-                <Text
-                  style={[
-                    theme.typography.label,
-                    {
-                      color: colors.error,
-                    },
-                  ]}
-                >
-                  Eliminar
-                </Text>
-              </Pressable>
-            </Animated.View>
-          </View>
+                {favorites.length}{" "}
+                {favorites.length === 1
+                  ? "receta guardada"
+                  : "recetas guardadas"}
+              </Text>
 
-          {/* Favorites List */}
-          <FlatList
-            data={favorites}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <RecipeCardItem
-                recipe={item}
-                onPress={() => handleRecipePress(item.id)}
-              />
-            )}
-            contentContainerStyle={{
-              paddingHorizontal: theme.screenMargins.horizontal,
-              paddingTop: theme.spacing.lg,
-              paddingBottom: theme.spacing.xl,
-            }}
-            showsVerticalScrollIndicator={false}
-          />
-        </>
+              {/* Delete All */}
+              <Animated.View style={animatedDeleteButtonStyle}>
+                <Pressable
+                  onPress={handleClearAll}
+                  onPressIn={handleDeletePressIn}
+                  onPressOut={handleDeletePressOut}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 4,
+                    paddingVertical: theme.spacing.xs,
+                    paddingHorizontal: theme.spacing.sm,
+                    borderRadius: theme.borderRadius.full,
+                    backgroundColor: isDark
+                      ? "rgba(239,68,68,0.15)"
+                      : "rgba(239,68,68,0.08)",
+                  }}
+                >
+                  <Ionicons
+                    name="trash-outline"
+                    size={14}
+                    color={colors.error}
+                  />
+                  <Text
+                    style={[
+                      theme.typography.caption,
+                      {
+                        color: colors.error,
+                        textTransform: "none",
+                        fontWeight: "500",
+                      },
+                    ]}
+                  >
+                    Eliminar todo
+                  </Text>
+                </Pressable>
+              </Animated.View>
+            </View>
+          }
+          contentContainerStyle={{
+            paddingHorizontal: theme.spacing.sm + 4,
+            paddingBottom: tabBarTotalHeight + theme.spacing.md,
+          }}
+          showsVerticalScrollIndicator={false}
+        />
       )}
-    </SafeAreaView>
+    </View>
   );
 }

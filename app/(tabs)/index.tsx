@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 // Altura aproximada del header compacto
 const HEADER_HEIGHT = 56;
 // Altura de la tab bar flotante + bottom margin
-const TAB_BAR_HEIGHT = 52;
+const TAB_BAR_HEIGHT = 48;
 const SCROLL_THRESHOLD = 60;
 
 export default function HomeScreen() {

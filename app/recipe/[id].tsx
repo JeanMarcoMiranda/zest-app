@@ -4,19 +4,23 @@ import {
   LoadingSpinner,
 } from "@/src/components/common";
 import { useFavorites, useRecipes, useTheme } from "@/src/hooks";
-import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import {
   Image,
-  SafeAreaView,
+  Platform,
   ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const HERO_BASE_HEIGHT = 320;
 
 export default function RecipeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,6 +28,7 @@ export default function RecipeDetailScreen() {
   const { isFavorite, toggleFavorite } = useFavorites();
   const theme = useTheme();
   const { colors, isDark } = theme;
+  const insets = useSafeAreaInsets();
   const {
     currentRecipe: recipe,
     isLoading: loading,
@@ -71,30 +76,88 @@ export default function RecipeDetailScreen() {
     );
   }
 
+  const heroHeight = HERO_BASE_HEIGHT + insets.top;
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      {/* Translucent StatusBar for edge-to-edge */}
       <StatusBar
-        barStyle={isDark ? "light-content" : "dark-content"}
-        backgroundColor={colors.background}
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent={true}
       />
 
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-        {/* Imagen principal con botón de favorito */}
-        <View style={{ position: "relative" }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+      >
+        {/* Hero Image — extends behind status bar */}
+        <View style={{ height: heroHeight, position: "relative" }}>
           <Image
             source={{ uri: recipe.thumbnail }}
             style={{
               width: "100%",
-              height: 300,
-              backgroundColor: colors.divider,
+              height: "100%",
+              backgroundColor: colors.surfaceVariant,
             }}
             resizeMode="cover"
           />
+
+          {/* Gradient for legibility over image */}
+          <LinearGradient
+            colors={["rgba(0,0,0,0.4)", "transparent", "rgba(0,0,0,0.5)"]}
+            locations={[0, 0.4, 1]}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+          />
+
+          {/* Back button — top left with safe area */}
           <View
             style={{
               position: "absolute",
-              top: theme.spacing.md,
-              right: theme.spacing.md,
+              top: insets.top + theme.spacing.xs,
+              left: theme.spacing.sm,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => router.back()}
+              activeOpacity={0.8}
+              style={{
+                borderRadius: theme.borderRadius.full,
+                overflow: "hidden",
+              }}
+            >
+              <BlurView
+                intensity={Platform.OS === "ios" ? 50 : 90}
+                tint={isDark ? "dark" : "light"}
+                style={{
+                  width: 38,
+                  height: 38,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor:
+                    Platform.OS === "android"
+                      ? "rgba(0,0,0,0.4)"
+                      : "transparent",
+                }}
+              >
+                <Ionicons name="chevron-back" size={20} color="#FFF" />
+              </BlurView>
+            </TouchableOpacity>
+          </View>
+
+          {/* Favorite button — top right with safe area */}
+          <View
+            style={{
+              position: "absolute",
+              top: insets.top + theme.spacing.xs,
+              right: theme.spacing.sm,
             }}
           >
             <FavoriteButton
@@ -102,89 +165,111 @@ export default function RecipeDetailScreen() {
               onPress={handleToggleFavorite}
             />
           </View>
-        </View>
 
-        <View style={{ padding: theme.spacing.lg }}>
-          {/* Título */}
-          <Text
-            style={[
-              theme.typography.h1,
-              {
-                color: colors.text,
-                marginBottom: theme.spacing.md,
-              },
-            ]}
-          >
-            {recipe.title}
-          </Text>
-
-          {/* Tags */}
+          {/* Title overlay at bottom of hero */}
           <View
             style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              gap: theme.spacing.sm,
-              marginBottom: theme.spacing.lg,
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              padding: theme.spacing.md,
+              paddingBottom: theme.spacing.lg,
             }}
           >
+            {/* Category + Area pills */}
             <View
               style={{
-                paddingHorizontal: theme.spacing.md,
-                paddingVertical: theme.spacing.sm,
-                borderRadius: theme.borderRadius.sm,
                 flexDirection: "row",
-                alignItems: "center",
-                backgroundColor: colors.primaryLight,
+                gap: theme.spacing.xs,
+                marginBottom: theme.spacing.sm,
               }}
             >
-              <Ionicons
-                name="pricetag"
-                size={14}
-                color={colors.textInverse}
-                style={{ marginRight: theme.spacing.xs }}
-              />
-              <Text
-                style={[
-                  theme.typography.bodySm,
-                  {
-                    color: colors.textInverse,
-                    fontWeight: "600",
-                  },
-                ]}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 8,
+                  paddingVertical: 3,
+                  borderRadius: theme.borderRadius.full,
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                }}
               >
-                {recipe.category}
-              </Text>
-            </View>
-            <View
-              style={{
-                paddingHorizontal: theme.spacing.md,
-                paddingVertical: theme.spacing.sm,
-                borderRadius: theme.borderRadius.sm,
-                flexDirection: "row",
-                alignItems: "center",
-                backgroundColor: colors.secondary,
-              }}
-            >
-              <Ionicons
-                name="globe-outline"
-                size={14}
-                color={colors.textSecondary}
-                style={{ marginRight: theme.spacing.xs }}
-              />
-              <Text
-                style={[
-                  theme.typography.bodySm,
-                  {
-                    color: colors.textSecondary,
-                    fontWeight: "600",
-                  },
-                ]}
+                <Ionicons
+                  name="pricetag"
+                  size={10}
+                  color="rgba(255,255,255,0.9)"
+                  style={{ marginRight: 4 }}
+                />
+                <Text
+                  style={[
+                    theme.typography.caption,
+                    {
+                      color: "rgba(255,255,255,0.95)",
+                      textTransform: "none",
+                      fontSize: 11,
+                    },
+                  ]}
+                >
+                  {recipe.category}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 8,
+                  paddingVertical: 3,
+                  borderRadius: theme.borderRadius.full,
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                }}
               >
-                {recipe.area}
-              </Text>
+                <Ionicons
+                  name="globe-outline"
+                  size={10}
+                  color="rgba(255,255,255,0.9)"
+                  style={{ marginRight: 4 }}
+                />
+                <Text
+                  style={[
+                    theme.typography.caption,
+                    {
+                      color: "rgba(255,255,255,0.95)",
+                      textTransform: "none",
+                      fontSize: 11,
+                    },
+                  ]}
+                >
+                  {recipe.area}
+                </Text>
+              </View>
             </View>
-          </View>
 
+            <Text
+              style={[
+                theme.typography.h1,
+                {
+                  color: "#FFF",
+                  textShadowColor: "rgba(0,0,0,0.4)",
+                  textShadowOffset: { width: 0, height: 1 },
+                  textShadowRadius: 4,
+                },
+              ]}
+              numberOfLines={3}
+            >
+              {recipe.title}
+            </Text>
+          </View>
+        </View>
+
+        {/* Content body */}
+        <View
+          style={{
+            paddingHorizontal: theme.spacing.md,
+            paddingTop: theme.spacing.lg,
+            paddingBottom: theme.spacing.xl,
+          }}
+        >
           {/* Ingredientes */}
           <View style={{ marginBottom: theme.spacing.lg }}>
             <View
@@ -197,67 +282,73 @@ export default function RecipeDetailScreen() {
             >
               <Ionicons
                 name="restaurant-outline"
-                size={20}
+                size={18}
                 color={colors.primary}
               />
+              <Text style={[theme.typography.h3, { color: colors.text }]}>
+                Ingredientes
+              </Text>
               <Text
                 style={[
-                  theme.typography.h3,
+                  theme.typography.caption,
                   {
-                    color: colors.text,
+                    color: colors.textSecondary,
+                    textTransform: "none",
+                    marginLeft: 4,
                   },
                 ]}
               >
-                Ingredientes
+                ({recipe.ingredients.length})
               </Text>
             </View>
+
             <View
-              style={[
-                {
-                  padding: theme.spacing.md,
-                  borderRadius: theme.borderRadius.md,
-                  backgroundColor: colors.surface,
-                },
-                createShadow(theme as any, theme.elevation.low),
-              ]}
+              style={{
+                padding: theme.spacing.md,
+                borderRadius: theme.borderRadius.md,
+                backgroundColor: isDark
+                  ? "rgba(255,255,255,0.04)"
+                  : "rgba(0,0,0,0.02)",
+                borderWidth: 0.5,
+                borderColor: isDark
+                  ? "rgba(255,255,255,0.06)"
+                  : "rgba(0,0,0,0.05)",
+              }}
             >
               {recipe.ingredients.map((ingredient, index) => (
                 <View
                   key={index}
                   style={{
                     flexDirection: "row",
-                    marginBottom: theme.spacing.sm,
+                    paddingVertical: theme.spacing.xs + 1,
+                    borderBottomWidth:
+                      index < recipe.ingredients.length - 1 ? 0.5 : 0,
+                    borderBottomColor: isDark
+                      ? "rgba(255,255,255,0.04)"
+                      : "rgba(0,0,0,0.04)",
                   }}
                 >
                   <Text
                     style={[
-                      theme.typography.bodyLg,
+                      theme.typography.bodySm,
                       {
                         color: colors.primary,
-                        marginRight: theme.spacing.sm,
-                        fontWeight: "700",
+                        fontWeight: "600",
+                        minWidth: 80,
                       },
                     ]}
                   >
-                    •
+                    {ingredient.measure}
                   </Text>
                   <Text
                     style={[
-                      theme.typography.bodyLg,
+                      theme.typography.bodySm,
                       {
                         flex: 1,
                         color: colors.text,
                       },
                     ]}
                   >
-                    <Text
-                      style={{
-                        color: colors.primary,
-                        fontWeight: "600",
-                      }}
-                    >
-                      {ingredient.measure}
-                    </Text>{" "}
                     {ingredient.name}
                   </Text>
                 </View>
@@ -265,7 +356,7 @@ export default function RecipeDetailScreen() {
             </View>
           </View>
 
-          {/* Vista previa de instrucciones */}
+          {/* Instrucciones preview */}
           <View style={{ marginBottom: theme.spacing.lg }}>
             <View
               style={{
@@ -277,59 +368,55 @@ export default function RecipeDetailScreen() {
             >
               <Ionicons
                 name="document-text-outline"
-                size={20}
+                size={18}
                 color={colors.primary}
               />
-              <Text
-                style={[
-                  theme.typography.h3,
-                  {
-                    color: colors.text,
-                  },
-                ]}
-              >
+              <Text style={[theme.typography.h3, { color: colors.text }]}>
                 Instrucciones
               </Text>
             </View>
+
             <View
-              style={[
-                {
-                  padding: theme.spacing.md,
-                  borderRadius: theme.borderRadius.md,
-                  backgroundColor: colors.surface,
-                },
-                createShadow(theme as any, theme.elevation.low),
-              ]}
+              style={{
+                padding: theme.spacing.md,
+                borderRadius: theme.borderRadius.md,
+                backgroundColor: isDark
+                  ? "rgba(255,255,255,0.04)"
+                  : "rgba(0,0,0,0.02)",
+                borderWidth: 0.5,
+                borderColor: isDark
+                  ? "rgba(255,255,255,0.06)"
+                  : "rgba(0,0,0,0.05)",
+              }}
             >
               <Text
                 style={[
-                  theme.typography.bodyLg,
+                  theme.typography.bodySm,
                   {
                     color: colors.text,
-                    lineHeight: 22,
+                    lineHeight: 20,
                   },
                 ]}
-                numberOfLines={3}
+                numberOfLines={4}
               >
                 {recipe.instructions}
               </Text>
               <Text
                 style={[
-                  theme.typography.bodySm,
+                  theme.typography.caption,
                   {
                     color: colors.textLight,
-                    fontStyle: "italic",
+                    textTransform: "none",
                     marginTop: theme.spacing.sm,
                   },
                 ]}
               >
-                Toca &quot;Comenzar a Cocinar&quot; para ver todas las
-                instrucciones
+                Toca "Comenzar a Cocinar" para ver el paso a paso
               </Text>
             </View>
           </View>
 
-          {/* Tags adicionales */}
+          {/* Tags */}
           {recipe.tags.length > 0 && (
             <View style={{ marginBottom: theme.spacing.lg }}>
               <View
@@ -340,15 +427,8 @@ export default function RecipeDetailScreen() {
                   marginBottom: theme.spacing.sm,
                 }}
               >
-                <Ionicons name="pricetags" size={20} color={colors.primary} />
-                <Text
-                  style={[
-                    theme.typography.h3,
-                    {
-                      color: colors.text,
-                    },
-                  ]}
-                >
+                <Ionicons name="pricetags" size={18} color={colors.primary} />
+                <Text style={[theme.typography.h3, { color: colors.text }]}>
                   Etiquetas
                 </Text>
               </View>
@@ -365,10 +445,14 @@ export default function RecipeDetailScreen() {
                     style={{
                       paddingHorizontal: theme.spacing.sm,
                       paddingVertical: theme.spacing.xs,
-                      borderRadius: theme.borderRadius.xs,
-                      borderWidth: 1,
-                      backgroundColor: colors.background,
-                      borderColor: colors.border,
+                      borderRadius: theme.borderRadius.full,
+                      borderWidth: 0.5,
+                      backgroundColor: isDark
+                        ? "rgba(255,255,255,0.04)"
+                        : "rgba(0,0,0,0.02)",
+                      borderColor: isDark
+                        ? "rgba(255,255,255,0.08)"
+                        : "rgba(0,0,0,0.06)",
                     }}
                   >
                     <Text
@@ -376,6 +460,7 @@ export default function RecipeDetailScreen() {
                         theme.typography.caption,
                         {
                           color: colors.textSecondary,
+                          textTransform: "none",
                           fontWeight: "500",
                         },
                       ]}
@@ -388,40 +473,33 @@ export default function RecipeDetailScreen() {
             </View>
           )}
 
-          {/* Botón de cocinar */}
+          {/* Cocinar button */}
           <TouchableOpacity
-            style={[
-              {
-                padding: theme.spacing.md,
-                borderRadius: theme.borderRadius.md,
-                alignItems: "center",
-                marginTop: theme.spacing.md,
-                flexDirection: "row",
-                justifyContent: "center",
-                gap: theme.spacing.sm,
-                backgroundColor: colors.primary,
-              },
-              createShadow(theme as any, theme.elevation.medium),
-            ]}
+            style={{
+              paddingVertical: theme.spacing.md,
+              borderRadius: theme.borderRadius.md,
+              alignItems: "center",
+              marginTop: theme.spacing.sm,
+              flexDirection: "row",
+              justifyContent: "center",
+              gap: theme.spacing.sm,
+              backgroundColor: colors.primary,
+            }}
             onPress={handleStartCooking}
+            activeOpacity={0.85}
           >
-            <Ionicons name="flame" size={24} color={colors.textInverse} />
+            <Ionicons name="flame" size={20} color={colors.textInverse} />
             <Text
-              style={[
-                theme.typography.button,
-                {
-                  color: colors.textInverse,
-                },
-              ]}
+              style={[theme.typography.button, { color: colors.textInverse }]}
             >
               Comenzar a Cocinar
             </Text>
           </TouchableOpacity>
 
-          {/* Espacio inferior */}
-          <View style={{ height: theme.spacing.xl }} />
+          {/* Bottom spacing for safe area */}
+          <View style={{ height: insets.bottom + theme.spacing.md }} />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

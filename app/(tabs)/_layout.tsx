@@ -15,40 +15,38 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: isDark
-          ? "rgba(245,245,244,0.5)"
-          : "rgba(69,26,3,0.4)",
+          ? "rgba(245,245,244,0.35)"
+          : "rgba(69,26,3,0.3)",
+        tabBarShowLabel: false,
         tabBarStyle: {
           position: "absolute",
           bottom: Math.max(insets.bottom, theme.spacing.sm),
-          left: theme.spacing.lg,
-          right: theme.spacing.lg,
-          height: 52,
+          left: theme.spacing.xl,
+          right: theme.spacing.xl,
+          height: 48,
           borderRadius: theme.borderRadius.full,
           backgroundColor: isDark
-            ? "rgba(41,37,36,0.80)"
-            : "rgba(255,255,255,0.75)",
+            ? "rgba(28,25,23,0.85)"
+            : "rgba(255,255,255,0.80)",
           borderTopWidth: 0,
           borderWidth: 0.5,
-          borderColor: isDark ? "rgba(68,64,60,0.5)" : "rgba(231,229,228,0.8)",
+          borderColor: isDark ? "rgba(68,64,60,0.3)" : "rgba(0,0,0,0.06)",
           paddingBottom: 0,
           elevation: 0,
           shadowColor: "#000",
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.08,
-          shadowRadius: 24,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.06,
+          shadowRadius: 16,
         },
         tabBarItemStyle: {
-          paddingVertical: 4,
-        },
-        tabBarLabelStyle: {
-          fontSize: 9,
-          fontWeight: "600",
-          marginTop: 1,
+          paddingVertical: 0,
+          justifyContent: "center",
+          alignItems: "center",
         },
         tabBarBackground: () =>
           Platform.OS === "ios" ? (
             <BlurView
-              intensity={80}
+              intensity={70}
               tint={isDark ? "dark" : "light"}
               style={{
                 position: "absolute",
@@ -70,8 +68,8 @@ export default function TabLayout() {
                 bottom: 0,
                 borderRadius: theme.borderRadius.full,
                 backgroundColor: isDark
-                  ? "rgba(41,37,36,0.88)"
-                  : "rgba(255,255,255,0.82)",
+                  ? "rgba(28,25,23,0.92)"
+                  : "rgba(255,255,255,0.88)",
               }}
             />
           ),
@@ -82,8 +80,24 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Explorar",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <View style={{ alignItems: "center", gap: 3 }}>
+              <Ionicons
+                name={focused ? "compass" : "compass-outline"}
+                size={22}
+                color={color}
+              />
+              {focused && (
+                <View
+                  style={{
+                    width: 4,
+                    height: 4,
+                    borderRadius: 2,
+                    backgroundColor: colors.primary,
+                  }}
+                />
+              )}
+            </View>
           ),
         }}
       />
@@ -91,8 +105,24 @@ export default function TabLayout() {
         name="favorites"
         options={{
           title: "Favoritos",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="heart" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <View style={{ alignItems: "center", gap: 3 }}>
+              <Ionicons
+                name={focused ? "heart" : "heart-outline"}
+                size={22}
+                color={color}
+              />
+              {focused && (
+                <View
+                  style={{
+                    width: 4,
+                    height: 4,
+                    borderRadius: 2,
+                    backgroundColor: colors.primary,
+                  }}
+                />
+              )}
+            </View>
           ),
         }}
       />
@@ -100,8 +130,24 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: "Configuración",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <View style={{ alignItems: "center", gap: 3 }}>
+              <Ionicons
+                name={focused ? "settings" : "settings-outline"}
+                size={22}
+                color={color}
+              />
+              {focused && (
+                <View
+                  style={{
+                    width: 4,
+                    height: 4,
+                    borderRadius: 2,
+                    backgroundColor: colors.primary,
+                  }}
+                />
+              )}
+            </View>
           ),
         }}
       />

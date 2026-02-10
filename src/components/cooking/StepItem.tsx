@@ -1,6 +1,5 @@
 import { useTheme } from "@/src/hooks";
 import { RecipeStep } from "@/src/types/recipe.types";
-import { createShadow } from "@/src/utils";
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
@@ -30,7 +29,7 @@ export const StepItem: React.FC<StepItemProps> = ({
   onComplete,
 }) => {
   const theme = useTheme();
-  const { colors } = theme;
+  const { colors, isDark } = theme;
 
   // Animation values
   const scale = useSharedValue(1);
@@ -48,71 +47,57 @@ export const StepItem: React.FC<StepItemProps> = ({
     return "radio-button-unchecked";
   };
 
-  // Animated styles for card press
   const animatedCardStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
 
-  // Animated styles for checkbox press
   const animatedCheckboxStyle = useAnimatedStyle(() => ({
     transform: [{ scale: checkboxScale.value }],
   }));
 
   const handlePressIn = () => {
-    scale.value = withSpring(0.98, {
-      damping: 15,
-      stiffness: 300,
-    });
+    scale.value = withSpring(0.98, { damping: 15, stiffness: 300 });
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1, {
-      damping: 15,
-      stiffness: 300,
-    });
+    scale.value = withSpring(1, { damping: 15, stiffness: 300 });
   };
 
   const handleCheckboxPressIn = () => {
-    checkboxScale.value = withSpring(0.9, {
-      damping: 15,
-      stiffness: 300,
-    });
+    checkboxScale.value = withSpring(0.9, { damping: 15, stiffness: 300 });
   };
 
   const handleCheckboxPressOut = () => {
-    checkboxScale.value = withSpring(1, {
-      damping: 15,
-      stiffness: 300,
-    });
+    checkboxScale.value = withSpring(1, { damping: 15, stiffness: 300 });
   };
 
   return (
     <View
       style={{
         flexDirection: "row",
-        marginBottom: theme.spacing.lg,
-        paddingHorizontal: theme.screenMargins.horizontal,
+        marginBottom: theme.spacing.md,
+        paddingHorizontal: theme.spacing.md,
       }}
     >
       {/* Timeline Indicator */}
       <View
         style={{
           alignItems: "center",
-          marginRight: theme.spacing.md,
+          marginRight: theme.spacing.sm + 4,
         }}
       >
         {/* Step Circle Icon */}
         <View
           style={{
-            width: 44,
-            height: 44,
+            width: 32,
+            height: 32,
             justifyContent: "center",
             alignItems: "center",
           }}
         >
           <MaterialIcons
             name={getIconName()}
-            size={36}
+            size={24}
             color={getCircleColor()}
           />
         </View>
@@ -121,12 +106,17 @@ export const StepItem: React.FC<StepItemProps> = ({
         {!isLast && (
           <View
             style={{
-              width: 2,
+              width: 1.5,
               flex: 1,
-              minHeight: 24,
+              minHeight: 16,
               marginTop: theme.spacing.xs,
-              backgroundColor: isCompleted ? colors.success : colors.divider,
+              backgroundColor: isCompleted
+                ? colors.success
+                : isDark
+                  ? "rgba(255,255,255,0.08)"
+                  : "rgba(0,0,0,0.06)",
               opacity: isCompleted ? 0.4 : 1,
+              borderRadius: 1,
             }}
           />
         )}
@@ -137,21 +127,29 @@ export const StepItem: React.FC<StepItemProps> = ({
         <Pressable
           style={[
             {
-              padding: theme.spacing.lg,
-              borderRadius: theme.borderRadius.xl,
-              borderWidth: 2,
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              ...createShadow(theme as any, theme.elevation.low),
+              padding: theme.spacing.md,
+              borderRadius: theme.borderRadius.md,
+              borderWidth: 0.5,
+              backgroundColor: isDark
+                ? "rgba(255,255,255,0.03)"
+                : "rgba(0,0,0,0.01)",
+              borderColor: isDark
+                ? "rgba(255,255,255,0.06)"
+                : "rgba(0,0,0,0.05)",
             },
             isActive && {
-              borderColor: colors.primary,
-              ...createShadow(theme as any, theme.elevation.medium),
+              borderColor: isDark
+                ? `${colors.primary}40`
+                : `${colors.primary}25`,
+              backgroundColor: isDark
+                ? `${colors.primary}08`
+                : `${colors.primary}04`,
             },
             isCompleted && {
-              borderColor: colors.success,
-              backgroundColor: colors.surface,
-              opacity: 0.85,
+              borderColor: isDark
+                ? `${colors.success}30`
+                : `${colors.success}20`,
+              opacity: 0.8,
             },
           ]}
           onPress={onPress}
@@ -164,38 +162,35 @@ export const StepItem: React.FC<StepItemProps> = ({
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: theme.spacing.md,
+              marginBottom: theme.spacing.sm,
             }}
           >
             <Text
               style={[
-                isActive ? theme.typography.h3 : theme.typography.label,
+                theme.typography.caption,
                 {
                   color: colors.textSecondary,
                   textTransform: "uppercase",
-                  letterSpacing: 1,
+                  letterSpacing: 0.8,
+                  fontSize: 10,
                 },
-                isActive && {
-                  color: colors.primary,
-                },
-                isCompleted && {
-                  color: colors.success,
-                },
+                isActive && { color: colors.primary },
+                isCompleted && { color: colors.success },
               ]}
             >
               Paso {step.number}
             </Text>
 
-            {/* Checkbox with larger touch target */}
+            {/* Checkbox */}
             <Animated.View style={animatedCheckboxStyle}>
               <Pressable
                 onPress={onComplete}
                 onPressIn={handleCheckboxPressIn}
                 onPressOut={handleCheckboxPressOut}
                 style={{
-                  padding: theme.spacing.sm,
-                  minWidth: 44,
-                  minHeight: 44,
+                  padding: theme.spacing.xs,
+                  minWidth: 36,
+                  minHeight: 36,
                   justifyContent: "center",
                   alignItems: "center",
                 }}
@@ -203,25 +198,25 @@ export const StepItem: React.FC<StepItemProps> = ({
               >
                 <MaterialIcons
                   name={isCompleted ? "check-box" : "check-box-outline-blank"}
-                  size={28}
+                  size={20}
                   color={isCompleted ? colors.success : colors.textLight}
                 />
               </Pressable>
             </Animated.View>
           </View>
 
-          {/* Step Text - Cooking Mode Typography (20% larger) */}
+          {/* Step Text */}
           <Text
             style={[
               theme.typography.bodyLgCooking,
               {
-                color: colors.textHigh,
-                lineHeight: Math.round(19.2 * 1.7), // bodyLgCooking with relaxed line height
+                color: colors.text,
+                lineHeight: Math.round(19.2 * 1.6),
               },
               isCompleted && {
-                color: colors.textMed,
+                color: colors.textSecondary,
                 textDecorationLine: "line-through",
-                opacity: 0.7,
+                opacity: 0.6,
               },
             ]}
             numberOfLines={isActive ? undefined : 3}
@@ -229,29 +224,37 @@ export const StepItem: React.FC<StepItemProps> = ({
             {step.instruction}
           </Text>
 
-          {/* Note Section */}
+          {/* Note Section — theme-aware */}
           {step.note && (
             <View
               style={{
-                marginTop: theme.spacing.md,
-                padding: theme.spacing.md,
-                backgroundColor: isCompleted ? "#F0F0F0" : "#FFF9C4", // Yellow for active notes
-                borderRadius: theme.borderRadius.md,
-                borderLeftWidth: 4,
-                borderLeftColor: isCompleted ? "#CCC" : "#FBC02D",
+                marginTop: theme.spacing.sm,
+                padding: theme.spacing.sm,
+                backgroundColor: isDark
+                  ? "rgba(251,192,45,0.08)"
+                  : "rgba(251,192,45,0.1)",
+                borderRadius: theme.borderRadius.sm,
+                borderLeftWidth: 2,
+                borderLeftColor: isDark
+                  ? "rgba(251,192,45,0.4)"
+                  : "rgba(251,192,45,0.6)",
               }}
             >
               <Text
                 style={[
                   theme.typography.bodySm,
                   {
-                    color: isCompleted ? colors.textLight : "#5D4037",
+                    color: isDark
+                      ? "rgba(255,255,255,0.7)"
+                      : "rgba(93,64,55,0.85)",
                     fontStyle: "italic",
-                    fontSize: 16, // Un poco más grande que el caption
+                  },
+                  isCompleted && {
+                    color: colors.textLight,
                   },
                 ]}
               >
-                <Text style={{ fontWeight: "bold" }}>Nota: </Text>
+                <Text style={{ fontWeight: "600" }}>Nota: </Text>
                 {step.note}
               </Text>
             </View>
@@ -260,11 +263,15 @@ export const StepItem: React.FC<StepItemProps> = ({
           {/* Ingredients & Equipment Chips */}
           {isActive && !isCompleted && (
             <View
-              style={{ marginTop: theme.spacing.lg, gap: theme.spacing.sm }}
+              style={{ marginTop: theme.spacing.md, gap: theme.spacing.sm }}
             >
               {step.ingredients && step.ingredients.length > 0 && (
                 <View
-                  style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: theme.spacing.xs,
+                  }}
                 >
                   {step.ingredients.map((ing, i) => (
                     <View
@@ -272,18 +279,22 @@ export const StepItem: React.FC<StepItemProps> = ({
                       style={{
                         flexDirection: "row",
                         alignItems: "center",
-                        backgroundColor: colors.background,
+                        backgroundColor: isDark
+                          ? "rgba(255,255,255,0.06)"
+                          : "rgba(0,0,0,0.04)",
                         paddingHorizontal: 8,
-                        paddingVertical: 4,
-                        borderRadius: 12,
-                        borderWidth: 1,
-                        borderColor: colors.divider,
+                        paddingVertical: 3,
+                        borderRadius: theme.borderRadius.full,
                       }}
                     >
                       <Text
                         style={[
                           theme.typography.caption,
-                          { color: colors.textSecondary },
+                          {
+                            color: colors.textSecondary,
+                            textTransform: "none",
+                            fontSize: 11,
+                          },
                         ]}
                       >
                         {ing.name}
@@ -295,19 +306,19 @@ export const StepItem: React.FC<StepItemProps> = ({
             </View>
           )}
 
-          {/* Expand Hint for Collapsed Steps */}
+          {/* Expand Hint */}
           {!isActive && (
             <View
               style={{
-                marginTop: theme.spacing.md,
+                marginTop: theme.spacing.sm,
                 flexDirection: "row",
                 alignItems: "center",
-                gap: theme.spacing.xs,
+                gap: 3,
               }}
             >
               <MaterialIcons
                 name="touch-app"
-                size={14}
+                size={11}
                 color={colors.textLight}
               />
               <Text
@@ -315,6 +326,8 @@ export const StepItem: React.FC<StepItemProps> = ({
                   theme.typography.caption,
                   {
                     color: colors.textLight,
+                    textTransform: "none",
+                    fontSize: 10,
                   },
                 ]}
               >

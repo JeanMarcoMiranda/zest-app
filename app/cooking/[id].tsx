@@ -3,34 +3,26 @@
 import { ErrorView, LoadingSpinner } from "@/src/components/common";
 import { StepItem } from "@/src/components/cooking";
 import { useRecipes, useTheme } from "@/src/hooks";
-import { createShadow } from "@/src/utils";
 import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StatusBar, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function CookingStepsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const theme = useTheme();
-  const { colors } = theme;
+  const { colors, isDark } = theme;
+  const insets = useSafeAreaInsets();
   const { currentRecipe, isLoading, fetchRecipeById } = useRecipes();
 
-  // Si tenemos la receta en el store y coincide con el ID, la usamos.
-  // Si no, la buscamos.
   const recipe = currentRecipe?.id === id ? currentRecipe : null;
   const loading = isLoading && !recipe;
 
@@ -46,9 +38,6 @@ export default function CookingStepsScreen() {
     }
   }, [id, recipe, fetchRecipeById]);
 
-  // Usar los pasos ya procesados en el adaptador
-  // recipe.steps ya es RecipeStep[], que es lo que espera StepItem (si la interfaz coincide)
-  // StepItem espera `step: RecipeStep`.
   const steps = recipe?.steps || [];
   const totalSteps = steps.length;
   const progress =
@@ -93,22 +82,27 @@ export default function CookingStepsScreen() {
   const gradientColors = [colors.primary, colors.primaryLight] as const;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      {/* Edge-to-edge StatusBar */}
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent={true}
+      />
 
-      {/* Header con gradiente */}
-      <LinearGradient
-        colors={gradientColors}
-        style={createShadow(theme as any, theme.elevation.high)}
-      >
+      {/* Header with gradient — extends behind status bar */}
+      <LinearGradient colors={gradientColors}>
+        {/* Safe area spacer */}
+        <View style={{ height: insets.top }} />
+
+        {/* Header content */}
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            paddingHorizontal: theme.screenMargins.horizontal,
-            paddingVertical: theme.spacing.lg,
-            paddingTop: theme.spacing.md,
+            paddingHorizontal: theme.spacing.md,
+            paddingVertical: theme.spacing.md,
           }}
         >
           {/* Recipe Title & Progress Info */}
@@ -120,10 +114,10 @@ export default function CookingStepsScreen() {
           >
             <Text
               style={[
-                theme.typography.h2,
+                theme.typography.h3,
                 {
                   color: colors.textInverse,
-                  marginBottom: theme.spacing.xs,
+                  marginBottom: 2,
                 },
               ]}
               numberOfLines={2}
@@ -139,15 +133,15 @@ export default function CookingStepsScreen() {
             >
               <MaterialIcons
                 name="check-circle"
-                size={theme.iconSizes.sm}
-                color={colors.textInverse}
+                size={14}
+                color="rgba(255,255,255,0.8)"
               />
               <Text
                 style={[
-                  theme.typography.bodySm,
+                  theme.typography.caption,
                   {
-                    color: colors.textInverse,
-                    opacity: 0.95,
+                    color: "rgba(255,255,255,0.8)",
+                    textTransform: "none",
                   },
                 ]}
               >
@@ -156,33 +150,29 @@ export default function CookingStepsScreen() {
             </View>
           </View>
 
-          {/* Close Button - Glassmorphism */}
+          {/* Close Button */}
           <Pressable
             style={{
-              width: 44,
-              height: 44,
+              width: 36,
+              height: 36,
               borderRadius: theme.borderRadius.full,
-              backgroundColor: "rgba(255, 255, 255, 0.25)",
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
               justifyContent: "center",
               alignItems: "center",
-              borderWidth: 1,
-              borderColor: "rgba(255, 255, 255, 0.3)",
+              borderWidth: 0.5,
+              borderColor: "rgba(255, 255, 255, 0.25)",
             }}
             onPress={() => router.back()}
           >
-            <MaterialIcons
-              name="close"
-              size={theme.iconSizes.md}
-              color={colors.textInverse}
-            />
+            <MaterialIcons name="close" size={18} color={colors.textInverse} />
           </Pressable>
         </View>
 
-        {/* Progress Bar - Enhanced */}
+        {/* Progress Bar */}
         <View
           style={{
-            height: 6,
-            backgroundColor: "rgba(255, 255, 255, 0.25)",
+            height: 4,
+            backgroundColor: "rgba(255, 255, 255, 0.2)",
             overflow: "hidden",
           }}
         >
@@ -192,6 +182,7 @@ export default function CookingStepsScreen() {
               {
                 height: "100%",
                 backgroundColor: colors.textInverse,
+                borderRadius: 2,
               },
             ]}
           />
@@ -200,10 +191,10 @@ export default function CookingStepsScreen() {
 
       {/* Steps List */}
       <ScrollView
-        style={{ flex: 1, backgroundColor: colors.background }}
+        style={{ flex: 1 }}
         contentContainerStyle={{
-          paddingTop: theme.spacing.lg,
-          paddingBottom: theme.spacing.xl,
+          paddingTop: theme.spacing.md,
+          paddingBottom: theme.spacing.xl + 80 + insets.bottom,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -221,53 +212,43 @@ export default function CookingStepsScreen() {
         ))}
       </ScrollView>
 
-      {/* Finish Button - Fixed Bottom */}
+      {/* Finish Button — fixed bottom with safe area */}
       <View
-        style={[
-          {
-            paddingHorizontal: theme.screenMargins.horizontal,
-            paddingVertical: theme.spacing.lg,
-            borderTopWidth: 1,
-            backgroundColor: colors.surface,
-            borderTopColor: colors.border,
-          },
-          createShadow(theme as any, theme.elevation.high),
-        ]}
+        style={{
+          paddingHorizontal: theme.spacing.md,
+          paddingTop: theme.spacing.sm,
+          paddingBottom: insets.bottom + theme.spacing.sm,
+          backgroundColor: colors.background,
+          borderTopWidth: 0.5,
+          borderTopColor: isDark
+            ? "rgba(255,255,255,0.06)"
+            : "rgba(0,0,0,0.05)",
+        }}
       >
         <Pressable
-          style={[
-            {
-              paddingVertical: theme.spacing.md,
-              paddingHorizontal: theme.spacing.lg,
-              borderRadius: theme.borderRadius.md,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: theme.spacing.sm,
-              backgroundColor: allCompleted ? colors.success : colors.primary,
-              minHeight: 56,
-            },
-            createShadow(theme as any, theme.elevation.medium),
-          ]}
+          style={{
+            paddingVertical: theme.spacing.md,
+            borderRadius: theme.borderRadius.md,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: theme.spacing.sm,
+            backgroundColor: allCompleted ? colors.success : colors.primary,
+          }}
           onPress={handleFinish}
         >
           <MaterialIcons
             name={allCompleted ? "celebration" : "check-circle"}
-            size={theme.iconSizes.md}
+            size={20}
             color={colors.textInverse}
           />
           <Text
-            style={[
-              theme.typography.button,
-              {
-                color: colors.textInverse,
-              },
-            ]}
+            style={[theme.typography.button, { color: colors.textInverse }]}
           >
             {allCompleted ? "¡Receta Completada!" : "Finalizar Receta"}
           </Text>
         </Pressable>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
