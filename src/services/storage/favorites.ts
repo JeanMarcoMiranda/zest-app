@@ -1,7 +1,7 @@
 import { FavoriteRecipe } from "@/src/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const FAVORITES_KEY = "@chefhub:favorites";
+const FAVORITES_KEY = "@zest:favorites";
 
 export const getFavorites = async (): Promise<FavoriteRecipe[]> => {
   try {

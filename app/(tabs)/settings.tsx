@@ -190,7 +190,7 @@ export default function SettingsScreen() {
               },
             ]}
           >
-            ChefHub v1.0.0
+            Zest v1.0.0
           </Text>
         </View>
       </ScrollView>

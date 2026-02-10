@@ -15,7 +15,7 @@ export const useStore = create<StoreState>()(
       ...createThemeSlice(...a),
     }),
     {
-      name: "chefhub-storage",
+      name: "zest-storage",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         // Solo persistimos el tema y favoritos por ahora

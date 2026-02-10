@@ -64,7 +64,7 @@ export const MOCK_RECIPES: Recipe[] = [
       { name: "Pecorino Romano", measure: "100g" },
       { name: "Black Pepper", measure: "to taste" },
     ],
-    source: "ChefHub Classics",
+    source: "Zest Classics",
   },
   {
     id: "mock-2",
@@ -123,7 +123,7 @@ export const MOCK_RECIPES: Recipe[] = [
       { name: "White Onion", measure: "1 chopped" },
       { name: "Cilantro", measure: "1 bunch" },
     ],
-    source: "ChefHub Street Food",
+    source: "Zest Street Food",
   },
   {
     id: "mock-3",
@@ -178,7 +178,7 @@ export const MOCK_RECIPES: Recipe[] = [
       { name: "Lime", measure: "1/2" },
       { name: "Chili Flakes", measure: "pinch" },
     ],
-    source: "ChefHub Healthy",
+    source: "Zest Healthy",
   },
   {
     id: "mock-4",
@@ -242,7 +242,7 @@ export const MOCK_RECIPES: Recipe[] = [
       { name: "Garam Masala", measure: "2 tbsp" },
       { name: "Basmati Rice", measure: "for serving" },
     ],
-    source: "ChefHub World",
+    source: "Zest World",
   },
   {
     id: "mock-5",
@@ -302,7 +302,7 @@ export const MOCK_RECIPES: Recipe[] = [
       { name: "Tomato", measure: "4 slices" },
       { name: "Salt & Pepper", measure: "to taste" },
     ],
-    source: "ChefHub Grill",
+    source: "Zest Grill",
   },
   {
     id: "mock-6",
@@ -363,6 +363,6 @@ export const MOCK_RECIPES: Recipe[] = [
       { name: "Ginger", measure: "1 inch" },
       { name: "Rice", measure: "for serving" },
     ],
-    source: "ChefHub Quick & Easy",
+    source: "Zest Quick & Easy",
   },
 ];

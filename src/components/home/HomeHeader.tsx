@@ -109,7 +109,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                 { color: colors.text, lineHeight: 18 },
               ]}
             >
-              ChefHub
+              Zest
             </Text>
             <View
               style={{
