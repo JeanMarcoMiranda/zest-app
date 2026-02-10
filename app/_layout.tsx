@@ -1,10 +1,12 @@
 // app/_layout.tsx
 
 import { useTheme } from "@/src/hooks";
+import { fontSize } from "@/src/theme";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
 
   return (
     <Stack
@@ -15,7 +17,7 @@ export default function RootLayout() {
         headerTintColor: colors.primary,
         headerTitleStyle: {
           fontWeight: "600",
-          fontSize: 18,
+          fontSize: fontSize.lg,
         },
         headerShadowVisible: false,
         contentStyle: {

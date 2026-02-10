@@ -1,9 +1,11 @@
 import { useTheme } from "@/src/hooks";
+import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
 export default function TabLayout() {
-  const { colors, isDark } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
 
   return (
     <Tabs
@@ -13,6 +15,7 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
+          ...createShadow(theme as any, theme.elevation.low),
         },
         headerShown: false,
       }}

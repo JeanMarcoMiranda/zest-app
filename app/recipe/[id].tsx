@@ -4,7 +4,7 @@ import {
   LoadingSpinner,
 } from "@/src/components/common";
 import { useFavorites, useRecipes, useTheme } from "@/src/hooks";
-import { borderRadius, fontSize, spacing } from "@/src/theme";
+import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect } from "react";
@@ -13,7 +13,6 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -23,7 +22,8 @@ export default function RecipeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
-  const { colors, isDark } = useTheme();
+  const theme = useTheme();
+  const { colors, isDark } = theme;
   const {
     currentRecipe: recipe,
     isLoading: loading,
@@ -71,44 +71,32 @@ export default function RecipeDetailScreen() {
     );
   }
 
-  const shadows = {
-    sm: {
-      shadowColor: colors.primaryDark,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
-      shadowRadius: 2,
-      elevation: 2,
-    },
-    md: {
-      shadowColor: colors.primaryDark,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 4,
-    },
-  };
-
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar
         barStyle={isDark ? "light-content" : "dark-content"}
         backgroundColor={colors.background}
       />
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         {/* Imagen principal con botón de favorito */}
-        <View style={styles.imageContainer}>
+        <View style={{ position: "relative" }}>
           <Image
             source={{ uri: recipe.thumbnail }}
-            style={[styles.image, { backgroundColor: colors.divider }]}
+            style={{
+              width: "100%",
+              height: 300,
+              backgroundColor: colors.divider,
+            }}
             resizeMode="cover"
           />
-          <View style={styles.favoriteButtonContainer}>
+          <View
+            style={{
+              position: "absolute",
+              top: theme.spacing.md,
+              right: theme.spacing.md,
+            }}
+          >
             <FavoriteButton
               isFavorite={isFavorite(recipe.id)}
               onPress={handleToggleFavorite}
@@ -116,72 +104,157 @@ export default function RecipeDetailScreen() {
           </View>
         </View>
 
-        <View style={styles.content}>
+        <View style={{ padding: theme.spacing.lg }}>
           {/* Título */}
-          <Text style={[styles.title, { color: colors.text }]}>
+          <Text
+            style={[
+              theme.typography.h1,
+              {
+                color: colors.text,
+                marginBottom: theme.spacing.md,
+              },
+            ]}
+          >
             {recipe.title}
           </Text>
 
           {/* Tags */}
-          <View style={styles.tagsContainer}>
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              gap: theme.spacing.sm,
+              marginBottom: theme.spacing.lg,
+            }}
+          >
             <View
-              style={[styles.tag, { backgroundColor: colors.primaryLight }]}
+              style={{
+                paddingHorizontal: theme.spacing.md,
+                paddingVertical: theme.spacing.sm,
+                borderRadius: theme.borderRadius.sm,
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: colors.primaryLight,
+              }}
             >
               <Ionicons
                 name="pricetag"
                 size={14}
                 color={colors.textInverse}
-                style={styles.tagIcon}
+                style={{ marginRight: theme.spacing.xs }}
               />
-              <Text style={[styles.tagText, { color: colors.textInverse }]}>
+              <Text
+                style={[
+                  theme.typography.bodySm,
+                  {
+                    color: colors.textInverse,
+                    fontWeight: "600",
+                  },
+                ]}
+              >
                 {recipe.category}
               </Text>
             </View>
-            <View style={[styles.tag, { backgroundColor: colors.secondary }]}>
+            <View
+              style={{
+                paddingHorizontal: theme.spacing.md,
+                paddingVertical: theme.spacing.sm,
+                borderRadius: theme.borderRadius.sm,
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: colors.secondary,
+              }}
+            >
               <Ionicons
                 name="globe-outline"
                 size={14}
                 color={colors.textSecondary}
-                style={styles.tagIcon}
+                style={{ marginRight: theme.spacing.xs }}
               />
-              <Text style={[styles.tagText, { color: colors.textSecondary }]}>
+              <Text
+                style={[
+                  theme.typography.bodySm,
+                  {
+                    color: colors.textSecondary,
+                    fontWeight: "600",
+                  },
+                ]}
+              >
                 {recipe.area}
               </Text>
             </View>
           </View>
 
           {/* Ingredientes */}
-          <View style={styles.section}>
-            <View style={styles.sectionTitleRow}>
+          <View style={{ marginBottom: theme.spacing.lg }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: theme.spacing.xs,
+                marginBottom: theme.spacing.sm,
+              }}
+            >
               <Ionicons
                 name="restaurant-outline"
                 size={20}
                 color={colors.primary}
               />
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              <Text
+                style={[
+                  theme.typography.h3,
+                  {
+                    color: colors.text,
+                  },
+                ]}
+              >
                 Ingredientes
               </Text>
             </View>
             <View
               style={[
-                styles.card,
-                { backgroundColor: colors.surface },
-                shadows.sm,
+                {
+                  padding: theme.spacing.md,
+                  borderRadius: theme.borderRadius.md,
+                  backgroundColor: colors.surface,
+                },
+                createShadow(theme as any, theme.elevation.low),
               ]}
             >
               {recipe.ingredients.map((ingredient, index) => (
-                <View key={index} style={styles.ingredientRow}>
+                <View
+                  key={index}
+                  style={{
+                    flexDirection: "row",
+                    marginBottom: theme.spacing.sm,
+                  }}
+                >
                   <Text
-                    style={[styles.ingredientBullet, { color: colors.primary }]}
+                    style={[
+                      theme.typography.bodyLg,
+                      {
+                        color: colors.primary,
+                        marginRight: theme.spacing.sm,
+                        fontWeight: "700",
+                      },
+                    ]}
                   >
                     •
                   </Text>
-                  <Text style={[styles.ingredientText, { color: colors.text }]}>
+                  <Text
+                    style={[
+                      theme.typography.bodyLg,
+                      {
+                        flex: 1,
+                        color: colors.text,
+                      },
+                    ]}
+                  >
                     <Text
-                      style={[
-                        styles.ingredientMeasure,
-                        { color: colors.primary },
-                      ]}
+                      style={{
+                        color: colors.primary,
+                        fontWeight: "600",
+                      }}
                     >
                       {ingredient.measure}
                     </Text>{" "}
@@ -193,32 +266,62 @@ export default function RecipeDetailScreen() {
           </View>
 
           {/* Vista previa de instrucciones */}
-          <View style={styles.section}>
-            <View style={styles.sectionTitleRow}>
+          <View style={{ marginBottom: theme.spacing.lg }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: theme.spacing.xs,
+                marginBottom: theme.spacing.sm,
+              }}
+            >
               <Ionicons
                 name="document-text-outline"
                 size={20}
                 color={colors.primary}
               />
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              <Text
+                style={[
+                  theme.typography.h3,
+                  {
+                    color: colors.text,
+                  },
+                ]}
+              >
                 Instrucciones
               </Text>
             </View>
             <View
               style={[
-                styles.card,
-                { backgroundColor: colors.surface },
-                shadows.sm,
+                {
+                  padding: theme.spacing.md,
+                  borderRadius: theme.borderRadius.md,
+                  backgroundColor: colors.surface,
+                },
+                createShadow(theme as any, theme.elevation.low),
               ]}
             >
               <Text
-                style={[styles.instructionsPreview, { color: colors.text }]}
+                style={[
+                  theme.typography.bodyLg,
+                  {
+                    color: colors.text,
+                    lineHeight: 22,
+                  },
+                ]}
                 numberOfLines={3}
               >
                 {recipe.instructions}
               </Text>
               <Text
-                style={[styles.instructionsHint, { color: colors.textLight }]}
+                style={[
+                  theme.typography.bodySm,
+                  {
+                    color: colors.textLight,
+                    fontStyle: "italic",
+                    marginTop: theme.spacing.sm,
+                  },
+                ]}
               >
                 Toca &quot;Comenzar a Cocinar&quot; para ver todas las
                 instrucciones
@@ -228,29 +331,53 @@ export default function RecipeDetailScreen() {
 
           {/* Tags adicionales */}
           {recipe.tags.length > 0 && (
-            <View style={styles.section}>
-              <View style={styles.sectionTitleRow}>
+            <View style={{ marginBottom: theme.spacing.lg }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: theme.spacing.xs,
+                  marginBottom: theme.spacing.sm,
+                }}
+              >
                 <Ionicons name="pricetags" size={20} color={colors.primary} />
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                <Text
+                  style={[
+                    theme.typography.h3,
+                    {
+                      color: colors.text,
+                    },
+                  ]}
+                >
                   Etiquetas
                 </Text>
               </View>
-              <View style={styles.tagsRow}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: theme.spacing.xs,
+                }}
+              >
                 {recipe.tags.map((tag, index) => (
                   <View
                     key={index}
-                    style={[
-                      styles.tagSmall,
-                      {
-                        backgroundColor: colors.background,
-                        borderColor: colors.border,
-                      },
-                    ]}
+                    style={{
+                      paddingHorizontal: theme.spacing.sm,
+                      paddingVertical: theme.spacing.xs,
+                      borderRadius: theme.borderRadius.xs,
+                      borderWidth: 1,
+                      backgroundColor: colors.background,
+                      borderColor: colors.border,
+                    }}
                   >
                     <Text
                       style={[
-                        styles.tagSmallText,
-                        { color: colors.textSecondary },
+                        theme.typography.caption,
+                        {
+                          color: colors.textSecondary,
+                          fontWeight: "500",
+                        },
                       ]}
                     >
                       {tag}
@@ -264,141 +391,37 @@ export default function RecipeDetailScreen() {
           {/* Botón de cocinar */}
           <TouchableOpacity
             style={[
-              styles.button,
-              { backgroundColor: colors.primary },
-              shadows.md,
+              {
+                padding: theme.spacing.md,
+                borderRadius: theme.borderRadius.md,
+                alignItems: "center",
+                marginTop: theme.spacing.md,
+                flexDirection: "row",
+                justifyContent: "center",
+                gap: theme.spacing.sm,
+                backgroundColor: colors.primary,
+              },
+              createShadow(theme as any, theme.elevation.medium),
             ]}
             onPress={handleStartCooking}
           >
             <Ionicons name="flame" size={24} color={colors.textInverse} />
-            <Text style={[styles.buttonText, { color: colors.textInverse }]}>
+            <Text
+              style={[
+                theme.typography.button,
+                {
+                  color: colors.textInverse,
+                },
+              ]}
+            >
               Comenzar a Cocinar
             </Text>
           </TouchableOpacity>
 
           {/* Espacio inferior */}
-          <View style={{ height: spacing.xl }} />
+          <View style={{ height: theme.spacing.xl }} />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  imageContainer: {
-    position: "relative",
-  },
-  image: {
-    width: "100%",
-    height: 300,
-  },
-  favoriteButtonContainer: {
-    position: "absolute",
-    top: spacing.md,
-    right: spacing.md,
-  },
-  content: {
-    padding: spacing.lg,
-  },
-  title: {
-    fontSize: fontSize["2xl"],
-    fontWeight: "700",
-    marginBottom: spacing.md,
-  },
-  tagsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  tag: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.sm,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  tagIcon: {
-    marginRight: spacing.xs,
-  },
-  tagText: {
-    fontSize: fontSize.sm,
-    fontWeight: "600",
-  },
-  section: {
-    marginBottom: spacing.lg,
-  },
-  sectionTitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-    marginBottom: spacing.sm,
-  },
-  sectionTitle: {
-    fontSize: fontSize.lg,
-    fontWeight: "600",
-  },
-  card: {
-    padding: spacing.md,
-    borderRadius: borderRadius.md,
-  },
-  ingredientRow: {
-    flexDirection: "row",
-    marginBottom: spacing.sm,
-  },
-  ingredientBullet: {
-    fontSize: fontSize.base,
-    marginRight: spacing.sm,
-    fontWeight: "700",
-  },
-  ingredientText: {
-    flex: 1,
-    fontSize: fontSize.base,
-  },
-  ingredientMeasure: {
-    fontWeight: "600",
-  },
-  instructionsPreview: {
-    fontSize: fontSize.base,
-    lineHeight: 22,
-  },
-  instructionsHint: {
-    fontSize: fontSize.sm,
-    fontStyle: "italic",
-    marginTop: spacing.sm,
-  },
-  tagsRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.xs,
-  },
-  tagSmall: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.xs,
-    borderWidth: 1,
-  },
-  tagSmallText: {
-    fontSize: fontSize.xs,
-    fontWeight: "500",
-  },
-  button: {
-    padding: spacing.md,
-    borderRadius: borderRadius.md,
-    alignItems: "center",
-    marginTop: spacing.md,
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: spacing.sm,
-  },
-  buttonText: {
-    fontSize: fontSize.base,
-    fontWeight: "700",
-  },
-});

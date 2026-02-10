@@ -3,18 +3,11 @@ import { FilterSection, HomeHeader } from "@/src/components/home";
 import { RecipeCardItem } from "@/src/components/recipe";
 import { useFavorites, useRecipes, useTheme } from "@/src/hooks";
 import { getCategories } from "@/src/services";
-import { borderRadius, iconSizes, spacing, typography } from "@/src/theme";
+import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  RefreshControl,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Animated, RefreshControl, StatusBar, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Alturas del header (sin contar safe area)
@@ -25,7 +18,8 @@ const SCROLL_THRESHOLD = 60;
 export default function HomeScreen() {
   const router = useRouter();
   const { favorites } = useFavorites();
-  const { colors, isDark } = useTheme();
+  const theme = useTheme();
+  const { colors, isDark } = theme;
   const insets = useSafeAreaInsets();
 
   const {
@@ -202,29 +196,8 @@ export default function HomeScreen() {
     extrapolate: "clamp",
   });
 
-  // Sombras según especificación del tema
-  const shadows = isDark
-    ? {
-        md: {
-          shadowColor: "transparent",
-          shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0,
-          shadowRadius: 0,
-          elevation: 0,
-        },
-      }
-    : {
-        md: {
-          shadowColor: colors.primary,
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.05,
-          shadowRadius: 10,
-          elevation: 3,
-        },
-      };
-
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       {/* StatusBar con configuración apropiada */}
       <StatusBar
         barStyle={isDark ? "light-content" : "light-content"}
@@ -258,7 +231,14 @@ export default function HomeScreen() {
 
       {/* Lista de recetas con safe area bottom */}
       {loading && recipes.length === 0 ? (
-        <View style={[styles.listContent, { paddingBottom: insets.bottom }]}>
+        <View
+          style={{
+            padding: theme.spacing.md,
+            paddingTop: theme.spacing.xl,
+            gap: theme.spacing.md,
+            paddingBottom: insets.bottom,
+          }}
+        >
           <RecipeCardSkeleton />
           <RecipeCardSkeleton />
           <RecipeCardSkeleton />
@@ -273,12 +253,15 @@ export default function HomeScreen() {
               onPress={() => handleRecipePress(item.id)}
             />
           )}
-          contentContainerStyle={[
-            styles.listContent,
-            {
-              paddingBottom: Math.max(insets.bottom + spacing.xl, spacing.xxl),
-            },
-          ]}
+          contentContainerStyle={{
+            padding: theme.spacing.md,
+            paddingTop: theme.spacing.xl,
+            gap: theme.spacing.md,
+            paddingBottom: Math.max(
+              insets.bottom + theme.spacing.xl,
+              theme.spacing.xxl,
+            ),
+          }}
           showsVerticalScrollIndicator={false}
           onScroll={handleScroll}
           scrollEventThrottle={16}
@@ -291,29 +274,56 @@ export default function HomeScreen() {
             />
           }
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
+            <View
+              style={{
+                alignItems: "center",
+                paddingTop: theme.spacing.xxl * 2,
+                paddingHorizontal: theme.spacing.xl,
+              }}
+            >
               <View
                 style={[
-                  styles.emptyIconContainer,
-                  shadows.md,
                   {
+                    width: 140,
+                    height: 140,
+                    borderRadius: theme.borderRadius.full,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginBottom: theme.spacing.xl,
                     backgroundColor: colors.surface,
                     borderWidth: isDark ? 1 : 0,
                     borderColor: colors.border,
                   },
+                  !isDark && createShadow(theme as any, theme.elevation.medium),
                 ]}
               >
                 <Ionicons
                   name={searchQuery ? "search-outline" : "restaurant-outline"}
-                  size={iconSizes.xl}
+                  size={theme.iconSizes.xl}
                   color={colors.textLight}
                 />
               </View>
-              <Text style={[styles.emptyTitle, { color: colors.text }]}>
+              <Text
+                style={[
+                  theme.typography.h2,
+                  {
+                    color: colors.text,
+                    marginBottom: theme.spacing.sm,
+                    textAlign: "center",
+                  },
+                ]}
+              >
                 {searchQuery ? "Sin resultados" : "No hay recetas"}
               </Text>
               <Text
-                style={[styles.emptySubtitle, { color: colors.textSecondary }]}
+                style={[
+                  theme.typography.bodySm,
+                  {
+                    color: colors.textSecondary,
+                    textAlign: "center",
+                    maxWidth: 260,
+                  },
+                ]}
               >
                 {searchQuery
                   ? `No encontramos recetas para "${searchQuery}"`
@@ -326,37 +336,3 @@ export default function HomeScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  listContent: {
-    padding: spacing.md,
-    paddingTop: spacing.xl,
-    gap: spacing.md,
-  },
-  emptyContainer: {
-    alignItems: "center",
-    paddingTop: spacing.xxl * 2,
-    paddingHorizontal: spacing.xl,
-  },
-  emptyIconContainer: {
-    width: 140,
-    height: 140,
-    borderRadius: borderRadius.full,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: spacing.xl,
-  },
-  emptyTitle: {
-    ...typography.h2,
-    marginBottom: spacing.sm,
-    textAlign: "center",
-  },
-  emptySubtitle: {
-    ...typography.bodySm,
-    textAlign: "center",
-    maxWidth: 260,
-  },
-});

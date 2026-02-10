@@ -1,7 +1,6 @@
 import { LoadingSpinner } from "@/src/components/common";
 import { RecipeCardItem } from "@/src/components/recipe";
 import { useFavorites, useTheme } from "@/src/hooks";
-import { fontSize, spacing } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -10,7 +9,6 @@ import {
   FlatList,
   SafeAreaView,
   StatusBar,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -19,7 +17,8 @@ import {
 export default function FavoritesScreen() {
   const router = useRouter();
   const { favorites, loading, clearAllFavorites } = useFavorites();
-  const { colors, isDark } = useTheme();
+  const theme = useTheme();
+  const { colors, isDark } = theme;
 
   const handleRecipePress = (recipeId: string) => {
     router.push(`/recipe/${recipeId}` as any);
@@ -48,21 +47,45 @@ export default function FavoritesScreen() {
   }
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar
         barStyle={isDark ? "light-content" : "dark-content"}
         backgroundColor={colors.background}
       />
 
       {favorites.length === 0 ? (
-        <View style={styles.emptyContainer}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: theme.spacing.xl,
+          }}
+        >
           <Ionicons name="heart-outline" size={80} color={colors.textLight} />
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>
+          <Text
+            style={[
+              theme.typography.h2,
+              {
+                color: colors.text,
+                marginTop: theme.spacing.lg,
+                marginBottom: theme.spacing.sm,
+                textAlign: "center",
+              },
+            ]}
+          >
             No tienes favoritos
           </Text>
-          <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+          <Text
+            style={[
+              theme.typography.bodyLg,
+              {
+                color: colors.textSecondary,
+                textAlign: "center",
+                lineHeight: 22,
+              },
+            ]}
+          >
             Guarda tus recetas favoritas tocando el corazón
           </Text>
         </View>
@@ -70,19 +93,37 @@ export default function FavoritesScreen() {
         <>
           {/* Header con contador */}
           <View
-            style={[
-              styles.header,
-              {
-                backgroundColor: colors.surface,
-                borderBottomColor: colors.divider,
-              },
-            ]}
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: theme.spacing.md,
+              borderBottomWidth: 1,
+              backgroundColor: colors.surface,
+              borderBottomColor: colors.divider,
+            }}
           >
-            <Text style={[styles.headerText, { color: colors.textSecondary }]}>
+            <Text
+              style={[
+                theme.typography.bodyLg,
+                {
+                  color: colors.textSecondary,
+                  fontWeight: "500",
+                },
+              ]}
+            >
               {favorites.length} {favorites.length === 1 ? "receta" : "recetas"}
             </Text>
             <TouchableOpacity onPress={handleClearAll}>
-              <Text style={[styles.clearButton, { color: colors.error }]}>
+              <Text
+                style={[
+                  theme.typography.bodySm,
+                  {
+                    color: colors.error,
+                    fontWeight: "600",
+                  },
+                ]}
+              >
                 Eliminar todos
               </Text>
             </TouchableOpacity>
@@ -98,7 +139,7 @@ export default function FavoritesScreen() {
                 onPress={() => handleRecipePress(item.id)}
               />
             )}
-            contentContainerStyle={styles.listContent}
+            contentContainerStyle={{ padding: theme.spacing.md }}
             showsVerticalScrollIndicator={false}
           />
         </>
@@ -106,45 +147,3 @@ export default function FavoritesScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: spacing.md,
-    borderBottomWidth: 1,
-  },
-  headerText: {
-    fontSize: fontSize.base,
-    fontWeight: "500",
-  },
-  clearButton: {
-    fontSize: fontSize.sm,
-    fontWeight: "600",
-  },
-  listContent: {
-    padding: spacing.md,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: spacing.xl,
-  },
-  emptyTitle: {
-    fontSize: fontSize.xl,
-    fontWeight: "700",
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-    textAlign: "center",
-  },
-  emptySubtitle: {
-    fontSize: fontSize.base,
-    textAlign: "center",
-    lineHeight: 22,
-  },
-});
