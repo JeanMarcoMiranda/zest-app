@@ -2,10 +2,8 @@
 
 import { ErrorView, LoadingSpinner } from "@/src/components/common";
 import { Step, StepItem } from "@/src/components/cooking";
-import { useTheme } from "@/src/hooks";
-import { getRecipeById } from "@/src/services";
+import { useRecipes, useTheme } from "@/src/hooks";
 import { spacing, typography } from "@/src/theme";
-import { Recipe } from "@/src/types/recipe.types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -21,45 +19,24 @@ import {
 } from "react-native";
 
 export default function CookingStepsScreen() {
-  const { id, recipeData } = useLocalSearchParams<{
-    id: string;
-    recipeData?: string;
-  }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { colors } = useTheme();
+  const { currentRecipe, isLoading, error, fetchRecipeById } = useRecipes();
 
-  const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Si tenemos la receta en el store y coincide con el ID, la usamos.
+  // Si no, la buscamos.
+  const recipe = currentRecipe?.id === id ? currentRecipe : null;
+  const loading = isLoading && !recipe;
+
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
   useEffect(() => {
-    const loadRecipe = async () => {
-      // Primero intentar usar los datos pasados como parámetro
-      if (recipeData) {
-        try {
-          const parsedRecipe = JSON.parse(recipeData);
-          setRecipe(parsedRecipe);
-          setLoading(false);
-          return;
-        } catch (error) {
-          console.error("Error parsing recipe data:", error);
-        }
-      }
-
-      // Si no hay datos o falló el parsing, obtener de la API
-      try {
-        const data = await getRecipeById(id);
-        setRecipe(data);
-      } catch (err) {
-        console.error("Error loading recipe:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadRecipe();
-  }, [id, recipeData]);
+    if (!recipe && id) {
+      fetchRecipeById(id);
+    }
+  }, [id, recipe, fetchRecipeById]);
 
   if (loading) {
     return <LoadingSpinner message="Preparando la cocina..." />;

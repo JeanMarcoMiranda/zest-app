@@ -3,13 +3,11 @@ import {
   FavoriteButton,
   LoadingSpinner,
 } from "@/src/components/common";
-import { useFavorites, useTheme } from "@/src/hooks";
-import { getRecipeById } from "@/src/services";
+import { useFavorites, useRecipes, useTheme } from "@/src/hooks";
 import { spacing, typography } from "@/src/theme";
-import { Recipe } from "@/src/types/recipe.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Image,
   SafeAreaView,
@@ -26,38 +24,24 @@ export default function RecipeDetailScreen() {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { colors, isDark } = useTheme();
-
-  const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  const loadRecipe = async () => {
-    try {
-      setError(false);
-      setLoading(true);
-      const data = await getRecipeById(id);
-      setRecipe(data);
-    } catch (err) {
-      console.error("Error loading recipe:", err);
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    currentRecipe: recipe,
+    isLoading: loading,
+    error,
+    fetchRecipeById,
+    clearError,
+  } = useRecipes();
 
   useEffect(() => {
-    loadRecipe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+    fetchRecipeById(id);
+    return () => clearError();
+  }, [id, fetchRecipeById, clearError]);
 
   const handleStartCooking = () => {
     if (recipe) {
       router.push({
         pathname: "/cooking/[id]" as any,
-        params: {
-          id: recipe.id,
-          recipeData: JSON.stringify(recipe),
-        },
+        params: { id: recipe.id },
       });
     }
   };
@@ -82,7 +66,7 @@ export default function RecipeDetailScreen() {
     return (
       <ErrorView
         message="No pudimos cargar esta receta."
-        onRetry={loadRecipe}
+        onRetry={() => fetchRecipeById(id)}
       />
     );
   }
