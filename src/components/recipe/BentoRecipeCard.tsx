@@ -40,7 +40,7 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const isLarge = size === "large";
-  const cardHeight = isLarge ? 280 : 180;
+  const cardHeight = isLarge ? 240 : 160;
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -98,7 +98,7 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
       <TouchableOpacity
         style={{
           height: cardHeight,
-          borderRadius: theme.borderRadius.lg,
+          borderRadius: theme.borderRadius.md,
           overflow: "hidden",
           backgroundColor: colors.surface,
         }}
@@ -139,13 +139,13 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
 
         {/* Gradiente inferior para legibilidad */}
         <LinearGradient
-          colors={["transparent", "rgba(0,0,0,0.7)"]}
+          colors={["transparent", "rgba(0,0,0,0.65)"]}
           style={{
             position: "absolute",
             left: 0,
             right: 0,
             bottom: 0,
-            height: "65%",
+            height: "55%",
           }}
         />
 
@@ -163,9 +163,9 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
             style={{
               flexDirection: "row",
               alignItems: "center",
-              paddingHorizontal: theme.spacing.sm,
-              paddingVertical: theme.spacing.xs,
-              borderRadius: theme.borderRadius.sm,
+              paddingHorizontal: 6,
+              paddingVertical: 3,
+              borderRadius: theme.borderRadius.xs,
               overflow: "hidden",
               backgroundColor:
                 Platform.OS === "android"
@@ -177,16 +177,16 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
           >
             <Ionicons
               name="restaurant"
-              size={10}
+              size={9}
               color={isDark ? "#FFF" : colors.text}
-              style={{ marginRight: 3 }}
+              style={{ marginRight: 2 }}
             />
             <Text
               style={[
                 theme.typography.caption,
                 {
                   color: isDark ? "#FFF" : colors.text,
-                  fontSize: 10,
+                  fontSize: 9,
                 },
               ]}
               numberOfLines={1}
@@ -212,8 +212,8 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
               intensity={Platform.OS === "ios" ? 40 : 80}
               tint={isDark ? "dark" : "light"}
               style={{
-                width: isLarge ? 40 : 32,
-                height: isLarge ? 40 : 32,
+                width: isLarge ? 34 : 28,
+                height: isLarge ? 34 : 28,
                 justifyContent: "center",
                 alignItems: "center",
                 backgroundColor:
@@ -224,7 +224,7 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
             >
               <Ionicons
                 name={isFav ? "heart" : "heart-outline"}
-                size={isLarge ? 20 : 16}
+                size={isLarge ? 16 : 14}
                 color={isFav ? "#FF4757" : "#FFF"}
               />
             </BlurView>
@@ -238,15 +238,16 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
             bottom: 0,
             left: 0,
             right: 0,
-            padding: isLarge ? theme.spacing.md : theme.spacing.sm,
+            padding: isLarge ? theme.spacing.sm + 4 : theme.spacing.sm,
           }}
         >
           <Text
             style={[
-              isLarge ? theme.typography.h3 : theme.typography.bodySm,
+              isLarge ? theme.typography.h3 : theme.typography.caption,
               {
                 color: "#FFF",
-                fontWeight: "700",
+                fontWeight: "600",
+                textTransform: "none",
                 textShadowColor: "rgba(0,0,0,0.3)",
                 textShadowOffset: { width: 0, height: 1 },
                 textShadowRadius: 3,

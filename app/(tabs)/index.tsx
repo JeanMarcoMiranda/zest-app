@@ -1,6 +1,6 @@
-import { BentoGridSkeleton, ErrorView } from "@/src/components/common";
+import { ErrorView, ListSkeleton } from "@/src/components/common";
 import { FilterSection, HomeHeader } from "@/src/components/home";
-import { BentoRecipeCard } from "@/src/components/recipe";
+import { RecipeCardItem } from "@/src/components/recipe";
 import { useFavorites, useRecipes, useTheme } from "@/src/hooks";
 import { getCategories } from "@/src/services";
 import { createShadow } from "@/src/utils";
@@ -10,12 +10,10 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Animated, RefreshControl, StatusBar, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { RecipeCard } from "@/src/types/recipe.types";
-
 // Altura aproximada del header compacto
 const HEADER_HEIGHT = 56;
 // Altura de la tab bar flotante + bottom margin
-const TAB_BAR_HEIGHT = 56;
+const TAB_BAR_HEIGHT = 52;
 const SCROLL_THRESHOLD = 60;
 
 export default function HomeScreen() {
@@ -150,120 +148,6 @@ export default function HomeScreen() {
     );
   }
 
-  // ─── Bento Grid Builder ───────────────────────────────────────
-  // Pattern: Row A (1 large + 1 small), Row B (3 small), repeat.
-  // Alternates which side the large card is on.
-  const buildBentoRows = (items: RecipeCard[]) => {
-    const rows: React.ReactNode[] = [];
-    let i = 0;
-    let patternIndex = 0;
-
-    while (i < items.length) {
-      const patternType = patternIndex % 3; // 0 = large-left, 1 = triple, 2 = large-right
-
-      if (patternType === 0 && i + 1 < items.length) {
-        // Row A: large (left) + small (right)
-        rows.push(
-          <View
-            key={`row-${i}`}
-            style={{
-              flexDirection: "row",
-              gap: theme.spacing.sm,
-            }}
-          >
-            <BentoRecipeCard
-              recipe={items[i]}
-              size="large"
-              onPress={() => handleRecipePress(items[i].id)}
-            />
-            <BentoRecipeCard
-              recipe={items[i + 1]}
-              size="small"
-              onPress={() => handleRecipePress(items[i + 1].id)}
-            />
-          </View>,
-        );
-        i += 2;
-      } else if (patternType === 1 && i + 2 < items.length) {
-        // Row B: 3 small cards
-        rows.push(
-          <View
-            key={`row-${i}`}
-            style={{
-              flexDirection: "row",
-              gap: theme.spacing.sm,
-            }}
-          >
-            <BentoRecipeCard
-              recipe={items[i]}
-              size="small"
-              onPress={() => handleRecipePress(items[i].id)}
-            />
-            <BentoRecipeCard
-              recipe={items[i + 1]}
-              size="small"
-              onPress={() => handleRecipePress(items[i + 1].id)}
-            />
-            <BentoRecipeCard
-              recipe={items[i + 2]}
-              size="small"
-              onPress={() => handleRecipePress(items[i + 2].id)}
-            />
-          </View>,
-        );
-        i += 3;
-      } else if (patternType === 2 && i + 1 < items.length) {
-        // Row C: small (left) + large (right)
-        rows.push(
-          <View
-            key={`row-${i}`}
-            style={{
-              flexDirection: "row",
-              gap: theme.spacing.sm,
-            }}
-          >
-            <BentoRecipeCard
-              recipe={items[i]}
-              size="small"
-              onPress={() => handleRecipePress(items[i].id)}
-            />
-            <BentoRecipeCard
-              recipe={items[i + 1]}
-              size="large"
-              onPress={() => handleRecipePress(items[i + 1].id)}
-            />
-          </View>,
-        );
-        i += 2;
-      } else {
-        // Remaining items as small cards in a row
-        const remaining = items.slice(i);
-        rows.push(
-          <View
-            key={`row-${i}`}
-            style={{
-              flexDirection: "row",
-              gap: theme.spacing.sm,
-            }}
-          >
-            {remaining.map((item) => (
-              <BentoRecipeCard
-                key={item.id}
-                recipe={item}
-                size="small"
-                onPress={() => handleRecipePress(item.id)}
-              />
-            ))}
-          </View>,
-        );
-        break;
-      }
-      patternIndex++;
-    }
-
-    return rows;
-  };
-
   // ─── Empty State ──────────────────────────────────────────────
   const EmptyState = () => (
     <View
@@ -359,7 +243,7 @@ export default function HomeScreen() {
             paddingTop: insets.top + HEADER_HEIGHT + theme.spacing.md,
           }}
         >
-          <BentoGridSkeleton />
+          <ListSkeleton />
         </View>
       ) : (
         <Animated.ScrollView
@@ -368,7 +252,7 @@ export default function HomeScreen() {
           scrollEventThrottle={16}
           contentContainerStyle={{
             paddingTop: insets.top + HEADER_HEIGHT + theme.spacing.xs,
-            paddingHorizontal: theme.spacing.md,
+            paddingHorizontal: theme.spacing.sm + 4,
             paddingBottom: tabBarTotalHeight + theme.spacing.md,
           }}
           refreshControl={
@@ -393,14 +277,18 @@ export default function HomeScreen() {
             onSelectCategory={handleSelectCategory}
           />
 
-          {/* Bento Grid o Empty State */}
+          {/* Recipe List or Empty State */}
           {recipes.length === 0 ? (
             <EmptyState />
           ) : (
-            <View
-              style={{ gap: theme.spacing.sm, marginTop: theme.spacing.sm }}
-            >
-              {buildBentoRows(recipes)}
+            <View style={{ marginTop: theme.spacing.sm }}>
+              {recipes.map((recipe) => (
+                <RecipeCardItem
+                  key={recipe.id}
+                  recipe={recipe}
+                  onPress={() => handleRecipePress(recipe.id)}
+                />
+              ))}
             </View>
           )}
         </Animated.ScrollView>

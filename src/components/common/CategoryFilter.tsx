@@ -23,12 +23,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
   const { colors } = theme;
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: colors.surface, borderBottomColor: colors.divider },
-      ]}
-    >
+    <View style={[styles.container, { borderBottomColor: colors.divider }]}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -42,10 +37,10 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
         <TouchableOpacity
           style={[
             {
-              paddingHorizontal: theme.spacing.md,
-              paddingVertical: theme.spacing.sm,
+              paddingHorizontal: theme.spacing.sm + 4,
+              paddingVertical: theme.spacing.xs + 1,
               borderRadius: theme.borderRadius.full,
-              borderWidth: 1,
+              borderWidth: 0.5,
               backgroundColor: colors.background,
               borderColor: colors.divider,
             },
@@ -59,8 +54,8 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
         >
           <Text
             style={[
-              theme.typography.label,
-              { color: colors.text },
+              theme.typography.caption,
+              { color: colors.text, textTransform: "none" },
               selectedCategory === null && {
                 color: colors.textInverse,
                 fontWeight: "700",
@@ -77,10 +72,10 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
             key={category}
             style={[
               {
-                paddingHorizontal: theme.spacing.md,
-                paddingVertical: theme.spacing.sm,
+                paddingHorizontal: theme.spacing.sm + 4,
+                paddingVertical: theme.spacing.xs + 1,
                 borderRadius: theme.borderRadius.full,
-                borderWidth: 1,
+                borderWidth: 0.5,
                 backgroundColor: colors.background,
                 borderColor: colors.divider,
               },
@@ -94,8 +89,8 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
           >
             <Text
               style={[
-                theme.typography.label,
-                { color: colors.text },
+                theme.typography.caption,
+                { color: colors.text, textTransform: "none" },
                 selectedCategory === category && {
                   color: colors.textInverse,
                   fontWeight: "700",
@@ -113,7 +108,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    borderBottomWidth: 1,
+    borderBottomWidth: 0,
   },
 });
 

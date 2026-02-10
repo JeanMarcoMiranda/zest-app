@@ -36,16 +36,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <View
       style={{
-        paddingHorizontal: theme.spacing.md,
-        paddingVertical: theme.spacing.sm,
-        backgroundColor: colors.surface,
+        paddingHorizontal: theme.spacing.sm + 4,
+        paddingVertical: theme.spacing.xs + 2,
+        backgroundColor: "transparent",
       }}
     >
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
-          borderRadius: theme.borderRadius.md,
+          borderRadius: theme.borderRadius.sm,
           paddingHorizontal: theme.spacing.md,
           backgroundColor: colors.background,
           ...createShadow(theme as any, theme.elevation.low),
@@ -53,7 +53,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       >
         <Ionicons
           name="search"
-          size={18}
+          size={16}
           color={colors.textSecondary}
           style={{ marginRight: theme.spacing.sm }}
         />

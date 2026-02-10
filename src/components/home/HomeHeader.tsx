@@ -79,7 +79,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
           alignItems: "center",
           justifyContent: "space-between",
           paddingHorizontal: theme.spacing.lg,
-          paddingVertical: theme.spacing.sm + 2,
+          paddingVertical: theme.spacing.xs + 2,
         }}
       >
         {/* Logo / Nombre */}
@@ -92,21 +92,21 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
         >
           <View
             style={{
-              width: 36,
-              height: 36,
+              width: 30,
+              height: 30,
               borderRadius: theme.borderRadius.sm,
               backgroundColor: colors.primary,
               justifyContent: "center",
               alignItems: "center",
             }}
           >
-            <Ionicons name="restaurant" size={18} color={colors.onPrimary} />
+            <Ionicons name="restaurant" size={15} color={colors.onPrimary} />
           </View>
           <View>
             <Text
               style={[
-                theme.typography.h3,
-                { color: colors.text, lineHeight: 20 },
+                theme.typography.label,
+                { color: colors.text, lineHeight: 18 },
               ]}
             >
               ChefHub
@@ -120,13 +120,13 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
             >
               <Ionicons
                 name={getContextIcon()}
-                size={10}
+                size={9}
                 color={colors.primary}
               />
               <Text
                 style={[
                   theme.typography.caption,
-                  { color: colors.textSecondary, fontSize: 10 },
+                  { color: colors.textSecondary, fontSize: 9 },
                 ]}
               >
                 {getContextLabel()}
@@ -140,7 +140,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
           style={{
             flexDirection: "row",
             alignItems: "center",
-            gap: theme.spacing.sm,
+            gap: 6,
           }}
         >
           {favoritesCount > 0 && (
@@ -149,19 +149,20 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                 flexDirection: "row",
                 alignItems: "center",
                 gap: 3,
-                paddingHorizontal: theme.spacing.sm,
-                paddingVertical: theme.spacing.xs,
+                paddingHorizontal: theme.spacing.sm - 2,
+                paddingVertical: theme.spacing.xs - 1,
                 borderRadius: theme.borderRadius.full,
                 backgroundColor: isDark
                   ? "rgba(255,71,87,0.15)"
                   : "rgba(255,71,87,0.1)",
               }}
             >
-              <Ionicons name="heart" size={12} color="#FF4757" />
+              <Ionicons name="heart" size={10} color="#FF4757" />{" "}
+              {/* Smaller badge icon */}
               <Text
                 style={[
                   theme.typography.caption,
-                  { color: "#FF4757", fontWeight: "700", fontSize: 11 },
+                  { color: "#FF4757", fontWeight: "700", fontSize: 9 }, // Smaller badge font size
                 ]}
               >
                 {favoritesCount}
@@ -185,7 +186,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                   {
                     color: colors.primary,
                     fontWeight: "700",
-                    fontSize: 11,
+                    fontSize: 10,
                   },
                 ]}
               >

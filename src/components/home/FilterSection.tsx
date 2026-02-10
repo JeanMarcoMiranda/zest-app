@@ -53,8 +53,8 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
       {/* SearchBar con fondo translúcido */}
       <View
         style={{
-          marginHorizontal: theme.spacing.md,
-          borderRadius: theme.borderRadius.md,
+          marginHorizontal: theme.spacing.xs,
+          borderRadius: theme.borderRadius.sm,
           overflow: "hidden",
           backgroundColor: isDark
             ? "rgba(41,37,36,0.7)"

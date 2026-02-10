@@ -4,7 +4,7 @@ export { default as FavoriteButton } from "./FavoriteButton";
 export { default as LoadingSpinner } from "./LoadingSpinner";
 export { default as SearchBar } from "./SearchBar";
 export {
-    BentoGridSkeleton,
+    ListSkeleton,
     RecipeCardSkeleton,
     SkeletonLoader
 } from "./SkeletonLoader";

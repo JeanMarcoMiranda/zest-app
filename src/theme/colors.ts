@@ -79,17 +79,17 @@ export const lightColors = {
   textHigh: palette.coffee,
   textMed: palette.bronze, // Descripciones
   textSecondary: palette.bronze,
-  textLight: palette.stone,
+  textLight: palette.ash,
   textInverse: palette.cream,
 
   // Bordes y divisores
-  border: palette.stone,
-  divider: palette.stone,
+  border: "rgba(0,0,0,0.08)",
+  divider: "rgba(0,0,0,0.06)",
 
   // Estados
   placeholder: palette.bronze,
   disabled: palette.stone,
-  overlay: "rgba(69, 26, 3, 0.1)", // coffee con transparencia
+  overlay: "rgba(69, 26, 3, 0.06)", // coffee con transparencia
 
   // Semánticos
   success: palette.forest,
@@ -144,13 +144,13 @@ export const darkColors = {
   textInverse: palette.coffee,
 
   // Bordes y divisores
-  border: palette.clay,
-  divider: palette.clay,
+  border: "rgba(255,255,255,0.08)",
+  divider: "rgba(255,255,255,0.06)",
 
   // Estados
   placeholder: palette.ash,
   disabled: palette.warmGrayLight,
-  overlay: "rgba(245, 245, 244, 0.1)", // bone con transparencia
+  overlay: "rgba(245, 245, 244, 0.06)", // bone con transparencia
 
   // Semánticos
   success: palette.emerald,

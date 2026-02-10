@@ -22,28 +22,28 @@ export default function TabLayout() {
           bottom: Math.max(insets.bottom, theme.spacing.sm),
           left: theme.spacing.lg,
           right: theme.spacing.lg,
-          height: 56,
-          borderRadius: theme.borderRadius.xl,
+          height: 52,
+          borderRadius: theme.borderRadius.full,
           backgroundColor: isDark
-            ? "rgba(41,37,36,0.85)"
-            : "rgba(255,255,255,0.85)",
+            ? "rgba(41,37,36,0.80)"
+            : "rgba(255,255,255,0.75)",
           borderTopWidth: 0,
-          borderWidth: 1,
+          borderWidth: 0.5,
           borderColor: isDark ? "rgba(68,64,60,0.5)" : "rgba(231,229,228,0.8)",
           paddingBottom: 0,
           elevation: 0,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.15,
-          shadowRadius: 16,
+          shadowOpacity: 0.08,
+          shadowRadius: 24,
         },
         tabBarItemStyle: {
-          paddingVertical: 6,
+          paddingVertical: 4,
         },
         tabBarLabelStyle: {
-          fontSize: 10,
+          fontSize: 9,
           fontWeight: "600",
-          marginTop: 2,
+          marginTop: 1,
         },
         tabBarBackground: () =>
           Platform.OS === "ios" ? (
@@ -56,7 +56,7 @@ export default function TabLayout() {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                borderRadius: theme.borderRadius.xl,
+                borderRadius: theme.borderRadius.full,
                 overflow: "hidden",
               }}
             />
@@ -68,10 +68,10 @@ export default function TabLayout() {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                borderRadius: theme.borderRadius.xl,
+                borderRadius: theme.borderRadius.full,
                 backgroundColor: isDark
-                  ? "rgba(41,37,36,0.92)"
-                  : "rgba(255,255,255,0.92)",
+                  ? "rgba(41,37,36,0.88)"
+                  : "rgba(255,255,255,0.82)",
               }}
             />
           ),

@@ -1,5 +1,4 @@
 import { useFavorites, useTheme } from "@/src/hooks";
-import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -17,8 +16,9 @@ import {
 import { RecipeCard } from "../../types/recipe.types";
 
 // Constantes de animación
-const ANIMATION_SCALE_PRESSED = 0.96;
-const ANIMATION_SCALE_FAVORITE = 1.4;
+const ANIMATION_SCALE_PRESSED = 0.98;
+const ANIMATION_SCALE_FAVORITE = 1.3;
+const CARD_HEIGHT = 200;
 
 interface RecipeCardItemProps {
   recipe: RecipeCard;
@@ -55,7 +55,6 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
   const handleFavoritePress = () => {
     const isFav = isFavorite(recipe.id);
 
-    // Haptic feedback visual
     Animated.sequence([
       Animated.timing(favoriteScaleAnim, {
         toValue: 0.8,
@@ -63,7 +62,7 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
         useNativeDriver: true,
       }),
       Animated.spring(favoriteScaleAnim, {
-        toValue: isFav ? 1 : ANIMATION_SCALE_FAVORITE, // Pop si se activa
+        toValue: isFav ? 1 : ANIMATION_SCALE_FAVORITE,
         friction: 3,
         tension: 100,
         useNativeDriver: true,
@@ -83,190 +82,180 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
 
   return (
     <Animated.View
-      style={[
-        {
-          marginBottom: theme.spacing.lg,
-          paddingHorizontal: theme.spacing.xs,
-        },
-        { transform: [{ scale: scaleAnim }] },
-      ]}
+      style={{
+        marginBottom: theme.spacing.sm,
+        transform: [{ scale: scaleAnim }],
+      }}
     >
       <TouchableOpacity
-        style={[
-          {
-            borderRadius: theme.borderRadius.xl,
-            overflow: Platform.OS === "android" ? "hidden" : "visible",
-            backgroundColor: colors.surface,
-          },
-          createShadow(theme as any, theme.elevation.high),
-        ]}
+        style={{
+          height: CARD_HEIGHT,
+          borderRadius: theme.borderRadius.md,
+          overflow: "hidden",
+          backgroundColor: colors.surface,
+        }}
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={1}
       >
-        {/* Imagen Wrapper */}
+        {/* Placeholder mientras carga la imagen */}
+        {!imageLoaded && (
+          <View
+            style={[
+              StyleSheet.absoluteFillObject,
+              {
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: colors.surfaceVariant,
+              },
+            ]}
+          >
+            <Ionicons
+              name="restaurant"
+              size={32}
+              color={colors.textLight}
+              style={{ opacity: 0.5 }}
+            />
+          </View>
+        )}
+
+        {/* Imagen full-bleed */}
+        <Image
+          source={{ uri: recipe.thumbnail }}
+          style={StyleSheet.absoluteFillObject}
+          resizeMode="cover"
+          onLoad={() => setImageLoaded(true)}
+        />
+
+        {/* Gradiente inferior para legibilidad */}
+        <LinearGradient
+          colors={["transparent", "rgba(0,0,0,0.6)"]}
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: "60%",
+          }}
+        />
+
+        {/* Badge de categoría */}
         <View
           style={{
-            height: 220,
-            width: "100%",
-            position: "relative",
-            borderTopLeftRadius: theme.borderRadius.xl,
-            borderTopRightRadius: theme.borderRadius.xl,
-            overflow: "hidden",
+            position: "absolute",
+            top: theme.spacing.sm,
+            left: theme.spacing.sm,
           }}
         >
-          {/* Placeholder */}
-          {!imageLoaded && (
-            <View
-              style={[
-                StyleSheet.absoluteFillObject,
-                {
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: colors.surfaceVariant,
-                },
-              ]}
-            >
-              <Ionicons
-                name="restaurant"
-                size={40}
-                color={colors.textLight}
-                opacity={0.5}
-              />
-            </View>
-          )}
-
-          <Image
-            source={{ uri: recipe.thumbnail }}
-            style={{ width: "100%", height: "100%" }}
-            resizeMode="cover"
-            onLoad={() => setImageLoaded(true)}
-          />
-
-          {/* Gradiente sutil inferior */}
-          <LinearGradient
-            colors={
-              isDark ? theme.gradients.overlay : theme.gradients.overlayLight
-            }
+          <BlurView
+            intensity={Platform.OS === "ios" ? 60 : 90}
+            tint={isDark ? "dark" : "light"}
             style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: "60%",
-            }}
-          />
-
-          {/* Badge de Categoría */}
-          <View
-            style={{
-              position: "absolute",
-              top: theme.spacing.md,
-              left: theme.spacing.md,
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 6,
+              paddingVertical: 3,
+              borderRadius: theme.borderRadius.xs,
+              overflow: "hidden",
+              backgroundColor:
+                Platform.OS === "android"
+                  ? isDark
+                    ? "rgba(0,0,0,0.5)"
+                    : "rgba(255,255,255,0.7)"
+                  : "transparent",
             }}
           >
-            <LinearGradient
-              colors={[colors.primary, colors.primaryLight]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+            <Ionicons
+              name="restaurant"
+              size={9}
+              color={isDark ? "#FFF" : colors.text}
+              style={{ marginRight: 2 }}
+            />
+            <Text
+              style={[
+                theme.typography.caption,
+                {
+                  color: isDark ? "#FFF" : colors.text,
+                  fontSize: 9,
+                  textTransform: "none",
+                },
+              ]}
+              numberOfLines={1}
+            >
+              {recipe.category}
+            </Text>
+          </BlurView>
+        </View>
+
+        {/* Botón de favorito */}
+        <Animated.View
+          style={{
+            position: "absolute",
+            top: theme.spacing.sm,
+            right: theme.spacing.sm,
+            borderRadius: theme.borderRadius.full,
+            overflow: "hidden",
+            transform: [{ scale: favoriteScaleAnim }],
+          }}
+        >
+          <TouchableOpacity onPress={handleFavoritePress} activeOpacity={0.8}>
+            <BlurView
+              intensity={Platform.OS === "ios" ? 40 : 80}
+              tint={isDark ? "dark" : "light"}
               style={{
-                flexDirection: "row",
+                width: 34,
+                height: 34,
+                justifyContent: "center",
                 alignItems: "center",
-                paddingHorizontal: theme.spacing.sm + 2,
-                paddingVertical: theme.spacing.xs + 2,
-                borderRadius: theme.borderRadius.md,
+                backgroundColor:
+                  Platform.OS === "android"
+                    ? "rgba(255,255,255,0.7)"
+                    : "transparent",
               }}
             >
               <Ionicons
-                name="restaurant"
-                size={12}
-                color="#FFF"
-                style={{ marginRight: 4 }}
+                name={isFav ? "heart" : "heart-outline"}
+                size={16}
+                color={isFav ? "#FF4757" : "#FFF"}
               />
-              <Text
-                style={[
-                  theme.typography.caption,
-                  {
-                    color: "#FFFFFF",
-                    letterSpacing: 0.5,
-                  },
-                ]}
-              >
-                {recipe.category}
-              </Text>
-            </LinearGradient>
-          </View>
+            </BlurView>
+          </TouchableOpacity>
+        </Animated.View>
 
-          {/* Botón Favorito (Glassmorphism) */}
-          <Animated.View
-            style={[
-              {
-                position: "absolute",
-                top: theme.spacing.md,
-                right: theme.spacing.md,
-                borderRadius: theme.borderRadius.full,
-                overflow: "hidden",
-                ...createShadow(theme as any, theme.elevation.low),
-              },
-              { transform: [{ scale: favoriteScaleAnim }] },
-            ]}
-          >
-            <TouchableOpacity onPress={handleFavoritePress} activeOpacity={0.8}>
-              <BlurView
-                intensity={Platform.OS === "ios" ? 40 : 80}
-                tint={isDark ? "dark" : "light"}
-                style={{
-                  width: 44,
-                  height: 44,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor:
-                    Platform.OS === "android"
-                      ? "rgba(255,255,255,0.8)"
-                      : "transparent",
-                }}
-              >
-                <Ionicons
-                  name={isFav ? "heart" : "heart-outline"}
-                  size={22}
-                  color={isFav ? "#FF4757" : isDark ? "#FFF" : "#333"}
-                />
-              </BlurView>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-
-        {/* Contenido (Info) */}
+        {/* Info overlay inferior */}
         <View
           style={{
-            padding: theme.spacing.lg,
-            paddingTop: theme.spacing.md,
-            borderBottomLeftRadius: theme.borderRadius.xl,
-            borderBottomRightRadius: theme.borderRadius.xl,
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: theme.spacing.sm + 4,
           }}
         >
-          <View style={{ marginBottom: theme.spacing.sm }}>
-            <Text
-              style={[
-                theme.typography.h2,
-                {
-                  color: colors.text,
-                  letterSpacing: -0.4,
-                  lineHeight: 24,
-                },
-              ]}
-              numberOfLines={2}
-            >
-              {recipe.title}
-            </Text>
-          </View>
+          <Text
+            style={[
+              theme.typography.h3,
+              {
+                color: "#FFF",
+                fontWeight: "600",
+                textShadowColor: "rgba(0,0,0,0.3)",
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 3,
+              },
+            ]}
+            numberOfLines={2}
+          >
+            {recipe.title}
+          </Text>
 
+          {/* Metadata row */}
           <View
             style={{
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
+              marginTop: theme.spacing.xs,
             }}
           >
             {/* Área */}
@@ -274,16 +263,20 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                gap: 6,
+                gap: 4,
               }}
             >
-              <Ionicons name="globe-outline" size={14} color={colors.primary} />
+              <Ionicons
+                name="globe-outline"
+                size={12}
+                color="rgba(255,255,255,0.8)"
+              />
               <Text
                 style={[
-                  theme.typography.bodySm,
+                  theme.typography.caption,
                   {
-                    color: colors.textSecondary,
-                    fontWeight: "500",
+                    color: "rgba(255,255,255,0.8)",
+                    textTransform: "none",
                   },
                 ]}
               >
@@ -291,36 +284,31 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
               </Text>
             </View>
 
-            {/* Separador */}
-            <View
-              style={{
-                width: 1,
-                height: 16,
-                marginHorizontal: theme.spacing.md,
-                backgroundColor: colors.divider,
-              }}
-            />
-
-            {/* Indicador visual "Ver receta" */}
+            {/* "Ver receta" indicator */}
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                gap: 6,
+                gap: 3,
               }}
             >
               <Text
                 style={[
-                  theme.typography.bodySm,
+                  theme.typography.caption,
                   {
-                    color: colors.primary,
-                    fontWeight: "600",
+                    color: "rgba(255,255,255,0.7)",
+                    textTransform: "none",
+                    fontWeight: "500",
                   },
                 ]}
               >
                 Ver receta
               </Text>
-              <Ionicons name="arrow-forward" size={14} color={colors.primary} />
+              <Ionicons
+                name="chevron-forward"
+                size={12}
+                color="rgba(255,255,255,0.6)"
+              />
             </View>
           </View>
         </View>
