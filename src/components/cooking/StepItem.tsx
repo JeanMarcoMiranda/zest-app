@@ -1,4 +1,5 @@
 import { useTheme } from "@/src/hooks";
+import { RecipeStep } from "@/src/types/recipe.types";
 import { createShadow } from "@/src/utils";
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
@@ -9,13 +10,8 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
-export interface Step {
-  number: number;
-  text: string;
-}
-
 interface StepItemProps {
-  step: Step;
+  step: RecipeStep;
   index: number;
   isActive: boolean;
   isCompleted: boolean;
@@ -230,8 +226,74 @@ export const StepItem: React.FC<StepItemProps> = ({
             ]}
             numberOfLines={isActive ? undefined : 3}
           >
-            {step.text}
+            {step.instruction}
           </Text>
+
+          {/* Note Section */}
+          {step.note && (
+            <View
+              style={{
+                marginTop: theme.spacing.md,
+                padding: theme.spacing.md,
+                backgroundColor: isCompleted ? "#F0F0F0" : "#FFF9C4", // Yellow for active notes
+                borderRadius: theme.borderRadius.md,
+                borderLeftWidth: 4,
+                borderLeftColor: isCompleted ? "#CCC" : "#FBC02D",
+              }}
+            >
+              <Text
+                style={[
+                  theme.typography.bodySm,
+                  {
+                    color: isCompleted ? colors.textLight : "#5D4037",
+                    fontStyle: "italic",
+                    fontSize: 16, // Un poco más grande que el caption
+                  },
+                ]}
+              >
+                <Text style={{ fontWeight: "bold" }}>Nota: </Text>
+                {step.note}
+              </Text>
+            </View>
+          )}
+
+          {/* Ingredients & Equipment Chips */}
+          {isActive && !isCompleted && (
+            <View
+              style={{ marginTop: theme.spacing.lg, gap: theme.spacing.sm }}
+            >
+              {step.ingredients && step.ingredients.length > 0 && (
+                <View
+                  style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}
+                >
+                  {step.ingredients.map((ing, i) => (
+                    <View
+                      key={`ing-${i}`}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        backgroundColor: colors.background,
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderRadius: 12,
+                        borderWidth: 1,
+                        borderColor: colors.divider,
+                      }}
+                    >
+                      <Text
+                        style={[
+                          theme.typography.caption,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        {ing.name}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+          )}
 
           {/* Expand Hint for Collapsed Steps */}
           {!isActive && (

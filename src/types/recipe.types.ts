@@ -83,12 +83,21 @@ export interface Ingredient {
   measure: string;
 }
 
+export interface RecipeStep {
+  number: number;
+  instruction: string;
+  note?: string;
+  ingredients?: { name: string; image: string }[];
+  equipment?: { name: string; image: string }[];
+}
+
 export interface Recipe {
   id: string;
   title: string;
   category: string;
   area: string;
   instructions: string;
+  steps: RecipeStep[]; // Pasos estructurados y enriquecidos
   thumbnail: string;
   tags: string[];
   youtube: string;
@@ -109,48 +118,8 @@ export interface FavoriteRecipe extends RecipeCard {
 }
 
 // ============================================
-// FUNCIONES HELPER PARA CONVERTIR DATOS
+// SPOONACULAR TYPES
 // ============================================
-
-export const convertMealDBToRecipe = (meal: MealDBRecipe): Recipe => {
-  // Extraer ingredientes y medidas
-  const ingredients: Ingredient[] = [];
-
-  for (let i = 1; i <= 20; i++) {
-    const ingredient = meal[`strIngredient${i}` as keyof MealDBRecipe];
-    const measure = meal[`strMeasure${i}` as keyof MealDBRecipe];
-
-    if (ingredient && ingredient.trim() !== "") {
-      ingredients.push({
-        name: ingredient.trim(),
-        measure: measure?.trim() || "",
-      });
-    }
-  }
-
-  return {
-    id: meal.idMeal,
-    title: meal.strMeal,
-    category: meal.strCategory,
-    area: meal.strArea,
-    instructions: meal.strInstructions,
-    thumbnail: meal.strMealThumb,
-    tags: meal.strTags ? meal.strTags.split(",").map((tag) => tag.trim()) : [],
-    youtube: meal.strYoutube,
-    ingredients,
-    source: meal.strSource,
-  };
-};
-
-export const convertMealDBToRecipeCard = (meal: MealDBRecipe): RecipeCard => {
-  return {
-    id: meal.idMeal,
-    title: meal.strMeal,
-    thumbnail: meal.strMealThumb,
-    category: meal.strCategory,
-    area: meal.strArea,
-  };
-};
 
 export interface SpoonacularIngredient {
   id: number;
@@ -238,14 +207,168 @@ export interface SpoonacularSearchResponse {
   totalResults: number;
 }
 
+// ============================================
+// FUNCIONES HELPER PARA CONVERTIR DATOS
+// ============================================
+
+export const convertMealDBToRecipe = (meal: MealDBRecipe): Recipe => {
+  // Extraer ingredientes y medidas
+  const ingredients: Ingredient[] = [];
+
+  for (let i = 1; i <= 20; i++) {
+    const ingredient = meal[`strIngredient${i}` as keyof MealDBRecipe];
+    const measure = meal[`strMeasure${i}` as keyof MealDBRecipe];
+
+    if (ingredient && ingredient.trim() !== "") {
+      ingredients.push({
+        name: ingredient.trim(),
+        measure: measure?.trim() || "",
+      });
+    }
+  }
+
+  const rawSteps = meal.strInstructions
+    .split(/\r\n|\n|\r/)
+    .filter((step) => step.trim().length > 0);
+
+  const steps: RecipeStep[] = rawSteps.map((text, index) => ({
+    number: index + 1,
+    instruction: text.trim(),
+  }));
+
+  return {
+    id: meal.idMeal,
+    title: meal.strMeal,
+    category: meal.strCategory,
+    area: meal.strArea,
+    instructions: meal.strInstructions,
+    steps: steps,
+    thumbnail: meal.strMealThumb,
+    tags: meal.strTags ? meal.strTags.split(",").map((tag) => tag.trim()) : [],
+    youtube: meal.strYoutube,
+    ingredients,
+    source: meal.strSource,
+  };
+};
+
 export const convertSpoonacularToRecipe = (data: SpoonacularRecipe): Recipe => {
+  let steps: RecipeStep[] = [];
+
+  if (data.analyzedInstructions && data.analyzedInstructions.length > 0) {
+    let stepCounter = 1;
+
+    // Aplanar todas las secciones de instrucciones
+    data.analyzedInstructions.forEach((instructionSection) => {
+      instructionSection.steps.forEach((s) => {
+        // Lógica para extraer notas (heurística básica)
+        let text = s.step;
+        let note: string | undefined = undefined;
+
+        // Detectar notas al final entre paréntesis si son cortas?
+        // O detectar "Note:" al principio
+        const noteMatch = text.match(/^(?:Note|Tip|Nota|Consejo):\s*(.*)/i);
+        if (noteMatch) {
+          // Si el paso es SOLO una nota, lo tratamos como tal (instruction vacía o especial?)
+          // O mejor, lo separamos. Pero aqui asumimos que una nota puede ser un "paso" en sí mismo
+          // o un adjunto. El usuario quiere separarlo.
+          // Si empieza con Note:, lo ponemos en el campo nota y dejamos instruction vacía?
+          // StepItem tendrá que manejar esto.
+          note = noteMatch[1];
+          text = ""; // El texto principal se vacía porque todo es nota
+        } else {
+          // Buscar nota al final "Do this. (Note: be careful)"
+          // Regex simple para capturar (Note: ...) al final
+          const noteSuffixMatch = text.match(
+            /(.*)\s*\((?:Note|Tip|Nota|Consejo):\s*(.*)\)$/i,
+          );
+          if (noteSuffixMatch) {
+            text = noteSuffixMatch[1];
+            note = noteSuffixMatch[2];
+          }
+        }
+
+        // Dividir pasos muy largos si no son notas
+        if (text.length > 250 && !note) {
+          const subSteps = text
+            .split(". ")
+            .filter((sub) => sub.trim().length > 0);
+          subSteps.forEach((subStepText, subIndex) => {
+            steps.push({
+              number: stepCounter++,
+              instruction:
+                subStepText +
+                (subIndex < subSteps.length - 1 && !subStepText.endsWith(".")
+                  ? "."
+                  : ""),
+              ingredients:
+                subIndex === 0
+                  ? s.ingredients.map((i) => ({
+                      name: i.localizedName || i.name,
+                      image: i.image,
+                    }))
+                  : [], // Solo en el primero
+              equipment:
+                subIndex === 0
+                  ? s.equipment.map((e) => ({
+                      name: e.localizedName || e.name,
+                      image: e.image,
+                    }))
+                  : [],
+            });
+          });
+        } else {
+          // Caso normal
+          if (text.length > 0 || note) {
+            steps.push({
+              number: stepCounter++,
+              instruction: text,
+              note: note,
+              ingredients: s.ingredients?.map((i) => ({
+                name: i.localizedName || i.name,
+                image: i.image,
+              })),
+              equipment: s.equipment?.map((i) => ({
+                name: i.localizedName || i.name,
+                image: i.image,
+              })),
+            });
+          }
+        }
+      });
+    });
+  } else if (data.instructions) {
+    // Fallback HTML clean
+    const rawText = data.instructions.replace(/<[^>]*>?/gm, "");
+    const rawSteps = rawText
+      .split(/\r\n|\n|\r/)
+      .filter((s) => s.trim().length > 0);
+    steps = rawSteps.map((text, index) => ({
+      number: index + 1,
+      instruction: text.trim(),
+    }));
+  }
+
+  // Fallback summary
+  if (steps.length === 0 && data.summary) {
+    steps = [
+      {
+        number: 1,
+        instruction: data.summary.replace(/<[^>]*>?/gm, ""),
+      },
+    ];
+  }
+
   return {
     id: data.id.toString(),
     title: data.title,
     category: data.dishTypes?.[0] || (data.cuisines?.[0] ?? "General"),
     area: data.cuisines?.[0] || "International",
-    instructions:
-      data.instructions || data.summary || "No instructions provided.",
+    instructions: (
+      data.instructions ||
+      data.summary ||
+      "No instructions provided."
+    ).replace(/<[^>]*>?/gm, ""),
+    steps: steps,
     thumbnail: data.image,
     tags: [...(data.diets || []), ...(data.dishTypes || [])],
     youtube: "",
@@ -255,6 +378,16 @@ export const convertSpoonacularToRecipe = (data: SpoonacularRecipe): Recipe => {
         measure: `${ing.amount} ${ing.unit}`,
       })) || [],
     source: data.sourceUrl,
+  };
+};
+
+export const convertMealDBToRecipeCard = (meal: MealDBRecipe): RecipeCard => {
+  return {
+    id: meal.idMeal,
+    title: meal.strMeal,
+    thumbnail: meal.strMealThumb,
+    category: meal.strCategory,
+    area: meal.strArea,
   };
 };
 

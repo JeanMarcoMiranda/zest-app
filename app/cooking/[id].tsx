@@ -1,7 +1,7 @@
 // app/cooking/[id].tsx
 
 import { ErrorView, LoadingSpinner } from "@/src/components/common";
-import { Step, StepItem } from "@/src/components/cooking";
+import { StepItem } from "@/src/components/cooking";
 import { useRecipes, useTheme } from "@/src/hooks";
 import { createShadow } from "@/src/utils";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -46,17 +46,10 @@ export default function CookingStepsScreen() {
     }
   }, [id, recipe, fetchRecipeById]);
 
-  // Dividir instrucciones en pasos
-  const steps: Step[] = recipe
-    ? recipe.instructions
-        .split("\n")
-        .filter((step) => step.trim() !== "")
-        .map((step, index) => ({
-          number: index + 1,
-          text: step.trim(),
-        }))
-    : [];
-
+  // Usar los pasos ya procesados en el adaptador
+  // recipe.steps ya es RecipeStep[], que es lo que espera StepItem (si la interfaz coincide)
+  // StepItem espera `step: RecipeStep`.
+  const steps = recipe?.steps || [];
   const totalSteps = steps.length;
   const progress =
     totalSteps > 0 ? (completedSteps.length / totalSteps) * 100 : 0;
