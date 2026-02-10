@@ -92,6 +92,8 @@ export const letterSpacing = {
 /**
  * Jerarquía de tipografía predefinida.
  * Estos son los estilos listos para usar en componentes.
+ *
+ * IMPORTANTE: lineHeight debe estar en píxeles para React Native
  */
 export const typography = {
   /**
@@ -102,7 +104,7 @@ export const typography = {
     fontFamily: fontFamily.serif,
     fontSize: fontSize["4xl"], // 32px
     fontWeight: fontWeight.bold,
-    lineHeight: lineHeight.tight, // 1.2
+    lineHeight: Math.round(fontSize["4xl"] * lineHeight.tight), // 38px (32 * 1.2)
     letterSpacing: letterSpacing.tight,
   },
 
@@ -113,7 +115,7 @@ export const typography = {
     fontFamily: fontFamily.serif,
     fontSize: fontSize["5xl"], // 38px
     fontWeight: fontWeight.bold,
-    lineHeight: lineHeight.tight,
+    lineHeight: Math.round(fontSize["5xl"] * lineHeight.tight), // 46px (38 * 1.2)
     letterSpacing: letterSpacing.tight,
   },
 
@@ -125,7 +127,7 @@ export const typography = {
     fontFamily: fontFamily.serif,
     fontSize: fontSize["2xl"], // 24px
     fontWeight: fontWeight.bold,
-    lineHeight: lineHeight.tight, // 1.2
+    lineHeight: Math.round(fontSize["2xl"] * lineHeight.tight), // 29px (24 * 1.2)
     letterSpacing: letterSpacing.normal,
   },
 
@@ -137,7 +139,7 @@ export const typography = {
     fontFamily: fontFamily.serif,
     fontSize: fontSize.lg, // 18px
     fontWeight: fontWeight.semibold,
-    lineHeight: lineHeight.snug, // 1.4
+    lineHeight: Math.round(fontSize.lg * lineHeight.snug), // 25px (18 * 1.4)
     letterSpacing: letterSpacing.normal,
   },
 
@@ -148,8 +150,8 @@ export const typography = {
   bodyLg: {
     fontFamily: fontFamily.sans,
     fontSize: fontSize.base, // 16px
-    fontWeight: fontWeight.medium,
-    lineHeight: lineHeight.normal, // 1.5
+    fontWeight: fontWeight.regular,
+    lineHeight: Math.round(fontSize.base * lineHeight.relaxed), // 27px (16 * 1.7)
     letterSpacing: letterSpacing.normal,
   },
 
@@ -161,7 +163,7 @@ export const typography = {
     fontFamily: fontFamily.sans,
     fontSize: 19.2, // 16px * 1.2 (20% más grande que base)
     fontWeight: fontWeight.medium,
-    lineHeight: lineHeight.relaxed,
+    lineHeight: Math.round(19.2 * lineHeight.relaxed), // 33px (19.2 * 1.7)
     letterSpacing: letterSpacing.normal,
   },
 
@@ -173,7 +175,7 @@ export const typography = {
     fontFamily: fontFamily.sans,
     fontSize: fontSize.sm, // 14px
     fontWeight: fontWeight.regular,
-    lineHeight: lineHeight.relaxed, // 1.7
+    lineHeight: Math.round(fontSize.sm * lineHeight.relaxed), // 24px (14 * 1.7)
     letterSpacing: letterSpacing.normal,
   },
 
@@ -183,10 +185,10 @@ export const typography = {
    * Estilo: ALL-CAPS con tracking amplio
    */
   caption: {
-    fontFamily: fontFamily.sans,
+    fontFamily: fontFamily.sansBold,
     fontSize: fontSize.xs, // 12px
     fontWeight: fontWeight.bold,
-    lineHeight: lineHeight.normal, // 1.5
+    lineHeight: Math.round(fontSize.xs * lineHeight.normal), // 18px (12 * 1.5)
     letterSpacing: letterSpacing.wide, // 0.1em
     textTransform: "uppercase" as const,
   },
@@ -195,10 +197,10 @@ export const typography = {
    * Label - Etiquetas de inputs y botones
    */
   label: {
-    fontFamily: fontFamily.sans,
+    fontFamily: fontFamily.sansSemiBold,
     fontSize: fontSize.sm, // 14px
     fontWeight: fontWeight.semibold,
-    lineHeight: lineHeight.normal,
+    lineHeight: Math.round(fontSize.sm * lineHeight.normal), // 21px (14 * 1.5)
     letterSpacing: letterSpacing.normal,
   },
 
@@ -206,10 +208,10 @@ export const typography = {
    * Button - Texto de botones
    */
   button: {
-    fontFamily: fontFamily.sans,
+    fontFamily: fontFamily.sansBold,
     fontSize: fontSize.base, // 16px
     fontWeight: fontWeight.bold,
-    lineHeight: lineHeight.normal,
+    lineHeight: Math.round(fontSize.base * lineHeight.normal), // 24px (16 * 1.5)
     letterSpacing: letterSpacing.normal,
   },
 } as const;
