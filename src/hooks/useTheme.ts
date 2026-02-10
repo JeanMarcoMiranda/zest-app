@@ -4,40 +4,30 @@
  */
 
 import { useColorScheme } from "react-native";
+import { useStore } from "../store";
 import { darkTheme, lightTheme } from "../theme";
 
 /**
- * Hook para obtener el tema completo según el color scheme del dispositivo.
- * Automáticamente retorna lightTheme o darkTheme según la preferencia del sistema.
- *
- * NOTA: Mantiene compatibilidad con la API anterior agregando propiedades legacy.
- *
- * @returns El tema completo con propiedades adicionales para compatibilidad
- *
- * @example
- * // Uso moderno (acceso al tema completo)
- * const theme = useTheme();
- * <View style={{ padding: theme.spacing.md }}>
- *   <Text style={theme.typography.h1}>Título</Text>
- * </View>
- *
- * @example
- * // Uso legacy (compatibilidad hacia atrás)
- * const { colors, isDark } = useTheme();
- * <View style={{ backgroundColor: colors.background }}>
- *   <Text style={{ color: colors.text }}>Texto</Text>
- * </View>
+ * Hook para obtener el tema completo según la configuración del usuario.
+ * Maneja los modos 'light', 'dark' y 'system'.
  */
 export function useTheme() {
-  const colorScheme = useColorScheme();
-  const theme = colorScheme === "dark" ? darkTheme : lightTheme;
+  const systemColorScheme = useColorScheme();
+  const themeMode = useStore((state) => state.themeMode);
+
+  // Determinar si debemos usar modo oscuro
+  const isDark =
+    themeMode === "dark" ||
+    (themeMode === "system" && systemColorScheme === "dark");
+
+  const theme = isDark ? darkTheme : lightTheme;
 
   // Retornar tema completo + propiedades legacy para compatibilidad
   return {
     ...theme,
     // Legacy properties (mantienen compatibilidad con código existente)
-    isDark: colorScheme === "dark",
-    colorScheme: colorScheme ?? "light",
+    isDark,
+    colorScheme: isDark ? "dark" : ("light" as "light" | "dark"),
   };
 }
 
