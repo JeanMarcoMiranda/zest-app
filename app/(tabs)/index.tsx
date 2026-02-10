@@ -80,23 +80,25 @@ export default function HomeScreen() {
     setCategories(cats);
   };
 
-  const loadRecipesData = async () => {
+  const loadRecipesData = useCallback(async () => {
     if (searchQuery.trim() !== "") {
       await fetchRecipes(searchQuery);
     } else if (selectedCategory) {
       await fetchRecipesByCategory(selectedCategory);
     } else {
-      // Si ya hay recetas y no es un refresh explícito, quizás no queramos recargar randoms siempre?
-      // Pero la lógica original recargaba. Mantenemos comportamiento original por ahora.
-      // Optimización: si recipes.length > 0 y no cambió nada, no recargar?
-      // La lógica original era: en mount loadRecipes().
       await fetchRandomRecipes(6);
     }
-  };
+  }, [
+    searchQuery,
+    selectedCategory,
+    fetchRecipes,
+    fetchRecipesByCategory,
+    fetchRandomRecipes,
+  ]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await loadRecipes();
+    await loadRecipesData();
     setRefreshing(false);
   };
 
@@ -192,22 +194,21 @@ export default function HomeScreen() {
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      setLoading(true);
-      loadRecipes();
+      loadRecipesData();
     }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, loadRecipesData]);
 
   const handleRecipePress = (recipeId: string) => {
     router.push(`/recipe/${recipeId}` as any);
   };
 
-  if (error && recipes.length === 0) {
+  if (storeError && recipes.length === 0) {
     return (
       <ErrorView
         message="No pudimos cargar las recetas. Verifica tu conexión."
-        onRetry={loadRecipes}
+        onRetry={loadRecipesData}
       />
     );
   }
