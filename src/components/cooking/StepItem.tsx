@@ -1,12 +1,9 @@
 import { useTheme } from "@/src/hooks";
-import { spacing, typography } from "@/src/theme";
+import { fontSize } from "@/src/theme";
+import { createShadow } from "@/src/utils";
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
-const borderRadius = {
-  lg: 12,
-};
+import { Text, TouchableOpacity, View } from "react-native";
 
 export interface Step {
   number: number;
@@ -32,7 +29,8 @@ export const StepItem: React.FC<StepItemProps> = ({
   onPress,
   onComplete,
 }) => {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
 
   const getCircleColor = () => {
     if (isCompleted) return colors.success;
@@ -46,28 +44,28 @@ export const StepItem: React.FC<StepItemProps> = ({
     return "radio-button-unchecked";
   };
 
-  const shadows = {
-    sm: {
-      shadowColor: colors.primaryDark,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
-      shadowRadius: 2,
-      elevation: 2,
-    },
-    md: {
-      shadowColor: colors.primaryDark,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 4,
-    },
-  };
-
   return (
-    <View style={styles.container}>
-      <View style={styles.leftColumn}>
+    <View
+      style={{
+        flexDirection: "row",
+        marginBottom: theme.spacing.md,
+      }}
+    >
+      <View
+        style={{
+          alignItems: "center",
+          marginRight: theme.spacing.md,
+        }}
+      >
         {/* Círculo del paso */}
-        <View style={styles.circleContainer}>
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <MaterialIcons
             name={getIconName()}
             size={32}
@@ -77,22 +75,31 @@ export const StepItem: React.FC<StepItemProps> = ({
 
         {/* Línea conectora */}
         {!isLast && (
-          <View style={[styles.line, { backgroundColor: colors.divider }]} />
+          <View
+            style={{
+              width: 2,
+              flex: 1,
+              marginTop: theme.spacing.xs,
+              backgroundColor: colors.divider,
+            }}
+          />
         )}
       </View>
 
-      <View style={styles.rightColumn}>
+      <View style={{ flex: 1 }}>
         <TouchableOpacity
           style={[
-            styles.stepCard,
             {
+              padding: theme.spacing.md,
+              borderRadius: theme.borderRadius.lg,
+              borderWidth: 2,
               backgroundColor: colors.surface,
               borderColor: colors.divider,
+              ...createShadow(theme as any, theme.elevation.low),
             },
-            shadows.sm,
             isActive && {
               borderColor: colors.primary,
-              ...shadows.md,
+              ...createShadow(theme as any, theme.elevation.medium),
             },
             isCompleted && {
               borderColor: colors.success,
@@ -102,14 +109,23 @@ export const StepItem: React.FC<StepItemProps> = ({
           onPress={onPress}
           activeOpacity={0.7}
         >
-          <View style={styles.stepHeader}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: theme.spacing.sm,
+            }}
+          >
             <Text
               style={[
-                styles.stepNumber,
-                { color: colors.textSecondary },
+                theme.typography.button,
+                {
+                  color: colors.textSecondary,
+                },
                 isActive && {
                   color: colors.primary,
-                  fontSize: typography.fontSize.lg,
+                  fontSize: fontSize.lg,
                 },
                 isCompleted && {
                   color: colors.success,
@@ -122,7 +138,7 @@ export const StepItem: React.FC<StepItemProps> = ({
             {/* Checkbox para marcar como completado */}
             <TouchableOpacity
               onPress={onComplete}
-              style={styles.checkbox}
+              style={{ padding: theme.spacing.xs }}
               activeOpacity={0.7}
             >
               <MaterialIcons
@@ -135,8 +151,10 @@ export const StepItem: React.FC<StepItemProps> = ({
 
           <Text
             style={[
-              styles.stepText,
-              { color: colors.text },
+              theme.typography.bodyLg,
+              {
+                color: colors.text,
+              },
               isCompleted && {
                 color: colors.textSecondary,
                 textDecorationLine: "line-through",
@@ -148,7 +166,16 @@ export const StepItem: React.FC<StepItemProps> = ({
           </Text>
 
           {!isActive && (
-            <Text style={[styles.tapToExpand, { color: colors.textLight }]}>
+            <Text
+              style={[
+                theme.typography.caption,
+                {
+                  color: colors.textLight,
+                  fontStyle: "italic",
+                  marginTop: theme.spacing.xs,
+                },
+              ]}
+            >
               Toca para ver más
             </Text>
           )}
@@ -157,55 +184,3 @@ export const StepItem: React.FC<StepItemProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    marginBottom: spacing.md,
-  },
-  leftColumn: {
-    alignItems: "center",
-    marginRight: spacing.md,
-  },
-  circleContainer: {
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  line: {
-    width: 2,
-    flex: 1,
-    marginTop: spacing.xs,
-  },
-  rightColumn: {
-    flex: 1,
-  },
-  stepCard: {
-    padding: spacing.md,
-    borderRadius: borderRadius.lg,
-    borderWidth: 2,
-  },
-  stepHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: spacing.sm,
-  },
-  stepNumber: {
-    fontSize: typography.fontSize.base,
-    fontWeight: "700",
-  },
-  checkbox: {
-    padding: spacing.xs,
-  },
-  stepText: {
-    fontSize: typography.fontSize.base,
-    lineHeight: typography.fontSize.base * 1.5,
-  },
-  tapToExpand: {
-    fontSize: typography.fontSize.xs,
-    fontStyle: "italic",
-    marginTop: spacing.xs,
-  },
-});

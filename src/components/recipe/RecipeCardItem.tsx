@@ -1,5 +1,5 @@
 import { useFavorites, useTheme } from "@/src/hooks";
-import { borderRadius, spacing } from "@/src/theme";
+import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -20,12 +20,6 @@ import { RecipeCard } from "../../types/recipe.types";
 const ANIMATION_SCALE_PRESSED = 0.96;
 const ANIMATION_SCALE_FAVORITE = 1.4;
 
-// Gradientes para overlays
-const gradients = {
-  overlay: ["transparent", "rgba(0,0,0,0.7)"] as const,
-  overlayLight: ["transparent", "rgba(0,0,0,0.5)"] as const,
-};
-
 interface RecipeCardItemProps {
   recipe: RecipeCard;
   onPress: () => void;
@@ -33,7 +27,8 @@ interface RecipeCardItemProps {
 
 const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
   const { isFavorite, toggleFavorite } = useFavorites();
-  const { colors, isDark } = useTheme();
+  const theme = useTheme();
+  const { colors, isDark } = theme;
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const favoriteScaleAnim = useRef(new Animated.Value(1)).current;
@@ -86,42 +81,51 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
 
   const isFav = isFavorite(recipe.id);
 
-  const shadows = {
-    card: {
-      shadowColor: colors.primaryDark,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.12,
-      shadowRadius: 16,
-      elevation: 8,
-    },
-    button: {
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.2,
-      shadowRadius: 6,
-      elevation: 4,
-    },
-  };
-
   return (
     <Animated.View
-      style={[styles.cardWrapper, { transform: [{ scale: scaleAnim }] }]}
+      style={[
+        {
+          marginBottom: theme.spacing.lg,
+          paddingHorizontal: theme.spacing.xs,
+        },
+        { transform: [{ scale: scaleAnim }] },
+      ]}
     >
       <TouchableOpacity
-        style={[styles.card, { backgroundColor: colors.surface }, shadows.card]}
+        style={[
+          {
+            borderRadius: theme.borderRadius.xl,
+            overflow: Platform.OS === "android" ? "hidden" : "visible",
+            backgroundColor: colors.surface,
+          },
+          createShadow(theme as any, theme.elevation.high),
+        ]}
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={1}
       >
         {/* Imagen Wrapper */}
-        <View style={styles.imageContainer}>
+        <View
+          style={{
+            height: 220,
+            width: "100%",
+            position: "relative",
+            borderTopLeftRadius: theme.borderRadius.xl,
+            borderTopRightRadius: theme.borderRadius.xl,
+            overflow: "hidden",
+          }}
+        >
           {/* Placeholder */}
           {!imageLoaded && (
             <View
               style={[
-                styles.placeholder,
-                { backgroundColor: colors.surfaceVariant },
+                StyleSheet.absoluteFillObject,
+                {
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: colors.surfaceVariant,
+                },
               ]}
             >
               <Ionicons
@@ -135,25 +139,44 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
 
           <Image
             source={{ uri: recipe.thumbnail }}
-            style={styles.image}
+            style={{ width: "100%", height: "100%" }}
             resizeMode="cover"
             onLoad={() => setImageLoaded(true)}
           />
 
           {/* Gradiente sutil inferior */}
           <LinearGradient
-            colors={isDark ? gradients.overlay : gradients.overlayLight}
-            style={styles.gradient}
+            colors={
+              isDark ? theme.gradients.overlay : theme.gradients.overlayLight
+            }
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: "60%",
+            }}
           />
 
-          {/* Badge de Categoría (Glassmorphism sutil o Gradiente) */}
-          <View style={styles.categoryBadgeContainer}>
-            {/* Usamos un contenedor normal con gradiente sólido para mejor legibilidad sobre imagen */}
+          {/* Badge de Categoría */}
+          <View
+            style={{
+              position: "absolute",
+              top: theme.spacing.md,
+              left: theme.spacing.md,
+            }}
+          >
             <LinearGradient
               colors={[colors.primary, colors.primaryLight]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={styles.categoryBadge}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: theme.spacing.sm + 2,
+                paddingVertical: theme.spacing.xs + 2,
+                borderRadius: theme.borderRadius.md,
+              }}
             >
               <Ionicons
                 name="restaurant"
@@ -161,22 +184,48 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
                 color="#FFF"
                 style={{ marginRight: 4 }}
               />
-              <Text style={styles.categoryText}>{recipe.category}</Text>
+              <Text
+                style={[
+                  theme.typography.caption,
+                  {
+                    color: "#FFFFFF",
+                    letterSpacing: 0.5,
+                  },
+                ]}
+              >
+                {recipe.category}
+              </Text>
             </LinearGradient>
           </View>
 
-          {/* Botón Favorito (Glassmorphism Real) */}
+          {/* Botón Favorito (Glassmorphism) */}
           <Animated.View
             style={[
-              styles.favoriteContainer,
+              {
+                position: "absolute",
+                top: theme.spacing.md,
+                right: theme.spacing.md,
+                borderRadius: theme.borderRadius.full,
+                overflow: "hidden",
+                ...createShadow(theme as any, theme.elevation.low),
+              },
               { transform: [{ scale: favoriteScaleAnim }] },
             ]}
           >
             <TouchableOpacity onPress={handleFavoritePress} activeOpacity={0.8}>
               <BlurView
-                intensity={Platform.OS === "ios" ? 40 : 80} // Android necesita más intensidad o tinte distinto
+                intensity={Platform.OS === "ios" ? 40 : 80}
                 tint={isDark ? "dark" : "light"}
-                style={styles.favoriteBlur}
+                style={{
+                  width: 44,
+                  height: 44,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor:
+                    Platform.OS === "android"
+                      ? "rgba(255,255,255,0.8)"
+                      : "transparent",
+                }}
               >
                 <Ionicons
                   name={isFav ? "heart" : "heart-outline"}
@@ -189,22 +238,54 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
         </View>
 
         {/* Contenido (Info) */}
-        <View style={styles.content}>
-          <View style={styles.titleRow}>
+        <View
+          style={{
+            padding: theme.spacing.lg,
+            paddingTop: theme.spacing.md,
+            borderBottomLeftRadius: theme.borderRadius.xl,
+            borderBottomRightRadius: theme.borderRadius.xl,
+          }}
+        >
+          <View style={{ marginBottom: theme.spacing.sm }}>
             <Text
-              style={[styles.title, { color: colors.text }]}
+              style={[
+                theme.typography.h2,
+                {
+                  color: colors.text,
+                  letterSpacing: -0.4,
+                  lineHeight: 24,
+                },
+              ]}
               numberOfLines={2}
             >
               {recipe.title}
             </Text>
           </View>
 
-          <View style={styles.detailsRow}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             {/* Área */}
-            <View style={styles.detailItem}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
               <Ionicons name="globe-outline" size={14} color={colors.primary} />
               <Text
-                style={[styles.detailText, { color: colors.textSecondary }]}
+                style={[
+                  theme.typography.bodySm,
+                  {
+                    color: colors.textSecondary,
+                    fontWeight: "500",
+                  },
+                ]}
               >
                 {recipe.area}
               </Text>
@@ -212,15 +293,29 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
 
             {/* Separador */}
             <View
-              style={[styles.separator, { backgroundColor: colors.divider }]}
+              style={{
+                width: 1,
+                height: 16,
+                marginHorizontal: theme.spacing.md,
+                backgroundColor: colors.divider,
+              }}
             />
 
             {/* Indicador visual "Ver receta" */}
-            <View style={styles.detailItem}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
               <Text
                 style={[
-                  styles.detailText,
-                  { color: colors.primary, fontWeight: "600" },
+                  theme.typography.bodySm,
+                  {
+                    color: colors.primary,
+                    fontWeight: "600",
+                  },
                 ]}
               >
                 Ver receta
@@ -233,140 +328,5 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
     </Animated.View>
   );
 };
-
-// Extraer valores del tema para usar en StyleSheet.create()
-const h2Styles = {
-  fontFamily: "PlayfairDisplay-Bold",
-  fontSize: 24,
-  fontWeight: "700" as const,
-  lineHeight: 1.2,
-  letterSpacing: 0,
-};
-
-const bodySmStyles = {
-  fontFamily: "Inter-Regular",
-  fontSize: 14,
-  fontWeight: "400" as const,
-  lineHeight: 1.7,
-  letterSpacing: 0,
-};
-
-const captionStyles = {
-  fontFamily: "Inter-Bold",
-  fontSize: 12,
-  fontWeight: "700" as const,
-  lineHeight: 1.5,
-  letterSpacing: 0.1,
-  textTransform: "uppercase" as const,
-};
-
-const styles = StyleSheet.create({
-  cardWrapper: {
-    marginBottom: spacing.lg,
-    paddingHorizontal: spacing.xs, // Para dar espacio a la sombra lateral
-  },
-  card: {
-    borderRadius: borderRadius.xl,
-    overflow: Platform.OS === "android" ? "hidden" : "visible",
-  },
-  imageContainer: {
-    height: 220,
-    width: "100%",
-    position: "relative",
-    borderTopLeftRadius: borderRadius.xl,
-    borderTopRightRadius: borderRadius.xl,
-    overflow: "hidden",
-  },
-  placeholder: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  gradient: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: "60%",
-  },
-  categoryBadgeContainer: {
-    position: "absolute",
-    top: spacing.md,
-    left: spacing.md,
-  },
-  categoryBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: spacing.sm + 2,
-    paddingVertical: spacing.xs + 2,
-    borderRadius: borderRadius.md,
-  },
-  categoryText: {
-    color: "#FFFFFF",
-    ...captionStyles,
-    letterSpacing: 0.5,
-  },
-  favoriteContainer: {
-    position: "absolute",
-    top: spacing.md,
-    right: spacing.md,
-    borderRadius: borderRadius.full,
-    overflow: "hidden",
-    ...Platform.select({
-      android: { elevation: 4 },
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-    }),
-  },
-  favoriteBlur: {
-    width: 44,
-    height: 44,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor:
-      Platform.OS === "android" ? "rgba(255,255,255,0.8)" : "transparent", // Fallback android
-  },
-  content: {
-    padding: spacing.lg,
-    paddingTop: spacing.md,
-    borderBottomLeftRadius: borderRadius.xl,
-    borderBottomRightRadius: borderRadius.xl,
-  },
-  titleRow: {
-    marginBottom: spacing.sm,
-  },
-  title: {
-    ...h2Styles,
-    letterSpacing: -0.4,
-    lineHeight: 24,
-  },
-  detailsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  detailItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  detailText: {
-    ...bodySmStyles,
-    fontWeight: "500",
-  },
-  separator: {
-    width: 1,
-    height: 16,
-    marginHorizontal: spacing.md,
-  },
-});
 
 export default RecipeCardItem;
