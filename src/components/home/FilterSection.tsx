@@ -25,7 +25,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
   onSelectCategory,
 }) => {
   const theme = useTheme();
-  const { isDark } = theme;
+  const { colors, isDark } = theme;
 
   return (
     <Animated.View
@@ -57,10 +57,10 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
           borderRadius: theme.borderRadius.sm,
           overflow: "hidden",
           backgroundColor: isDark
-            ? "rgba(41,37,36,0.7)"
+            ? colors.surfaceVariant
             : "rgba(255,255,255,0.8)",
           borderWidth: 1,
-          borderColor: isDark ? "rgba(68,64,60,0.4)" : "rgba(231,229,228,0.6)",
+          borderColor: colors.border,
         }}
       >
         <SearchBar

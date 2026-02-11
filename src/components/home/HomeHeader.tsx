@@ -63,12 +63,10 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: isDark ? "rgba(28,25,23,1)" : "rgba(253,252,240,1)",
+          backgroundColor: colors.background,
           opacity: headerBgOpacity,
           borderBottomWidth: 1,
-          borderBottomColor: isDark
-            ? "rgba(68,64,60,0.3)"
-            : "rgba(231,229,228,0.5)",
+          borderBottomColor: colors.border,
         }}
       />
 
@@ -153,16 +151,16 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                 paddingVertical: theme.spacing.xs - 1,
                 borderRadius: theme.borderRadius.full,
                 backgroundColor: isDark
-                  ? "rgba(255,71,87,0.15)"
-                  : "rgba(255,71,87,0.1)",
+                  ? colors.error + "25"
+                  : colors.error + "15",
               }}
             >
-              <Ionicons name="heart" size={10} color="#FF4757" />{" "}
+              <Ionicons name="heart" size={10} color={colors.error} />{" "}
               {/* Smaller badge icon */}
               <Text
                 style={[
                   theme.typography.caption,
-                  { color: "#FF4757", fontWeight: "700", fontSize: 9 }, // Smaller badge font size
+                  { color: colors.error, fontWeight: "700", fontSize: 9 }, // Smaller badge font size
                 ]}
               >
                 {favoritesCount}
@@ -176,8 +174,8 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                 paddingVertical: theme.spacing.xs,
                 borderRadius: theme.borderRadius.full,
                 backgroundColor: isDark
-                  ? "rgba(217,119,6,0.15)"
-                  : "rgba(146,64,14,0.1)",
+                  ? colors.primary + "25"
+                  : colors.primary + "15",
               }}
             >
               <Text

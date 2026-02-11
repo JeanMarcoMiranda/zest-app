@@ -158,25 +158,22 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
               paddingVertical: 3,
               borderRadius: theme.borderRadius.xs,
               overflow: "hidden",
-              backgroundColor:
-                Platform.OS === "android"
-                  ? isDark
-                    ? "rgba(0,0,0,0.5)"
-                    : "rgba(255,255,255,0.7)"
-                  : "transparent",
+              backgroundColor: isDark
+                ? colors.surface + "90"
+                : colors.surface + "70",
             }}
           >
             <Ionicons
               name="restaurant"
               size={9}
-              color={isDark ? "#FFF" : colors.text}
+              color={colors.text}
               style={{ marginRight: 2 }}
             />
             <Text
               style={[
                 theme.typography.caption,
                 {
-                  color: isDark ? "#FFF" : colors.text,
+                  color: colors.text,
                   fontSize: 9,
                   textTransform: "none",
                 },
@@ -208,16 +205,15 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
                 height: 34,
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor:
-                  Platform.OS === "android"
-                    ? "rgba(255,255,255,0.7)"
-                    : "transparent",
+                backgroundColor: isDark
+                  ? colors.surfaceVariant + "90"
+                  : "rgba(255,255,255,0.7)",
               }}
             >
               <Ionicons
                 name={isFav ? "heart" : "heart-outline"}
                 size={16}
-                color={isFav ? "#FF4757" : "#FFF"}
+                color={isFav ? colors.error : "#FFF"}
               />
             </BlurView>
           </TouchableOpacity>

@@ -167,7 +167,7 @@ export default function HomeScreen() {
             alignItems: "center",
             marginBottom: theme.spacing.xl,
             backgroundColor: isDark
-              ? "rgba(41,37,36,0.6)"
+              ? colors.surfaceVariant
               : "rgba(255,255,255,0.8)",
             borderWidth: isDark ? 1 : 0,
             borderColor: colors.border,
