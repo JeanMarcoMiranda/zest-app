@@ -1,17 +1,22 @@
 import { RecipeCardItem } from "@/src/components/recipe";
 import { useFavorites, useTheme } from "@/src/hooks";
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import {
   Alert,
-  FlatList,
+  Platform,
   Pressable,
   StatusBar,
+  StyleSheet,
   Text,
   View,
 } from "react-native";
 import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -30,6 +35,14 @@ export default function FavoritesScreen() {
   const theme = useTheme();
   const { colors, isDark } = theme;
   const insets = useSafeAreaInsets();
+
+  // Scroll value for header animation
+  const scrollY = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
 
   // Animation values
   const heartScale = useSharedValue(1);
@@ -66,6 +79,47 @@ export default function FavoritesScreen() {
   const animatedDeleteButtonStyle = useAnimatedStyle(() => ({
     transform: [{ scale: deleteButtonScale.value }],
   }));
+
+  // Header Animation Styles
+  const headerContentStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollY.value,
+      [0, 40],
+      [1, 0],
+      Extrapolation.CLAMP,
+    );
+    const translateY = interpolate(
+      scrollY.value,
+      [0, 40],
+      [0, -10],
+      Extrapolation.CLAMP,
+    );
+
+    return {
+      opacity,
+      transform: [{ translateY }],
+    };
+  });
+
+  const miniHeaderStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollY.value,
+      [30, 60],
+      [0, 1],
+      Extrapolation.CLAMP,
+    );
+    const translateY = interpolate(
+      scrollY.value,
+      [30, 60],
+      [10, 0],
+      Extrapolation.CLAMP,
+    );
+
+    return {
+      opacity,
+      transform: [{ translateY }],
+    };
+  });
 
   const handleRecipePress = (recipeId: string) => {
     router.push(`/recipe/${recipeId}` as any);
@@ -127,142 +181,192 @@ export default function FavoritesScreen() {
     Math.max(insets.bottom, theme.spacing.sm) +
     theme.spacing.sm;
 
+  const headerTotalHeight = insets.top + 60; // Fixed header height for safe area + content
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Edge-to-edge StatusBar */}
       <StatusBar
         barStyle={isDark ? "light-content" : "dark-content"}
         backgroundColor="transparent"
         translucent={true}
       />
 
-      {favorites.length === 0 ? (
-        // Empty State — centered with insets
-        <View
+      {/* Glass Header */}
+      <View
+        style={[StyleSheet.absoluteFill, { bottom: undefined, zIndex: 10 }]}
+      >
+        <BlurView
+          intensity={Platform.OS === "ios" ? 80 : 50}
+          tint={isDark ? "dark" : "light"}
           style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            paddingHorizontal: theme.spacing.xl,
             paddingTop: insets.top,
-            paddingBottom: tabBarTotalHeight,
+            paddingHorizontal: theme.spacing.md,
+            paddingBottom: theme.spacing.sm,
+            borderBottomWidth: 1,
+            borderBottomColor: isDark
+              ? "rgba(255,255,255,0.1)"
+              : "rgba(0,0,0,0.05)",
           }}
         >
-          <Animated.View style={animatedHeartStyle}>
-            <Ionicons
-              name="heart-outline"
-              size={80}
-              color={colors.primary}
-              style={{ marginBottom: theme.spacing.lg }}
-            />
-          </Animated.View>
-
-          <Text
-            style={[
-              theme.typography.h2,
-              {
-                color: colors.text,
-                marginBottom: theme.spacing.sm,
-                textAlign: "center",
-              },
-            ]}
+          <View
+            style={{
+              height: 50,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
           >
-            No tienes favoritos
-          </Text>
-
-          <Text
-            style={[
-              theme.typography.bodySm,
-              {
-                color: colors.textSecondary,
-                textAlign: "center",
-                maxWidth: 280,
-              },
-            ]}
-          >
-            Explora recetas deliciosas y guarda tus favoritas tocando el corazón
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={favorites}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <RecipeCardItem
-              recipe={item}
-              onPress={() => handleRecipePress(item.id)}
-            />
-          )}
-          ListHeaderComponent={
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                paddingTop: insets.top + theme.spacing.md,
-                paddingBottom: theme.spacing.sm,
-                paddingHorizontal: theme.spacing.sm + 4,
-              }}
-            >
-              {/* Count */}
-              <Text
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              {/* Expanded Title (fades out on scroll) */}
+              <Animated.Text
                 style={[
-                  theme.typography.label,
-                  { color: colors.textSecondary },
+                  theme.typography.h2,
+                  {
+                    color: colors.text,
+                    position: "absolute",
+                    width: "100%",
+                  },
+                  headerContentStyle,
                 ]}
               >
-                {favorites.length}{" "}
-                {favorites.length === 1
-                  ? "receta guardada"
-                  : "recetas guardadas"}
-              </Text>
+                Favoritos
+              </Animated.Text>
 
-              {/* Delete All */}
-              <Animated.View style={animatedDeleteButtonStyle}>
+              {/* Collapsed Title (fades in on scroll) */}
+              <Animated.Text
+                style={[
+                  theme.typography.h3,
+                  {
+                    color: colors.text,
+                    position: "absolute",
+                    width: "100%",
+                    textAlign: "center", // Center title when collapsed for typical iOS feel
+                  },
+                  miniHeaderStyle,
+                ]}
+              >
+                Favoritos
+              </Animated.Text>
+            </View>
+
+            {/* Actions - Always visible if favorites exist */}
+            {favorites.length > 0 && (
+              <Animated.View
+                style={[{ zIndex: 20 }, animatedDeleteButtonStyle]}
+              >
                 <Pressable
                   onPress={handleClearAll}
                   onPressIn={handleDeletePressIn}
                   onPressOut={handleDeletePressOut}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 4,
-                    paddingVertical: theme.spacing.xs,
-                    paddingHorizontal: theme.spacing.sm,
-                    borderRadius: theme.borderRadius.full,
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.7 : 1,
+                    padding: 8,
                     backgroundColor: isDark
                       ? "rgba(239,68,68,0.15)"
-                      : "rgba(239,68,68,0.08)",
-                  }}
+                      : "rgba(239,68,68,0.1)",
+                    borderRadius: theme.borderRadius.full,
+                  })}
                 >
                   <Ionicons
                     name="trash-outline"
-                    size={14}
+                    size={20}
                     color={colors.error}
                   />
-                  <Text
-                    style={[
-                      theme.typography.caption,
-                      {
-                        color: colors.error,
-                        textTransform: "none",
-                        fontWeight: "500",
-                      },
-                    ]}
-                  >
-                    Eliminar todo
-                  </Text>
                 </Pressable>
               </Animated.View>
-            </View>
-          }
-          contentContainerStyle={{
-            paddingHorizontal: theme.spacing.sm + 4,
-            paddingBottom: tabBarTotalHeight + theme.spacing.md,
-          }}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
+            )}
+          </View>
+        </BlurView>
+      </View>
+
+      {/* Main Content */}
+      <Animated.FlatList
+        data={favorites}
+        keyExtractor={(item) => item.id}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        contentContainerStyle={{
+          paddingTop: headerTotalHeight + theme.spacing.sm, // Push content down
+          paddingBottom: tabBarTotalHeight + theme.spacing.md,
+          paddingHorizontal: theme.spacing.sm + 4,
+          flexGrow: 1, // Ensure empty state centering works
+        }}
+        renderItem={({ item }) => (
+          <RecipeCardItem
+            recipe={item}
+            onPress={() => handleRecipePress(item.id)}
+          />
+        )}
+        ListEmptyComponent={
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingHorizontal: theme.spacing.xl,
+              // Adjust spacing to account for header being visually there but structurally absolute
+              marginTop: theme.spacing.xl * 2,
+            }}
+          >
+            <Animated.View style={animatedHeartStyle}>
+              <View
+                style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: 60,
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.05)"
+                    : "rgba(0,0,0,0.03)",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginBottom: theme.spacing.lg,
+                }}
+              >
+                <Ionicons
+                  name="heart"
+                  size={64}
+                  color={colors.primary}
+                  style={{
+                    shadowColor: colors.primary,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                  }}
+                />
+              </View>
+            </Animated.View>
+
+            <Text
+              style={[
+                theme.typography.h2,
+                {
+                  color: colors.text,
+                  marginBottom: theme.spacing.sm,
+                  textAlign: "center",
+                },
+              ]}
+            >
+              Tu recetario está vacío
+            </Text>
+
+            <Text
+              style={[
+                theme.typography.bodyLg,
+                {
+                  color: colors.textSecondary,
+                  textAlign: "center",
+                  maxWidth: 300,
+                  lineHeight: 22,
+                },
+              ]}
+            >
+              Explora nuestra colección y guarda las recetas que más te gusten
+              para tenerlas siempre a mano.
+            </Text>
+          </View>
+        }
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 }
