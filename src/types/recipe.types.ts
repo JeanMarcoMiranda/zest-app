@@ -1,3 +1,4 @@
+import { optimizeSteps } from "../utils/recipeUtils";
 export interface MealDBRecipe {
   idMeal: string;
   strMeal: string;
@@ -368,7 +369,7 @@ export const convertSpoonacularToRecipe = (data: SpoonacularRecipe): Recipe => {
       data.summary ||
       "No instructions provided."
     ).replace(/<[^>]*>?/gm, ""),
-    steps: steps,
+    steps: optimizeSteps(steps),
     thumbnail: data.image,
     tags: [...(data.diets || []), ...(data.dishTypes || [])],
     youtube: "",

@@ -48,6 +48,7 @@ export default function RootLayout() {
           title: "Preparación",
           headerBackTitle: "Volver",
           presentation: "card",
+          headerShown: false,
         }}
       />
     </Stack>

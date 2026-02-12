@@ -1,19 +1,30 @@
 // app/cooking/[id].tsx
 
 import { ErrorView, LoadingSpinner } from "@/src/components/common";
-import { StepItem } from "@/src/components/cooking";
+import { StepCard } from "@/src/components/cooking";
 import { useRecipes, useTheme } from "@/src/hooks";
-import { MaterialIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Pressable, ScrollView, StatusBar, Text, View } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  Platform,
+  Pressable,
+  StatusBar,
+  Text,
+  View,
+  ViewToken,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function CookingStepsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -28,6 +39,7 @@ export default function CookingStepsScreen() {
 
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const flatListRef = useRef<FlatList>(null);
 
   // Animation for progress bar
   const progressWidth = useSharedValue(0);
@@ -40,32 +52,56 @@ export default function CookingStepsScreen() {
 
   const steps = recipe?.steps || [];
   const totalSteps = steps.length;
-  const progress =
-    totalSteps > 0 ? (completedSteps.length / totalSteps) * 100 : 0;
-  const allCompleted = completedSteps.length === totalSteps && totalSteps > 0;
+  const progress = totalSteps > 0 ? ((currentStep + 1) / totalSteps) * 100 : 0;
+  const completedCount = completedSteps.length;
+  const allCompleted = completedCount === totalSteps && totalSteps > 0;
 
   // Animate progress bar
   useEffect(() => {
-    progressWidth.value = withTiming(progress, {
-      duration: 400,
-    });
+    progressWidth.value = withTiming(progress, { duration: 350 });
   }, [progress, progressWidth]);
 
   const animatedProgressStyle = useAnimatedStyle(() => ({
     width: `${progressWidth.value}%`,
   }));
 
-  const handleStepPress = (index: number) => {
-    setCurrentStep(index);
-  };
+  // FlatList viewability config
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 50,
+  }).current;
 
-  const handleStepComplete = (index: number) => {
-    if (completedSteps.includes(index)) {
-      setCompletedSteps(completedSteps.filter((i) => i !== index));
-    } else {
-      setCompletedSteps([...completedSteps, index]);
-    }
-  };
+  const onViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      if (viewableItems.length > 0 && viewableItems[0].index != null) {
+        setCurrentStep(viewableItems[0].index);
+      }
+    },
+  ).current;
+
+  const handleStepComplete = useCallback((stepNumber: number) => {
+    setCompletedSteps((prev) =>
+      prev.includes(stepNumber)
+        ? prev.filter((i) => i !== stepNumber)
+        : [...prev, stepNumber],
+    );
+  }, []);
+
+  const goToStep = useCallback(
+    (index: number) => {
+      if (index >= 0 && index < totalSteps) {
+        flatListRef.current?.scrollToIndex({ index, animated: true });
+      }
+    },
+    [totalSteps],
+  );
+
+  const handlePrev = useCallback(() => {
+    goToStep(currentStep - 1);
+  }, [currentStep, goToStep]);
+
+  const handleNext = useCallback(() => {
+    goToStep(currentStep + 1);
+  }, [currentStep, goToStep]);
 
   const handleFinish = () => {
     router.back();
@@ -79,101 +115,143 @@ export default function CookingStepsScreen() {
     return <ErrorView message="No pudimos cargar las instrucciones." />;
   }
 
-  const gradientColors = [colors.primary, colors.primaryLight] as const;
+  const isFirstStep = currentStep === 0;
+  const isLastStep = currentStep === totalSteps - 1;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       {/* Edge-to-edge StatusBar */}
       <StatusBar
-        barStyle="light-content"
+        barStyle={isDark ? "light-content" : "dark-content"}
         backgroundColor="transparent"
         translucent={true}
       />
 
-      {/* Header with gradient — extends behind status bar */}
-      <LinearGradient colors={gradientColors}>
-        {/* Safe area spacer */}
-        <View style={{ height: insets.top }} />
+      {/* ─── Step Cards — Paginated FlatList ─── */}
+      {/* 
+         NOTE: We render the list FIRST so it goes BEHIND the header.
+         The StepCard has internal padding to push content down.
+      */}
+      <FlatList
+        ref={flatListRef}
+        data={steps}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => String(item.number)}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+        getItemLayout={(_, index) => ({
+          length: SCREEN_WIDTH,
+          offset: SCREEN_WIDTH * index,
+          index,
+        })}
+        renderItem={({ item, index }) => (
+          <StepCard
+            step={item}
+            index={index}
+            totalSteps={totalSteps}
+            isCompleted={completedSteps.includes(item.number)}
+            onComplete={() => handleStepComplete(item.number)}
+            screenWidth={SCREEN_WIDTH}
+            // Pass the header height + spacing as top padding
+            contentPaddingTop={insets.top + 60}
+          />
+        )}
+      />
 
-        {/* Header content */}
+      {/* ─── Absolute Glass Header ─── */}
+      <BlurView
+        intensity={Platform.OS === "ios" ? 80 : 50}
+        tint={isDark ? "dark" : "light"}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          paddingTop: insets.top,
+          borderBottomWidth: 1,
+          borderBottomColor: isDark
+            ? "rgba(255,255,255,0.05)"
+            : "rgba(0,0,0,0.05)",
+        }}
+      >
         <View
           style={{
+            height: 60, // Fixed height for header content
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
             paddingHorizontal: theme.spacing.md,
-            paddingVertical: theme.spacing.md,
           }}
         >
-          {/* Recipe Title & Progress Info */}
-          <View
-            style={{
-              flex: 1,
-              marginRight: theme.spacing.md,
-            }}
-          >
-            <Text
-              style={[
-                theme.typography.h3,
-                {
-                  color: colors.textInverse,
-                  marginBottom: 2,
-                },
-              ]}
-              numberOfLines={2}
-            >
-              {recipe.title}
-            </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: theme.spacing.xs,
-              }}
-            >
-              <MaterialIcons
-                name="check-circle"
-                size={14}
-                color="rgba(255,255,255,0.8)"
-              />
-              <Text
-                style={[
-                  theme.typography.caption,
-                  {
-                    color: "rgba(255,255,255,0.8)",
-                    textTransform: "none",
-                  },
-                ]}
-              >
-                {completedSteps.length} de {totalSteps} completados
-              </Text>
-            </View>
-          </View>
-
           {/* Close Button */}
           <Pressable
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: theme.borderRadius.full,
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: isDark
+                ? "rgba(255,255,255,0.1)"
+                : "rgba(0,0,0,0.05)",
               justifyContent: "center",
               alignItems: "center",
-              borderWidth: 0.5,
-              borderColor: "rgba(255, 255, 255, 0.25)",
             }}
             onPress={() => router.back()}
           >
-            <MaterialIcons name="close" size={18} color={colors.textInverse} />
+            <MaterialIcons name="close" size={20} color={colors.text} />
           </Pressable>
+
+          {/* Title and Progress */}
+          <View style={{ flex: 1, marginHorizontal: theme.spacing.md }}>
+            <Text
+              style={[
+                theme.typography.h3,
+                { color: colors.text, fontSize: 16, textAlign: "left" },
+              ]}
+              numberOfLines={1}
+            >
+              {recipe.title}
+            </Text>
+            <Text
+              style={[
+                theme.typography.caption,
+                { color: colors.textSecondary, fontSize: 11 },
+              ]}
+            >
+              PASO {currentStep + 1} DE {totalSteps}
+            </Text>
+          </View>
+
+          {/* Simple Progress Indicator Ring? Or just text? Kept text above. */}
+          {/* Maybe a small visual indicator of completion? */}
+          <View
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 16,
+              borderWidth: 2,
+              borderColor: allCompleted ? colors.success : colors.primary,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ fontSize: 10, fontWeight: "bold", color: colors.text }}
+            >
+              {Math.round(progress)}%
+            </Text>
+          </View>
         </View>
 
-        {/* Progress Bar */}
+        {/* Slim Progress Bar at Bottom */}
         <View
           style={{
-            height: 4,
-            backgroundColor: "rgba(255, 255, 255, 0.2)",
-            overflow: "hidden",
+            height: 2,
+            backgroundColor: isDark
+              ? "rgba(255,255,255,0.1)"
+              : "rgba(0,0,0,0.05)",
+            width: "100%",
           }}
         >
           <Animated.View
@@ -181,73 +259,120 @@ export default function CookingStepsScreen() {
               animatedProgressStyle,
               {
                 height: "100%",
-                backgroundColor: colors.textInverse,
-                borderRadius: 2,
+                backgroundColor: colors.primary,
               },
             ]}
           />
         </View>
-      </LinearGradient>
+      </BlurView>
 
-      {/* Steps List */}
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          paddingTop: theme.spacing.md,
-          paddingBottom: theme.spacing.xl + 80 + insets.bottom,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        {steps.map((step, index) => (
-          <StepItem
-            key={step.number}
-            step={step}
-            index={index}
-            isActive={step.number === currentStep}
-            isCompleted={completedSteps.includes(step.number)}
-            isLast={index === steps.length - 1}
-            onPress={() => handleStepPress(step.number)}
-            onComplete={() => handleStepComplete(step.number)}
-          />
-        ))}
-      </ScrollView>
+      {/* ─── Dot Indicators (Floating above bottom content?) ─── */}
+      {/* Actually, dots might be redundant with the new progress designs. 
+           Let's keep them but maybe move them or style them subtly. 
+           Or remove them if we want cleaner look. User asked for minimal. 
+           Let's keep them for navigation context but ensure they don't conflict. 
+       */}
 
-      {/* Finish Button — fixed bottom with safe area */}
+      {/* ─── Bottom Navigation — fixed with safe area ─── */}
       <View
         style={{
+          flexDirection: "row",
           paddingHorizontal: theme.spacing.md,
           paddingTop: theme.spacing.sm,
           paddingBottom: insets.bottom + theme.spacing.sm,
-          backgroundColor: colors.background,
+          gap: theme.spacing.sm,
+          backgroundColor: colors.background, // Solid background for nav
           borderTopWidth: 0.5,
           borderTopColor: isDark
             ? "rgba(255,255,255,0.06)"
             : "rgba(0,0,0,0.05)",
         }}
       >
+        {/* Previous Button */}
         <Pressable
           style={{
-            paddingVertical: theme.spacing.md,
+            flex: 1,
+            paddingVertical: theme.spacing.md - 2,
             borderRadius: theme.borderRadius.md,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
-            gap: theme.spacing.sm,
-            backgroundColor: allCompleted ? colors.success : colors.primary,
+            gap: theme.spacing.xs,
+            backgroundColor: isDark
+              ? "rgba(255,255,255,0.06)"
+              : "rgba(0,0,0,0.04)",
+            opacity: isFirstStep ? 0.4 : 1,
           }}
-          onPress={handleFinish}
+          onPress={handlePrev}
+          disabled={isFirstStep}
         >
-          <MaterialIcons
-            name={allCompleted ? "celebration" : "check-circle"}
-            size={20}
-            color={colors.textInverse}
+          <Ionicons
+            name="chevron-back"
+            size={18}
+            color={colors.textSecondary}
           />
           <Text
-            style={[theme.typography.button, { color: colors.textInverse }]}
+            style={[theme.typography.label, { color: colors.textSecondary }]}
           >
-            {allCompleted ? "¡Receta Completada!" : "Finalizar Receta"}
+            Anterior
           </Text>
         </Pressable>
+
+        {/* Next / Finish Button */}
+        {isLastStep ? (
+          <Pressable
+            style={{
+              flex: 2,
+              paddingVertical: theme.spacing.md - 2,
+              borderRadius: theme.borderRadius.md,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: theme.spacing.sm,
+              backgroundColor: allCompleted ? colors.success : colors.primary,
+            }}
+            onPress={handleFinish}
+          >
+            <MaterialIcons
+              name={allCompleted ? "celebration" : "check-circle"}
+              size={20}
+              color={allCompleted ? "#FFF" : colors.textInverse}
+            />
+            <Text
+              style={[
+                theme.typography.button,
+                { color: allCompleted ? "#FFF" : colors.textInverse },
+              ]}
+            >
+              {allCompleted ? "¡Completada!" : "Finalizar"}
+            </Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            style={{
+              flex: 2,
+              paddingVertical: theme.spacing.md - 2,
+              borderRadius: theme.borderRadius.md,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: theme.spacing.xs,
+              backgroundColor: colors.primary,
+            }}
+            onPress={handleNext}
+          >
+            <Text
+              style={[theme.typography.button, { color: colors.textInverse }]}
+            >
+              Siguiente
+            </Text>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={colors.textInverse}
+            />
+          </Pressable>
+        )}
       </View>
     </View>
   );

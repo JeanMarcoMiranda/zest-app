@@ -1,3 +1,3 @@
+export { StepCard } from "./StepCard";
 export { StepItem } from "./StepItem";
-export type { Step } from "./StepItem";
 
