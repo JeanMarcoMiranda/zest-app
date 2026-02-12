@@ -11,7 +11,6 @@ export const useFavorites = () => {
   const loadFavorites = useStore((state) => state.loadFavorites);
   const addFavorite = useStore((state) => state.addFavorite);
   const removeFavorite = useStore((state) => state.removeFavorite);
-  const storeIsFavorite = useStore((state) => state.isFavorite);
   const clearFavoritesAction = useStore((state) => state.clearFavorites);
 
   const [loading, setLoading] = useState(true);
@@ -26,9 +25,9 @@ export const useFavorites = () => {
 
   const isFavorite = useCallback(
     (recipeId: string): boolean => {
-      return storeIsFavorite(recipeId);
+      return favorites.some((f) => f.id === recipeId);
     },
-    [storeIsFavorite],
+    [favorites],
   );
 
   const toggleFavorite = useCallback(

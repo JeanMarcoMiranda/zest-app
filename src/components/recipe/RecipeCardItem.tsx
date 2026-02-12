@@ -1,3 +1,4 @@
+import { FavoriteButton } from "@/src/components/common";
 import { useFavorites, useTheme } from "@/src/hooks";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
@@ -17,7 +18,6 @@ import { RecipeCard } from "../../types/recipe.types";
 
 // Constantes de animación
 const ANIMATION_SCALE_PRESSED = 0.98;
-const ANIMATION_SCALE_FAVORITE = 1.3;
 const CARD_HEIGHT = 200;
 
 interface RecipeCardItemProps {
@@ -31,7 +31,6 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
   const { colors, isDark } = theme;
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  const favoriteScaleAnim = useRef(new Animated.Value(1)).current;
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const handlePressIn = () => {
@@ -50,32 +49,6 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
       tension: 40,
       friction: 5,
     }).start();
-  };
-
-  const handleFavoritePress = () => {
-    const isFav = isFavorite(recipe.id);
-
-    Animated.sequence([
-      Animated.timing(favoriteScaleAnim, {
-        toValue: 0.8,
-        duration: 80,
-        useNativeDriver: true,
-      }),
-      Animated.spring(favoriteScaleAnim, {
-        toValue: isFav ? 1 : ANIMATION_SCALE_FAVORITE,
-        friction: 3,
-        tension: 100,
-        useNativeDriver: true,
-      }),
-      Animated.spring(favoriteScaleAnim, {
-        toValue: 1,
-        friction: 4,
-        tension: 50,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    toggleFavorite(recipe);
   };
 
   const isFav = isFavorite(recipe.id);
@@ -186,38 +159,19 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
         </View>
 
         {/* Botón de favorito */}
-        <Animated.View
+        <View
           style={{
             position: "absolute",
             top: theme.spacing.sm,
             right: theme.spacing.sm,
-            borderRadius: theme.borderRadius.full,
-            overflow: "hidden",
-            transform: [{ scale: favoriteScaleAnim }],
           }}
         >
-          <TouchableOpacity onPress={handleFavoritePress} activeOpacity={0.8}>
-            <BlurView
-              intensity={Platform.OS === "ios" ? 40 : 80}
-              tint={isDark ? "dark" : "light"}
-              style={{
-                width: 34,
-                height: 34,
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: isDark
-                  ? colors.surfaceVariant + "90"
-                  : colors.surface + "B3",
-              }}
-            >
-              <Ionicons
-                name={isFav ? "heart" : "heart-outline"}
-                size={16}
-                color={isFav ? colors.error : colors.text}
-              />
-            </BlurView>
-          </TouchableOpacity>
-        </Animated.View>
+          <FavoriteButton
+            isFavorite={isFav}
+            onPress={() => toggleFavorite(recipe)}
+            size={16}
+          />
+        </View>
 
         {/* Info overlay inferior */}
         <View
