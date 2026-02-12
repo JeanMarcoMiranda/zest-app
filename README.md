@@ -1,50 +1,104 @@
-# Welcome to your Expo app 👋
+# Zest
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Zest is a comprehensive, cross-platform mobile application designed to facilitate recipe discovery, organization, and preparation. Built with React Native and Expo, it leverages a modern technology stack to deliver a high-performance, native user experience. The application features a custom implementation of an edge-to-edge design system, ensuring visual immersion while strictly adhering to safe area guidelines across diverse device form factors.
 
-## Get started
+## Key Features
 
-1. Install dependencies
+- **Advanced Recipe Discovery**: Implements a responsive Bento Grid layout for browsing recipes, optimized for visual engagement and information density.
+- **Interactive Cooking Mode**: specific "Cooking Mode" interface that provides large-format typography and step-by-step guidance, designed for distance visibility during food preparation.
+- **Custom Design System**: A proprietary theme engine supporting "Warm Savory" and "Dark Coffee" palettes, with automated dark mode adaptation and semantic color tokenization.
+- **Edge-to-Edge UI**: Full implementation of edge-to-edge layout principles, rendering content behind system bars (status and navigation) for a seamless aesthetic.
+- **Performance Optimization**: Utilizes React Native Reanimated for 60fps UI transitions and Zustand for efficient, atomic state management to minimize re-renders.
+- **Local Persistence**: Integrated favorite system with asynchronous storage for offline access to preferred recipes.
 
-   ```bash
-   npm install
-   ```
+## Technical Architecture
 
-2. Start the app
+The application focuses on maintainability and scalability through a modular architecture:
 
-   ```bash
-   npx expo start
-   ```
+- **Routing**: File-based routing via Expo Router, mirroring Next.js patterns for intuitive navigation structure.
+- **State Management**: Zustand is employed for global state, providing a lightweight alternative to Redux with minimal boilerplate.
+- **Styling**: A hybrid approach using React Native's StyleSheet API and a custom theme provider, ensuring type safety and consistent design tokens.
+- **Component Design**: Atomic design principles applied to UI components (e.g., `FavoriteButton`, `RecipeCardItem`) to maximize reusability.
 
-In the output, you'll find options to open the app in a
+## Technology Stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Core Framework**: React Native 0.81.5, Expo SDK 52
+- **Language**: TypeScript 5.x
+- **Navigation**: Expo Router (built on React Navigation)
+- **State Management**: Zustand
+- **Animation**: React Native Reanimated
+- **Blur Effects**: Expo Blur
+- **HTTP Client**: Axios
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Prerequisites
 
-## Get a fresh project
+Ensure the following tools are installed in your development environment:
 
-When you're ready, run:
+- **Node.js**: LTS version recommended (v18 or higher)
+- **npm** or **yarn**: Package manager
+- **Expo Go**: Application installed on a physical Android/iOS device for testing
+- **Android Studio / Xcode**: (Optional) For running on local simulators/emulators
 
-```bash
-npm run reset-project
+## Installation and Setup
+
+1.  **Clone the Repository**
+
+    ```bash
+    git clone https://github.com/yourusername/zest.git
+    cd zest
+    ```
+
+2.  **Install Dependencies**
+
+    ```bash
+    npm install
+    ```
+
+3.  **Start Development Server**
+
+    ```bash
+    npm start
+    ```
+
+    or
+
+    ```bash
+    npx expo start
+    ```
+
+4.  **Run Application**
+    - **Physical Device**: Scan the QR code displayed in the terminal using the Expo Go app (Android) or Camera app (iOS).
+    - **Emulator**: Press `a` to launch on Android Emulator or `i` for iOS Simulator.
+
+## Project Structure
+
+The project follows a standard Expo layout with source code separation:
+
+```
+zest/
+├── app/                 # Expo Router application entry points and screens
+│   ├── (tabs)/          # Tab-based navigation stack (Home, Favorites, Settings, etc.)
+│   ├── cooking/         # Dynamic routes for Cooking Mode screens
+│   └── recipe/          # Dynamic routes for Recipe Detail screens
+├── src/                 # Application source code
+│   ├── components/      # Reusable UI components (Atomic design)
+│   ├── hooks/           # Custom React hooks for logic reuse
+│   ├── store/           # Global state definitions (Zustand stores)
+│   ├── theme/           # Design system tokens (Colors, Typography, Spacing)
+│   ├── types/           # Global TypeScript interface definitions
+│   └── utils/           # Helper functions and utilities
+├── assets/              # Static assets (Images, Fonts)
+└── package.json         # Project metadata and dependencies
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Available Scripts
 
-## Learn more
+- `npm start`: Starts the Expo development server.
+- `npm run android`: Starts the app on a connected Android device or emulator.
+- `npm run ios`: Starts the app on an iOS simulator (macOS only).
+- `npm run lint`: Runs ESLint to check for code quality issues.
+- `npm run reset-project`: Resets the project to a blank state (caution: destructive).
 
-To learn more about developing your project with Expo, look at the following resources:
+## License
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+This project is licensed under the MIT License. See the LICENSE file for more details.
