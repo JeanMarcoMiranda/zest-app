@@ -16,7 +16,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   size = 18,
 }) => {
   const theme = useTheme();
-  const { isDark } = theme;
+  const { isDark, colors } = theme;
   const scaleValue = React.useRef(new Animated.Value(1)).current;
 
   const handlePress = () => {
@@ -53,19 +53,16 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
           height: 38,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor:
-            Platform.OS === "android"
-              ? isDark
-                ? "rgba(0,0,0,0.4)"
-                : "rgba(255,255,255,0.7)"
-              : "transparent",
+          backgroundColor: isDark
+            ? colors.surfaceVariant + "90"
+            : colors.surface + "B3",
         }}
       >
         <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
           <Ionicons
             name={isFavorite ? "heart" : "heart-outline"}
             size={size}
-            color={isFavorite ? "#FF4757" : "#FFF"}
+            color={isFavorite ? colors.error : colors.text}
           />
         </Animated.View>
       </BlurView>

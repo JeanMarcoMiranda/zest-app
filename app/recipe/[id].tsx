@@ -149,13 +149,12 @@ export default function RecipeDetailScreen() {
                   height: 38,
                   justifyContent: "center",
                   alignItems: "center",
-                  backgroundColor:
-                    Platform.OS === "android"
-                      ? "rgba(0,0,0,0.4)"
-                      : "transparent",
+                  backgroundColor: isDark
+                    ? colors.surfaceVariant + "90"
+                    : colors.surface + "B3",
                 }}
               >
-                <Ionicons name="chevron-back" size={20} color="#FFF" />
+                <Ionicons name="chevron-back" size={20} color={colors.text} />
               </BlurView>
             </TouchableOpacity>
           </View>

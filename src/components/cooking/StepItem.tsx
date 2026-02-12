@@ -113,8 +113,8 @@ export const StepItem: React.FC<StepItemProps> = ({
               backgroundColor: isCompleted
                 ? colors.success
                 : isDark
-                  ? "rgba(255,255,255,0.08)"
-                  : "rgba(0,0,0,0.06)",
+                  ? "rgba(255,255,255,0.1)"
+                  : "rgba(0,0,0,0.1)",
               opacity: isCompleted ? 0.4 : 1,
               borderRadius: 1,
             }}
@@ -130,25 +130,15 @@ export const StepItem: React.FC<StepItemProps> = ({
               padding: theme.spacing.md,
               borderRadius: theme.borderRadius.md,
               borderWidth: 0.5,
-              backgroundColor: isDark
-                ? "rgba(255,255,255,0.03)"
-                : "rgba(0,0,0,0.01)",
-              borderColor: isDark
-                ? "rgba(255,255,255,0.06)"
-                : "rgba(0,0,0,0.05)",
+              backgroundColor: colors.surfaceVariant,
+              borderColor: colors.border,
             },
             isActive && {
-              borderColor: isDark
-                ? `${colors.primary}40`
-                : `${colors.primary}25`,
-              backgroundColor: isDark
-                ? `${colors.primary}08`
-                : `${colors.primary}04`,
+              borderColor: colors.primary,
+              backgroundColor: colors.highlightLow,
             },
             isCompleted && {
-              borderColor: isDark
-                ? `${colors.success}30`
-                : `${colors.success}20`,
+              borderColor: colors.successLight,
               opacity: 0.8,
             },
           ]}
@@ -228,23 +218,17 @@ export const StepItem: React.FC<StepItemProps> = ({
               style={{
                 marginTop: theme.spacing.sm,
                 padding: theme.spacing.sm,
-                backgroundColor: isDark
-                  ? colors.highlightLow
-                  : "rgba(251,192,45,0.1)", // Keep light mode custom for yellow note
+                backgroundColor: colors.highlightLow,
                 borderRadius: theme.borderRadius.sm,
-                borderLeftWidth: 2,
-                borderLeftColor: isDark
-                  ? "rgba(251,192,45,0.4)"
-                  : "rgba(251,192,45,0.6)",
+                borderLeftWidth: 3,
+                borderLeftColor: colors.primary,
               }}
             >
               <Text
                 style={[
                   theme.typography.bodySm,
                   {
-                    color: isDark
-                      ? "rgba(255,255,255,0.7)"
-                      : "rgba(93,64,55,0.85)",
+                    color: colors.textSecondary,
                     fontStyle: "italic",
                   },
                   isCompleted && {
@@ -277,9 +261,9 @@ export const StepItem: React.FC<StepItemProps> = ({
                       style={{
                         flexDirection: "row",
                         alignItems: "center",
-                        backgroundColor: isDark
-                          ? "rgba(255,255,255,0.06)"
-                          : "rgba(0,0,0,0.04)",
+                        backgroundColor: colors.surface,
+                        borderWidth: 1,
+                        borderColor: colors.border,
                         paddingHorizontal: 8,
                         paddingVertical: 3,
                         borderRadius: theme.borderRadius.full,

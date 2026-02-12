@@ -12,7 +12,7 @@ const palette = {
   white: "#FFFFFF",
   parchment: "#FCF8F2",
   bone: "#F2ECE4",
-  warmGray: "#D1C7BD",
+  warmGray: "#A89F91", // Darkened from #D1C7BD for better visibility
   mocha: "#6D6158",
   darkRoast: "#2A241F",
 
@@ -48,14 +48,14 @@ export const lightColors = {
   textHigh: palette.darkRoast,
   textMed: palette.mocha,
   textSecondary: palette.mocha,
-  textLight: palette.warmGray,
+  textLight: palette.warmGray, // Now darker
   textInverse: palette.white,
 
-  border: "rgba(42, 36, 31, 0.08)",
-  divider: "rgba(42, 36, 31, 0.05)",
+  border: "rgba(42, 36, 31, 0.12)", // Increased opacity
+  divider: "rgba(42, 36, 31, 0.08)", // Increased opacity
 
   placeholder: palette.warmGray,
-  disabled: palette.bone,
+  disabled: "#E5DACE", // Darker than bone/parchment
   overlay: "rgba(42, 36, 31, 0.4)",
 
   success: palette.success,
@@ -65,11 +65,11 @@ export const lightColors = {
   info: palette.info,
 
   highlightMedium: palette.terracotta + "80", // 50%
-  highlightLow: palette.terracotta + "20", // 10-15%
+  highlightLow: palette.terracotta + "30", // Increased from 20 to 30% for better visibility
 
   shadow: {
     color: palette.darkRoast,
-    opacity: 0.06,
+    opacity: 0.08, // Increased from 0.06
     offset: { width: 0, height: 4 },
     radius: 12,
     elevation: 4,

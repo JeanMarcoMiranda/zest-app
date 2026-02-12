@@ -207,13 +207,13 @@ const RecipeCardItem: React.FC<RecipeCardItemProps> = ({ recipe, onPress }) => {
                 alignItems: "center",
                 backgroundColor: isDark
                   ? colors.surfaceVariant + "90"
-                  : "rgba(255,255,255,0.7)",
+                  : colors.surface + "B3",
               }}
             >
               <Ionicons
                 name={isFav ? "heart" : "heart-outline"}
                 size={16}
-                color={isFav ? colors.error : "#FFF"}
+                color={isFav ? colors.error : colors.text}
               />
             </BlurView>
           </TouchableOpacity>
