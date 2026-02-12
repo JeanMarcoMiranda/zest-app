@@ -10,10 +10,10 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Animated, RefreshControl, StatusBar, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-// Altura aproximada del header compacto
-const HEADER_HEIGHT = 56;
-// Altura de la tab bar flotante + bottom margin
-const TAB_BAR_HEIGHT = 48;
+// Altura del header flotante (sin contar status bar)
+const HEADER_CONTENT_HEIGHT = 52;
+// Altura de la tab bar (sin contar bottom inset)
+const TAB_BAR_HEIGHT = 58;
 const SCROLL_THRESHOLD = 60;
 
 export default function HomeScreen() {
@@ -210,10 +210,9 @@ export default function HomeScreen() {
     </View>
   );
 
-  const tabBarTotalHeight =
-    TAB_BAR_HEIGHT +
-    Math.max(insets.bottom, theme.spacing.sm) +
-    theme.spacing.sm;
+  // Alturas totales para padding
+  const headerTotalHeight = insets.top + HEADER_CONTENT_HEIGHT;
+  const tabBarTotalHeight = TAB_BAR_HEIGHT + insets.bottom;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -240,20 +239,26 @@ export default function HomeScreen() {
           style={{
             flex: 1,
             paddingHorizontal: theme.spacing.md,
-            paddingTop: insets.top + HEADER_HEIGHT + theme.spacing.md,
+            paddingTop: headerTotalHeight + theme.spacing.md,
           }}
         >
           <ListSkeleton />
         </View>
       ) : (
         <Animated.ScrollView
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={true}
           onScroll={handleScroll}
           scrollEventThrottle={16}
+          contentInsetAdjustmentBehavior="never"
+          automaticallyAdjustContentInsets={false}
           contentContainerStyle={{
-            paddingTop: insets.top + HEADER_HEIGHT + theme.spacing.xs,
-            paddingHorizontal: theme.spacing.sm + 4,
-            paddingBottom: tabBarTotalHeight + theme.spacing.md,
+            paddingTop: headerTotalHeight + theme.spacing.xs,
+            paddingHorizontal: theme.spacing.md,
+            paddingBottom: tabBarTotalHeight + theme.spacing.lg,
+          }}
+          scrollIndicatorInsets={{
+            top: headerTotalHeight,
+            bottom: tabBarTotalHeight,
           }}
           refreshControl={
             <RefreshControl
@@ -261,7 +266,7 @@ export default function HomeScreen() {
               onRefresh={handleRefresh}
               colors={[colors.primary]}
               tintColor={colors.primary}
-              progressViewOffset={insets.top + HEADER_HEIGHT}
+              progressViewOffset={headerTotalHeight}
             />
           }
         >
