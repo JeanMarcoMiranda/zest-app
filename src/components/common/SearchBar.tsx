@@ -1,5 +1,4 @@
 import { useTheme } from "@/src/hooks";
-import { createShadow } from "@/src/utils";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Platform, TextInput, TouchableOpacity, View } from "react-native";
@@ -36,58 +35,49 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <View
       style={{
-        paddingHorizontal: theme.spacing.sm + 4,
-        paddingVertical: theme.spacing.xs + 2,
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: theme.spacing.md,
+        paddingVertical:
+          Platform.OS === "ios" ? theme.spacing.sm + 2 : theme.spacing.sm,
         backgroundColor: "transparent",
       }}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          borderRadius: theme.borderRadius.sm,
-          paddingHorizontal: theme.spacing.md,
-          backgroundColor: colors.background,
-          ...createShadow(theme as any, theme.elevation.low),
-        }}
-      >
-        <Ionicons
-          name="search"
-          size={16}
-          color={colors.textSecondary}
-          style={{ marginRight: theme.spacing.sm }}
-        />
-        <TextInput
-          style={[
-            theme.typography.bodyLg,
-            {
-              flex: 1,
-              color: colors.text,
-              paddingVertical:
-                Platform.OS === "ios" ? theme.spacing.sm + 2 : theme.spacing.sm,
-            },
-          ]}
-          placeholder={placeholder}
-          placeholderTextColor={colors.textLight}
-          value={query}
-          onChangeText={handleSearch}
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="search"
-        />
-        {query.length > 0 && (
-          <TouchableOpacity
-            onPress={handleClear}
-            style={{ padding: theme.spacing.xs }}
-          >
-            <Ionicons
-              name="close-circle"
-              size={18}
-              color={colors.textSecondary}
-            />
-          </TouchableOpacity>
-        )}
-      </View>
+      <Ionicons
+        name="search"
+        size={18}
+        color={colors.textSecondary}
+        style={{ marginRight: theme.spacing.sm }}
+      />
+      <TextInput
+        style={[
+          theme.typography.bodyLg,
+          {
+            flex: 1,
+            color: colors.text,
+            paddingVertical: 0,
+          },
+        ]}
+        placeholder={placeholder}
+        placeholderTextColor={colors.textLight}
+        value={query}
+        onChangeText={handleSearch}
+        autoCapitalize="none"
+        autoCorrect={false}
+        returnKeyType="search"
+      />
+      {query.length > 0 && (
+        <TouchableOpacity
+          onPress={handleClear}
+          style={{ padding: theme.spacing.xs }}
+        >
+          <Ionicons
+            name="close-circle"
+            size={18}
+            color={colors.textSecondary}
+          />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

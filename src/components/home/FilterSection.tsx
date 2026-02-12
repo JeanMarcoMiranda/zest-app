@@ -1,7 +1,8 @@
 import { CategoryFilter, SearchBar } from "@/src/components/common";
 import { useTheme } from "@/src/hooks";
+import { BlurView } from "expo-blur";
 import React from "react";
-import { Animated, View } from "react-native";
+import { Animated, Platform, View } from "react-native";
 
 interface FilterSectionProps {
   showFilters: boolean;
@@ -50,25 +51,49 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
       }}
       pointerEvents={showFilters ? "auto" : "none"}
     >
-      {/* SearchBar con fondo translúcido */}
-      <View
-        style={{
-          marginHorizontal: theme.spacing.xs,
-          borderRadius: theme.borderRadius.sm,
-          overflow: "hidden",
-          backgroundColor: isDark
-            ? colors.surfaceVariant
-            : "rgba(255,255,255,0.8)",
-          borderWidth: 1,
-          borderColor: colors.border,
-        }}
-      >
-        <SearchBar
-          placeholder="Buscar recetas..."
-          onSearch={onSearch}
-          onClear={onClear}
-        />
-      </View>
+      {/* SearchBar con fondo translúcido y blur */}
+      {Platform.OS === "ios" ? (
+        <View
+          style={{
+            marginHorizontal: theme.spacing.md,
+            borderRadius: theme.borderRadius.md,
+            overflow: "hidden",
+            borderWidth: 1,
+            borderColor: colors.border,
+          }}
+        >
+          <BlurView
+            intensity={60}
+            tint={isDark ? "dark" : "light"}
+            style={{ overflow: "hidden" }}
+          >
+            <SearchBar
+              placeholder="Buscar recetas..."
+              onSearch={onSearch}
+              onClear={onClear}
+            />
+          </BlurView>
+        </View>
+      ) : (
+        <View
+          style={{
+            marginHorizontal: theme.spacing.md,
+            borderRadius: theme.borderRadius.md,
+            overflow: "hidden",
+            backgroundColor: isDark
+              ? "rgba(42, 38, 34, 0.88)"
+              : "rgba(255, 255, 255, 0.85)",
+            borderWidth: 1,
+            borderColor: colors.border,
+          }}
+        >
+          <SearchBar
+            placeholder="Buscar recetas..."
+            onSearch={onSearch}
+            onClear={onClear}
+          />
+        </View>
+      )}
 
       {/* Category pills */}
       <View style={{ marginTop: theme.spacing.sm }}>
