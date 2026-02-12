@@ -5,6 +5,9 @@ import { Tabs } from "expo-router";
 import { Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+// Altura del contenido de la tab bar (sin contar el bottom inset)
+const TAB_BAR_HEIGHT = 58;
+
 export default function TabLayout() {
   const theme = useTheme();
   const { colors, isDark } = theme;
@@ -14,50 +17,56 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: isDark
-          ? "rgba(245,245,244,0.35)"
-          : "rgba(69,26,3,0.3)",
+        tabBarInactiveTintColor: colors.textLight,
         tabBarShowLabel: false,
         tabBarStyle: {
           position: "absolute",
-          bottom: Math.max(insets.bottom, theme.spacing.sm),
-          left: theme.spacing.xl,
-          right: theme.spacing.xl,
-          height: 48,
-          borderRadius: theme.borderRadius.full,
-          backgroundColor: isDark
-            ? "rgba(28,25,23,0.85)"
-            : "rgba(255,255,255,0.80)",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: TAB_BAR_HEIGHT + insets.bottom,
+          paddingBottom: insets.bottom,
+          borderTopLeftRadius: theme.borderRadius.lg,
+          borderTopRightRadius: theme.borderRadius.lg,
+          backgroundColor: "transparent",
           borderTopWidth: 0,
-          borderWidth: 0.5,
-          borderColor: isDark ? "rgba(68,64,60,0.3)" : "rgba(0,0,0,0.06)",
-          paddingBottom: 0,
           elevation: 0,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.06,
-          shadowRadius: 16,
         },
         tabBarItemStyle: {
-          paddingVertical: 0,
+          paddingVertical: theme.spacing.xs,
           justifyContent: "center",
           alignItems: "center",
         },
         tabBarBackground: () =>
           Platform.OS === "ios" ? (
-            <BlurView
-              intensity={70}
-              tint={isDark ? "dark" : "light"}
+            <View
               style={{
                 position: "absolute",
                 top: 0,
                 left: 0,
                 right: 0,
                 bottom: 0,
-                borderRadius: theme.borderRadius.full,
+                borderTopLeftRadius: theme.borderRadius.lg,
+                borderTopRightRadius: theme.borderRadius.lg,
                 overflow: "hidden",
+                borderWidth: 1,
+                borderColor: isDark
+                  ? "rgba(252, 248, 242, 0.1)"
+                  : "rgba(42, 36, 31, 0.08)",
+                shadowColor: colors.text,
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: isDark ? 0.4 : 0.08,
+                shadowRadius: 24,
               }}
-            />
+            >
+              <BlurView
+                intensity={80}
+                tint={isDark ? "dark" : "light"}
+                style={{
+                  flex: 1,
+                }}
+              />
+            </View>
           ) : (
             <View
               style={{
@@ -66,10 +75,16 @@ export default function TabLayout() {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                borderRadius: theme.borderRadius.full,
+                borderTopLeftRadius: theme.borderRadius.lg,
+                borderTopRightRadius: theme.borderRadius.lg,
                 backgroundColor: isDark
-                  ? "rgba(28,25,23,0.92)"
-                  : "rgba(255,255,255,0.88)",
+                  ? "rgba(42, 38, 34, 0.92)"
+                  : "rgba(255, 255, 255, 0.88)",
+                borderWidth: 1,
+                borderColor: isDark
+                  ? "rgba(252, 248, 242, 0.1)"
+                  : "rgba(42, 36, 31, 0.08)",
+                elevation: 8,
               }}
             />
           ),
@@ -84,7 +99,7 @@ export default function TabLayout() {
             <View style={{ alignItems: "center", gap: 3 }}>
               <Ionicons
                 name={focused ? "compass" : "compass-outline"}
-                size={22}
+                size={24}
                 color={color}
               />
               {focused && (
@@ -109,7 +124,7 @@ export default function TabLayout() {
             <View style={{ alignItems: "center", gap: 3 }}>
               <Ionicons
                 name={focused ? "heart" : "heart-outline"}
-                size={22}
+                size={24}
                 color={color}
               />
               {focused && (
@@ -134,7 +149,7 @@ export default function TabLayout() {
             <View style={{ alignItems: "center", gap: 3 }}>
               <Ionicons
                 name={focused ? "settings" : "settings-outline"}
-                size={22}
+                size={24}
                 color={color}
               />
               {focused && (
