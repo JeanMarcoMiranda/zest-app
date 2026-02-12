@@ -1,63 +1,62 @@
 const palette = {
-  // Brand Colors
-  zestOrange: "#FF6B00",
-  zestOrangeLight: "#FF8E3C",
-  zestOrangeDark: "#CC5600",
+  // Brand Colors - Warm Savory
+  terracotta: "#BC5230",
+  terracottaLight: "#D47A5D",
+  terracottaDark: "#8E3E24",
 
-  forestGreen: "#2D5A27",
-  forestGreenLight: "#4A8A3F",
-  forestGreenDark: "#1E3D1A",
+  sage: "#6B7D5F",
+  sageLight: "#8D9D81",
+  sageDark: "#4C5A43",
 
-  // Neutrals - Light Mode
+  // Neutrals - Light Mode (Warm)
   white: "#FFFFFF",
-  softWhite: "#FAFAFA",
-  cream: "#FDFCF8",
-  lightGray: "#F2F2F2",
-  gray: "#8E8E93",
-  darkGray: "#3A3A3C",
-  black: "#1C1C1E",
+  parchment: "#FCF8F2",
+  bone: "#F2ECE4",
+  warmGray: "#D1C7BD",
+  mocha: "#6D6158",
+  darkRoast: "#2A241F",
 
-  // Neutrals - Dark Mode
-  darkSurface: "#1C1C1E",
-  darkCard: "#2C2C2E",
-  darkBorder: "#3A3A3C",
+  // Neutrals - Dark Mode (Deep Coffee)
+  espresso: "#1E1B18",
+  deepMocha: "#2A2622",
+  toasted: "#3D362F",
 
   // Semantic
-  success: "#34C759",
-  warning: "#FFCC00",
-  error: "#FF3B30",
-  info: "#007AFF",
+  success: "#4C7D48",
+  warning: "#D49D42",
+  error: "#A63D31",
+  info: "#5B7C8C",
 } as const;
 
 export const lightColors = {
-  primary: palette.zestOrange,
-  primaryLight: palette.zestOrangeLight,
-  primaryDark: palette.zestOrangeDark,
+  primary: palette.terracotta,
+  primaryLight: palette.terracottaLight,
+  primaryDark: palette.terracottaDark,
   onPrimary: palette.white,
 
-  secondary: palette.forestGreen,
-  secondaryLight: palette.forestGreenLight,
-  secondaryDark: palette.forestGreenDark,
+  secondary: palette.sage,
+  secondaryLight: palette.sageLight,
+  secondaryDark: palette.sageDark,
   onSecondary: palette.white,
 
-  background: palette.softWhite,
+  background: palette.parchment,
   surface: palette.white,
-  surfaceVariant: palette.cream,
+  surfaceVariant: palette.bone,
   card: palette.white,
 
-  text: palette.black,
-  textHigh: palette.black,
-  textMed: palette.darkGray,
-  textSecondary: palette.darkGray,
-  textLight: palette.gray,
+  text: palette.darkRoast,
+  textHigh: palette.darkRoast,
+  textMed: palette.mocha,
+  textSecondary: palette.mocha,
+  textLight: palette.warmGray,
   textInverse: palette.white,
 
-  border: "rgba(0, 0, 0, 0.08)",
-  divider: "rgba(0, 0, 0, 0.05)",
+  border: "rgba(42, 36, 31, 0.08)",
+  divider: "rgba(42, 36, 31, 0.05)",
 
-  placeholder: palette.gray,
-  disabled: palette.lightGray,
-  overlay: "rgba(0, 0, 0, 0.4)",
+  placeholder: palette.warmGray,
+  disabled: palette.bone,
+  overlay: "rgba(42, 36, 31, 0.4)",
 
   success: palette.success,
   successLight: palette.success + "20",
@@ -66,8 +65,8 @@ export const lightColors = {
   info: palette.info,
 
   shadow: {
-    color: palette.black,
-    opacity: 0.08,
+    color: palette.darkRoast,
+    opacity: 0.06,
     offset: { width: 0, height: 4 },
     radius: 12,
     elevation: 4,
@@ -75,33 +74,33 @@ export const lightColors = {
 } as const;
 
 export const darkColors = {
-  primary: palette.zestOrange,
-  primaryLight: palette.zestOrangeLight,
-  primaryDark: palette.zestOrangeDark,
-  onPrimary: palette.white,
+  primary: palette.terracottaLight,
+  primaryLight: palette.terracotta,
+  primaryDark: palette.terracottaDark,
+  onPrimary: palette.darkRoast,
 
-  secondary: palette.forestGreenLight,
-  secondaryLight: palette.forestGreen,
-  secondaryDark: palette.forestGreenDark,
-  onSecondary: palette.white,
+  secondary: palette.sageLight,
+  secondaryLight: palette.sage,
+  secondaryDark: palette.sageDark,
+  onSecondary: palette.darkRoast,
 
-  background: palette.darkSurface,
-  surface: palette.darkCard,
-  surfaceVariant: palette.darkBorder,
-  card: palette.darkCard,
+  background: palette.espresso,
+  surface: palette.deepMocha,
+  surfaceVariant: palette.toasted,
+  card: palette.deepMocha,
 
-  text: palette.softWhite,
-  textHigh: palette.softWhite,
-  textMed: palette.gray,
-  textSecondary: palette.gray,
-  textLight: palette.darkGray,
-  textInverse: palette.black,
+  text: palette.parchment,
+  textHigh: palette.parchment,
+  textMed: palette.warmGray,
+  textSecondary: palette.warmGray,
+  textLight: palette.mocha,
+  textInverse: palette.darkRoast,
 
-  border: "rgba(255, 255, 255, 0.12)",
-  divider: "rgba(255, 255, 255, 0.08)",
+  border: "rgba(252, 248, 242, 0.12)",
+  divider: "rgba(252, 248, 242, 0.08)",
 
-  placeholder: palette.gray,
-  disabled: palette.black,
+  placeholder: palette.mocha,
+  disabled: palette.espresso,
   overlay: "rgba(0, 0, 0, 0.7)",
 
   success: palette.success,
@@ -120,11 +119,11 @@ export const darkColors = {
 } as const;
 
 export const gradients = {
-  primary: [palette.zestOrange, palette.zestOrangeLight],
-  primaryDark: [palette.zestOrangeDark, palette.zestOrange],
-  secondary: [palette.forestGreen, palette.forestGreenLight],
-  secondaryDark: [palette.forestGreenDark, palette.forestGreen],
-  warm: [palette.zestOrange, "#FFB800"],
+  primary: [palette.terracotta, palette.terracottaLight],
+  primaryDark: [palette.terracottaDark, palette.terracotta],
+  secondary: [palette.sage, palette.sageLight],
+  secondaryDark: [palette.sageDark, palette.sage],
+  warm: [palette.terracotta, "#D49D42"],
   overlay: ["rgba(0,0,0,0)", "rgba(0,0,0,0.8)"],
   overlayLight: ["rgba(255,255,255,0)", "rgba(255,255,255,0.8)"],
 } as const;
