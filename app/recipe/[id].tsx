@@ -211,11 +211,10 @@ export default function RecipeDetailScreen() {
                 />
                 <Text
                   style={[
-                    theme.typography.caption,
+                    theme.typography.micro,
                     {
                       color: "rgba(255,255,255,0.95)",
                       textTransform: "none",
-                      fontSize: 11,
                     },
                   ]}
                 >
@@ -240,11 +239,10 @@ export default function RecipeDetailScreen() {
                 />
                 <Text
                   style={[
-                    theme.typography.caption,
+                    theme.typography.micro,
                     {
                       color: "rgba(255,255,255,0.95)",
                       textTransform: "none",
-                      fontSize: 11,
                     },
                   ]}
                 >
@@ -419,7 +417,7 @@ export default function RecipeDetailScreen() {
                   },
                 ]}
               >
-                Toca "Comenzar a Cocinar" para ver el paso a paso
+                Toca &quot;Comenzar a Cocinar&quot; para ver el paso a paso
               </Text>
             </View>
           </View>

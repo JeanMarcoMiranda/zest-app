@@ -167,12 +167,10 @@ export const StepItem: React.FC<StepItemProps> = ({
           >
             <Text
               style={[
-                theme.typography.caption,
+                theme.typography.micro,
                 {
                   color: colors.textSecondary,
-                  textTransform: "uppercase",
                   letterSpacing: 0.8,
-                  fontSize: 10,
                 },
                 isActive && { color: colors.primary },
                 isCompleted && { color: colors.success },
@@ -231,8 +229,8 @@ export const StepItem: React.FC<StepItemProps> = ({
                 marginTop: theme.spacing.sm,
                 padding: theme.spacing.sm,
                 backgroundColor: isDark
-                  ? "rgba(251,192,45,0.08)"
-                  : "rgba(251,192,45,0.1)",
+                  ? colors.highlightLow
+                  : "rgba(251,192,45,0.1)", // Keep light mode custom for yellow note
                 borderRadius: theme.borderRadius.sm,
                 borderLeftWidth: 2,
                 borderLeftColor: isDark
@@ -323,11 +321,9 @@ export const StepItem: React.FC<StepItemProps> = ({
               />
               <Text
                 style={[
-                  theme.typography.caption,
+                  theme.typography.micro,
                   {
                     color: colors.textLight,
-                    textTransform: "none",
-                    fontSize: 10,
                   },
                 ]}
               >

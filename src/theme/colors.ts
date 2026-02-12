@@ -64,6 +64,9 @@ export const lightColors = {
   error: palette.error,
   info: palette.info,
 
+  highlightMedium: palette.terracotta + "80", // 50%
+  highlightLow: palette.terracotta + "20", // 10-15%
+
   shadow: {
     color: palette.darkRoast,
     opacity: 0.06,
@@ -108,6 +111,9 @@ export const darkColors = {
   warning: palette.warning,
   error: palette.error,
   info: palette.info,
+
+  highlightMedium: palette.terracottaLight + "80",
+  highlightLow: palette.terracottaLight + "20",
 
   shadow: {
     color: "transparent",

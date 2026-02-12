@@ -39,19 +39,34 @@ import {
  * Permite importar solo lo necesario para mejor tree-shaking
  */
 export {
-
   // Animaciones
-  animations, borderRadius, breakpoints, customEasing, darkColors, duration,
-  easing, elevation,
+  animations,
+  borderRadius,
+  breakpoints,
+  customEasing,
+  darkColors,
+  duration,
+  easing,
+  elevation,
   // Tipografía
   fontFamily,
   fontSize,
-  fontWeight, gestures, gradients, iconSizes,
-  iconStroke, letterSpacing,
+  fontWeight,
+  gestures,
+  gradients,
+  iconSizes,
+  iconStroke,
+  letterSpacing,
   // Colores
-  lightColors, lineHeight, opacity, screenMargins,
+  lightColors,
+  lineHeight,
+  opacity,
+  screenMargins,
   // Espaciado
-  spacing, spring, typography, zIndex
+  spacing,
+  spring,
+  typography,
+  zIndex
 };
 
 /**
@@ -60,18 +75,49 @@ export {
   export type { ColorPalette, Gradients, Opacity, Palette } from "./colors";
 
 export type {
-  BorderRadius, BorderRadiusKey, BreakpointKey, Breakpoints, Elevation, ElevationKey, IconSizeKey, IconSizes,
-  IconStroke, ScreenMargins, Spacing, SpacingKey, ZIndex, ZIndexKey
+  BorderRadius,
+  BorderRadiusKey,
+  BreakpointKey,
+  Breakpoints,
+  Elevation,
+  ElevationKey,
+  IconSizeKey,
+  IconSizes,
+  IconStroke,
+  ScreenMargins,
+  Spacing,
+  SpacingKey,
+  ZIndex,
+  ZIndexKey
 } from "./spacing";
 
 export type {
-  FontFamily, FontFamilyKey, FontSize, FontSizeKey, FontWeight, FontWeightKey, LetterSpacing, LetterSpacingKey, LineHeight, LineHeightKey, TextTransform,
-  Typography, TypographyStyle
+  FontFamily,
+  FontFamilyKey,
+  FontSize,
+  FontSizeKey,
+  FontWeight,
+  FontWeightKey,
+  LetterSpacing,
+  LetterSpacingKey,
+  LineHeight,
+  LineHeightKey,
+  TextTransform,
+  Typography,
+  TypographyStyle
 } from "./typography";
 
 export type {
-  AnimationKey, Animations, CustomEasing, Duration, DurationKey, Easing, EasingKey, Gestures,
-  Spring, SpringKey
+  AnimationKey,
+  Animations,
+  CustomEasing,
+  Duration,
+  DurationKey,
+  Easing,
+  EasingKey,
+  Gestures,
+  Spring,
+  SpringKey
 } from "./animations";
 
 /**
@@ -128,7 +174,37 @@ export const darkTheme = {
 /**
  * Tipo para el objeto de tema completo
  */
-export type Theme = typeof lightTheme;
+export type Theme = {
+  colors: {
+    [K in keyof typeof lightColors]: K extends "shadow"
+      ? {
+          color: string;
+          opacity: number;
+          offset: { width: number; height: number };
+          radius: number;
+          elevation: number;
+        }
+      : string;
+  };
+  gradients: typeof gradients;
+  opacity: typeof opacity;
+  spacing: typeof spacing;
+  screenMargins: typeof screenMargins;
+  borderRadius: typeof borderRadius;
+  elevation: typeof elevation;
+  zIndex: typeof zIndex;
+  breakpoints: typeof breakpoints;
+  iconSizes: typeof iconSizes;
+  iconStroke: typeof iconStroke;
+  typography: typeof typography;
+  animations: typeof animations;
+  spring: typeof spring;
+  duration: typeof duration;
+  easing: typeof easing;
+  customEasing: typeof customEasing;
+  gestures: typeof gestures;
+  mode: "light" | "dark";
+};
 
 /**
  * Helper para obtener el tema correcto según el esquema de color

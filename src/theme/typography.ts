@@ -41,6 +41,8 @@ export const fontWeight = {
  * Tamaños de fuente base
  */
 export const fontSize = {
+  /** 10px - Microtextos, etiquetas muy pequeñas */
+  micro: 10,
   /** 12px - Metadatos, captions */
   xs: 12,
   /** 14px - Descripciones largas, texto secundario */
@@ -202,6 +204,18 @@ export const typography = {
     fontWeight: fontWeight.semibold,
     lineHeight: Math.round(fontSize.sm * lineHeight.normal), // 21px (14 * 1.5)
     letterSpacing: letterSpacing.normal,
+  },
+
+  /**
+   * Micro - Texto legal o detalles mínimos
+   */
+  micro: {
+    fontFamily: fontFamily.sansBold,
+    fontSize: fontSize.micro, // 10px
+    fontWeight: fontWeight.bold,
+    lineHeight: Math.round(fontSize.micro * lineHeight.normal), // 15px
+    letterSpacing: letterSpacing.wide,
+    textTransform: "uppercase" as const,
   },
 
   /**
