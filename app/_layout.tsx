@@ -39,6 +39,7 @@ export default function RootLayout() {
         options={{
           title: "Detalle de Receta",
           presentation: "card",
+          headerShown: false,
         }}
       />
       <Stack.Screen

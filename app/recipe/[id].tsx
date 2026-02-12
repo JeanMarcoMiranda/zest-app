@@ -91,6 +91,14 @@ export default function RecipeDetailScreen() {
         style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
         bounces={true}
+        contentInsetAdjustmentBehavior="never"
+        automaticallyAdjustContentInsets={false}
+        contentContainerStyle={{
+          paddingBottom: insets.bottom + theme.spacing.xl,
+        }}
+        scrollIndicatorInsets={{
+          bottom: insets.bottom,
+        }}
       >
         {/* Hero Image — extends behind status bar */}
         <View style={{ height: heroHeight, position: "relative" }}>
@@ -189,7 +197,7 @@ export default function RecipeDetailScreen() {
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  paddingHorizontal: 8,
+                  paddingHorizontal: theme.spacing.xs,
                   paddingVertical: 3,
                   borderRadius: theme.borderRadius.full,
                   backgroundColor: "rgba(255,255,255,0.2)",
@@ -199,7 +207,7 @@ export default function RecipeDetailScreen() {
                   name="pricetag"
                   size={10}
                   color="rgba(255,255,255,0.9)"
-                  style={{ marginRight: 4 }}
+                  style={{ marginRight: theme.spacing.xs }}
                 />
                 <Text
                   style={[
@@ -218,7 +226,7 @@ export default function RecipeDetailScreen() {
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  paddingHorizontal: 8,
+                  paddingHorizontal: theme.spacing.xs,
                   paddingVertical: 3,
                   borderRadius: theme.borderRadius.full,
                   backgroundColor: "rgba(255,255,255,0.2)",
@@ -228,7 +236,7 @@ export default function RecipeDetailScreen() {
                   name="globe-outline"
                   size={10}
                   color="rgba(255,255,255,0.9)"
-                  style={{ marginRight: 4 }}
+                  style={{ marginRight: theme.spacing.xs }}
                 />
                 <Text
                   style={[
@@ -495,9 +503,6 @@ export default function RecipeDetailScreen() {
               Comenzar a Cocinar
             </Text>
           </TouchableOpacity>
-
-          {/* Bottom spacing for safe area */}
-          <View style={{ height: insets.bottom + theme.spacing.md }} />
         </View>
       </ScrollView>
     </View>
