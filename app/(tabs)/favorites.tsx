@@ -1,4 +1,4 @@
-import { RecipeCardItem } from "@/src/components/recipe";
+import { RecipeCard } from "@/src/components/recipe";
 import { useFavorites, useTheme } from "@/src/hooks";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
@@ -292,8 +292,9 @@ export default function FavoritesScreen() {
           flexGrow: 1, // Ensure empty state centering works
         }}
         renderItem={({ item }) => (
-          <RecipeCardItem
+          <RecipeCard
             recipe={item}
+            variant="list"
             onPress={() => handleRecipePress(item.id)}
           />
         )}

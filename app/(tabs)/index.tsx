@@ -1,6 +1,6 @@
 import { ErrorView, ListSkeleton } from "@/src/components/common";
 import { FilterSection, HomeHeader } from "@/src/components/home";
-import { RecipeCardItem } from "@/src/components/recipe";
+import { RecipeCard } from "@/src/components/recipe";
 import { useFavorites, useRecipes, useTheme } from "@/src/hooks";
 import { getCategories } from "@/src/services";
 import { createShadow } from "@/src/utils";
@@ -288,9 +288,10 @@ export default function HomeScreen() {
           ) : (
             <View style={{ marginTop: theme.spacing.sm }}>
               {recipes.map((recipe) => (
-                <RecipeCardItem
+                <RecipeCard
                   key={recipe.id}
                   recipe={recipe}
+                  variant="list"
                   onPress={() => handleRecipePress(recipe.id)}
                 />
               ))}

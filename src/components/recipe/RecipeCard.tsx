@@ -1,46 +1,49 @@
+import { GlassView } from "@/src/components/common";
 import { useFavorites, useTheme } from "@/src/hooks";
+import { RecipeCard as RecipeCardType } from "@/src/types/recipe.types";
 import { Ionicons } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useRef, useState } from "react";
 import {
   Animated,
   Image,
-  Platform,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
-import { RecipeCard } from "../../types/recipe.types";
-
 // Constantes de animación
 const ANIMATION_SCALE_PRESSED = 0.97;
 const ANIMATION_SCALE_FAVORITE = 1.3;
 
-type BentoSize = "large" | "small";
+export type RecipeCardVariant = "list" | "bento-small" | "bento-large";
 
-interface BentoRecipeCardProps {
-  recipe: RecipeCard;
-  size: BentoSize;
+interface RecipeCardProps {
+  recipe: RecipeCardType;
+  variant?: RecipeCardVariant;
   onPress: () => void;
+  style?: any;
 }
 
-const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
+export const RecipeCard: React.FC<RecipeCardProps> = ({
   recipe,
-  size,
+  variant = "list",
   onPress,
+  style,
 }) => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const theme = useTheme();
-  const { colors, isDark } = theme;
+  const { colors } = theme;
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const favoriteScaleAnim = useRef(new Animated.Value(1)).current;
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const isLarge = size === "large";
-  const cardHeight = isLarge ? 240 : 160;
+  // Configuraciones según variante
+  const isLarge = variant === "bento-large";
+  const isList = variant === "list";
+  const cardHeight = isLarge ? 240 : isList ? 200 : 160;
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -90,10 +93,15 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
 
   return (
     <Animated.View
-      style={{
-        flex: isLarge ? 2 : 1,
-        transform: [{ scale: scaleAnim }],
-      }}
+      style={[
+        {
+          flex: isList ? 0 : isLarge ? 2 : 1,
+          width: isList ? "100%" : undefined,
+          marginBottom: isList ? theme.spacing.sm : 0,
+          transform: [{ scale: scaleAnim }],
+        },
+        style,
+      ]}
     >
       <TouchableOpacity
         style={{
@@ -107,37 +115,36 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
         onPressOut={handlePressOut}
         activeOpacity={1}
       >
-        {/* Imagen de fondo full-bleed */}
+        {/* Placeholder / Fondo de carga */}
         {!imageLoaded && (
           <View
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: colors.surfaceVariant,
-            }}
+            style={[
+              StyleSheet.absoluteFillObject,
+              {
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: colors.surfaceVariant,
+              },
+            ]}
           >
             <Ionicons
               name="restaurant"
-              size={isLarge ? 40 : 28}
+              size={isLarge || isList ? 40 : 28}
               color={colors.textLight}
               style={{ opacity: 0.5 }}
             />
           </View>
         )}
 
+        {/* Imagen */}
         <Image
           source={{ uri: recipe.thumbnail }}
-          style={{ width: "100%", height: "100%" }}
+          style={StyleSheet.absoluteFillObject}
           resizeMode="cover"
           onLoad={() => setImageLoaded(true)}
         />
 
-        {/* Gradiente inferior para legibilidad */}
+        {/* Gradiente */}
         <LinearGradient
           colors={["transparent", "rgba(0,0,0,0.65)"]}
           style={{
@@ -149,7 +156,7 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
           }}
         />
 
-        {/* Badge de categoría */}
+        {/* Badge de Categoría con GlassView */}
         <View
           style={{
             position: "absolute",
@@ -157,93 +164,83 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
             left: theme.spacing.sm,
           }}
         >
-          <BlurView
-            intensity={Platform.OS === "ios" ? 60 : 90}
-            tint={isDark ? "dark" : "light"}
+          <GlassView
+            intensity={60}
+            borderRadius={theme.borderRadius.xs}
             style={{
               flexDirection: "row",
               alignItems: "center",
               paddingHorizontal: 6,
               paddingVertical: 3,
-              borderRadius: theme.borderRadius.xs,
-              overflow: "hidden",
-              backgroundColor:
-                Platform.OS === "android"
-                  ? isDark
-                    ? "rgba(0,0,0,0.5)"
-                    : "rgba(255,255,255,0.7)"
-                  : "transparent",
             }}
           >
             <Ionicons
               name="restaurant"
               size={9}
-              color={isDark ? "#FFF" : colors.text}
+              color={theme.isDark ? "#FFF" : colors.text}
               style={{ marginRight: 2 }}
             />
             <Text
               style={[
                 theme.typography.caption,
                 {
-                  color: isDark ? "#FFF" : colors.text,
+                  color: theme.isDark ? "#FFF" : colors.text,
                   fontSize: 9,
+                  fontWeight: "600",
                 },
               ]}
               numberOfLines={1}
             >
               {recipe.category}
             </Text>
-          </BlurView>
+          </GlassView>
         </View>
 
-        {/* Botón de favorito */}
+        {/* Botón de Favorito */}
         <Animated.View
           style={{
             position: "absolute",
             top: theme.spacing.sm,
             right: theme.spacing.sm,
-            borderRadius: theme.borderRadius.full,
-            overflow: "hidden",
             transform: [{ scale: favoriteScaleAnim }],
           }}
         >
           <TouchableOpacity onPress={handleFavoritePress} activeOpacity={0.8}>
-            <BlurView
-              intensity={Platform.OS === "ios" ? 40 : 80}
-              tint={isDark ? "dark" : "light"}
+            <GlassView
+              intensity={40}
+              borderRadius={theme.borderRadius.full}
               style={{
-                width: isLarge ? 34 : 28,
-                height: isLarge ? 34 : 28,
+                width: isLarge || isList ? 34 : 28,
+                height: isLarge || isList ? 34 : 28,
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor:
-                  Platform.OS === "android"
-                    ? "rgba(255,255,255,0.7)"
-                    : "transparent",
               }}
             >
               <Ionicons
                 name={isFav ? "heart" : "heart-outline"}
-                size={isLarge ? 16 : 14}
+                size={isLarge || isList ? 16 : 14}
                 color={isFav ? "#FF4757" : "#FFF"}
               />
-            </BlurView>
+            </GlassView>
           </TouchableOpacity>
         </Animated.View>
 
-        {/* Info overlay inferior */}
+        {/* Info Overlay */}
         <View
           style={{
             position: "absolute",
             bottom: 0,
             left: 0,
             right: 0,
-            padding: isLarge ? theme.spacing.sm + 4 : theme.spacing.sm,
+            padding:
+              isLarge || isList ? theme.spacing.sm + 4 : theme.spacing.sm,
           }}
         >
           <Text
             style={[
-              isLarge ? theme.typography.h3 : theme.typography.caption,
+              isLarge || isList
+                ? theme.typography.h3
+                : theme.typography.caption,
               {
                 color: "#FFF",
                 fontWeight: "600",
@@ -253,32 +250,70 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
                 textShadowRadius: 3,
               },
             ]}
-            numberOfLines={isLarge ? 2 : 1}
+            numberOfLines={isLarge || isList ? 2 : 1}
           >
             {recipe.title}
           </Text>
-          {isLarge && (
+
+          {(isLarge || isList) && (
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
+                justifyContent: "space-between",
                 marginTop: theme.spacing.xs,
-                gap: 4,
               }}
             >
-              <Ionicons
-                name="globe-outline"
-                size={12}
-                color="rgba(255,255,255,0.8)"
-              />
-              <Text
-                style={[
-                  theme.typography.caption,
-                  { color: "rgba(255,255,255,0.8)" },
-                ]}
+              {/* Área */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 4,
+                }}
               >
-                {recipe.area}
-              </Text>
+                <Ionicons
+                  name="globe-outline"
+                  size={12}
+                  color="rgba(255,255,255,0.8)"
+                />
+                <Text
+                  style={[
+                    theme.typography.caption,
+                    { color: "rgba(255,255,255,0.8)" },
+                  ]}
+                >
+                  {recipe.area}
+                </Text>
+              </View>
+
+              {/* Indicador "Ver receta" (Solo en List por espacio) */}
+              {isList && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 3,
+                  }}
+                >
+                  <Text
+                    style={[
+                      theme.typography.caption,
+                      {
+                        color: "rgba(255,255,255,0.7)",
+                        fontWeight: "500",
+                      },
+                    ]}
+                  >
+                    Ver receta
+                  </Text>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={12}
+                    color="rgba(255,255,255,0.6)"
+                  />
+                </View>
+              )}
             </View>
           )}
         </View>
@@ -286,5 +321,3 @@ const BentoRecipeCard: React.FC<BentoRecipeCardProps> = ({
     </Animated.View>
   );
 };
-
-export default BentoRecipeCard;
