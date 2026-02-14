@@ -17,6 +17,7 @@ interface StepCardProps {
   onComplete: () => void;
   screenWidth: number;
   contentPaddingTop: number;
+  contentPaddingBottom: number; // Add this
 }
 
 export const StepCard: React.FC<StepCardProps> = ({
@@ -27,6 +28,7 @@ export const StepCard: React.FC<StepCardProps> = ({
   onComplete,
   screenWidth,
   contentPaddingTop,
+  contentPaddingBottom,
 }) => {
   const theme = useTheme();
   const { colors, isDark } = theme;
@@ -79,7 +81,7 @@ export const StepCard: React.FC<StepCardProps> = ({
             flexGrow: 1,
             paddingTop: contentPaddingTop + theme.spacing.md,
             paddingHorizontal: theme.spacing.md,
-            paddingBottom: theme.spacing.xl,
+            paddingBottom: contentPaddingBottom + theme.spacing.xl, // Use it here
             justifyContent: "space-between", // Push resources to bottom
           }}
         >

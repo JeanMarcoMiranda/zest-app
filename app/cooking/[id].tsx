@@ -3,6 +3,7 @@
 import { ErrorView, LoadingSpinner } from "@/src/components/common";
 import { StepCard } from "@/src/components/cooking";
 import { useRecipes, useTheme } from "@/src/hooks";
+import { layout } from "@/src/theme";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -10,7 +11,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
-  Platform,
   Pressable,
   StatusBar,
   Text,
@@ -156,13 +156,15 @@ export default function CookingStepsScreen() {
             screenWidth={SCREEN_WIDTH}
             // Pass the header height + spacing as top padding
             contentPaddingTop={insets.top + 60}
+            // Pass the bottom nav height + spacing as bottom padding
+            contentPaddingBottom={insets.bottom + 100} // Approx height of floating nav
           />
         )}
       />
 
       {/* ─── Absolute Glass Header ─── */}
       <BlurView
-        intensity={Platform.OS === "ios" ? 80 : 50}
+        intensity={layout.blur.regular}
         tint={isDark ? "dark" : "light"}
         style={{
           position: "absolute",
@@ -273,107 +275,118 @@ export default function CookingStepsScreen() {
            Let's keep them for navigation context but ensure they don't conflict. 
        */}
 
-      {/* ─── Bottom Navigation — fixed with safe area ─── */}
-      <View
+      {/* ─── Bottom Navigation — Floating Glass Bar ─── */}
+      <BlurView
+        intensity={layout.blur.regular}
+        tint={isDark ? "dark" : "light"}
         style={{
-          flexDirection: "row",
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
           paddingHorizontal: theme.spacing.md,
-          paddingTop: theme.spacing.sm,
-          paddingBottom: insets.bottom + theme.spacing.sm,
-          gap: theme.spacing.sm,
-          backgroundColor: colors.background, // Solid background for nav
-          borderTopWidth: 0.5,
+          paddingTop: theme.spacing.md,
+          paddingBottom: insets.bottom + theme.spacing.md,
+          borderTopWidth: 1,
           borderTopColor: isDark
-            ? "rgba(255,255,255,0.06)"
-            : "rgba(0,0,0,0.05)",
+            ? "rgba(255,255,255,0.1)"
+            : "rgba(255,255,255,0.2)",
         }}
       >
-        {/* Previous Button */}
-        <Pressable
+        <View
           style={{
-            flex: 1,
-            paddingVertical: theme.spacing.md - 2,
-            borderRadius: theme.borderRadius.md,
             flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: theme.spacing.xs,
-            backgroundColor: isDark
-              ? "rgba(255,255,255,0.06)"
-              : "rgba(0,0,0,0.04)",
-            opacity: isFirstStep ? 0.4 : 1,
+            gap: theme.spacing.sm,
           }}
-          onPress={handlePrev}
-          disabled={isFirstStep}
         >
-          <Ionicons
-            name="chevron-back"
-            size={18}
-            color={colors.textSecondary}
-          />
-          <Text
-            style={[theme.typography.label, { color: colors.textSecondary }]}
-          >
-            Anterior
-          </Text>
-        </Pressable>
-
-        {/* Next / Finish Button */}
-        {isLastStep ? (
+          {/* Previous Button */}
           <Pressable
             style={{
-              flex: 2,
-              paddingVertical: theme.spacing.md - 2,
-              borderRadius: theme.borderRadius.md,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: theme.spacing.sm,
-              backgroundColor: allCompleted ? colors.success : colors.primary,
-            }}
-            onPress={handleFinish}
-          >
-            <MaterialIcons
-              name={allCompleted ? "celebration" : "check-circle"}
-              size={20}
-              color={allCompleted ? "#FFF" : colors.textInverse}
-            />
-            <Text
-              style={[
-                theme.typography.button,
-                { color: allCompleted ? "#FFF" : colors.textInverse },
-              ]}
-            >
-              {allCompleted ? "¡Completada!" : "Finalizar"}
-            </Text>
-          </Pressable>
-        ) : (
-          <Pressable
-            style={{
-              flex: 2,
-              paddingVertical: theme.spacing.md - 2,
-              borderRadius: theme.borderRadius.md,
+              flex: 1,
+              paddingVertical: theme.spacing.md,
+              borderRadius: theme.borderRadius.full,
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
               gap: theme.spacing.xs,
-              backgroundColor: colors.primary,
+              backgroundColor: isDark
+                ? "rgba(255,255,255,0.1)"
+                : "rgba(0,0,0,0.05)",
+              opacity: isFirstStep ? 0.3 : 1,
             }}
-            onPress={handleNext}
+            onPress={handlePrev}
+            disabled={isFirstStep}
           >
-            <Text
-              style={[theme.typography.button, { color: colors.textInverse }]}
-            >
-              Siguiente
-            </Text>
-            <Ionicons
-              name="chevron-forward"
-              size={18}
-              color={colors.textInverse}
-            />
+            <Ionicons name="chevron-back" size={20} color={colors.text} />
           </Pressable>
-        )}
-      </View>
+
+          {/* Next / Finish Button */}
+          {isLastStep ? (
+            <Pressable
+              style={{
+                flex: 3,
+                paddingVertical: theme.spacing.md,
+                borderRadius: theme.borderRadius.full,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: theme.spacing.sm,
+                backgroundColor: allCompleted ? colors.success : colors.primary,
+                shadowColor: allCompleted ? colors.success : colors.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 4,
+              }}
+              onPress={handleFinish}
+            >
+              <MaterialIcons
+                name={allCompleted ? "celebration" : "check-circle"}
+                size={20}
+                color={allCompleted ? "#FFF" : colors.textInverse}
+              />
+              <Text
+                style={[
+                  theme.typography.button,
+                  { color: allCompleted ? "#FFF" : colors.textInverse },
+                ]}
+              >
+                {allCompleted ? "¡Completada!" : "Finalizar receta"}
+              </Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              style={{
+                flex: 3,
+                paddingVertical: theme.spacing.md,
+                borderRadius: theme.borderRadius.full,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: theme.spacing.xs,
+                backgroundColor: colors.primary,
+                shadowColor: colors.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 4,
+              }}
+              onPress={handleNext}
+            >
+              <Text
+                style={[theme.typography.button, { color: colors.textInverse }]}
+              >
+                Siguiente paso
+              </Text>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color={colors.textInverse}
+              />
+            </Pressable>
+          )}
+        </View>
+      </BlurView>
     </View>
   );
 }

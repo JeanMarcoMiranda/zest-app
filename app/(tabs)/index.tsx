@@ -8,10 +8,12 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Animated, RefreshControl, StatusBar, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { layout } from "@/src/theme";
+
 // Altura del header flotante (sin contar status bar)
-const HEADER_CONTENT_HEIGHT = 52;
+const HEADER_CONTENT_HEIGHT = layout.headerHeight;
 // Altura de la tab bar (sin contar bottom inset)
-const TAB_BAR_HEIGHT = 58;
+const TAB_BAR_HEIGHT = layout.tabBarHeight;
 const SCROLL_THRESHOLD = 60;
 
 export default function HomeScreen() {
@@ -157,8 +159,9 @@ export default function HomeScreen() {
           : "Desliza hacia abajo para recargar"
       }
       style={{
-        paddingTop: theme.spacing.xxl * 2,
+        paddingTop: layout.headerHeight + insets.top + theme.spacing.xl,
         paddingHorizontal: theme.spacing.xl,
+        paddingBottom: layout.tabBarHeight + insets.bottom,
       }}
     />
   );

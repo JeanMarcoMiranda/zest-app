@@ -7,31 +7,33 @@
  */
 
 import {
-  animations,
-  customEasing,
-  duration,
-  easing,
-  gestures,
-  spring,
+    animations,
+    customEasing,
+    duration,
+    easing,
+    gestures,
+    spring,
 } from "./animations";
 import { darkColors, gradients, lightColors, opacity } from "./colors";
+import { layout } from "./layout";
 import {
-  borderRadius,
-  breakpoints,
-  elevation,
-  iconSizes,
-  iconStroke,
-  screenMargins,
-  spacing,
-  zIndex,
+    borderRadius,
+    breakpoints,
+    elevation,
+    iconSizes,
+    iconStroke,
+    screenMargins,
+    spacing,
+    zIndex,
 } from "./spacing";
+
 import {
-  fontFamily,
-  fontSize,
-  fontWeight,
-  letterSpacing,
-  lineHeight,
-  typography,
+    fontFamily,
+    fontSize,
+    fontWeight,
+    letterSpacing,
+    lineHeight,
+    typography,
 } from "./typography";
 
 /**
@@ -39,85 +41,86 @@ import {
  * Permite importar solo lo necesario para mejor tree-shaking
  */
 export {
-  // Animaciones
-  animations,
-  borderRadius,
-  breakpoints,
-  customEasing,
-  darkColors,
-  duration,
-  easing,
-  elevation,
-  // Tipografía
-  fontFamily,
-  fontSize,
-  fontWeight,
-  gestures,
-  gradients,
-  iconSizes,
-  iconStroke,
-  letterSpacing,
-  // Colores
-  lightColors,
-  lineHeight,
-  opacity,
-  screenMargins,
-  // Espaciado
-  spacing,
-  spring,
-  typography,
-  zIndex
+    // Animaciones
+    animations,
+    borderRadius,
+    breakpoints,
+    customEasing,
+    darkColors,
+    duration,
+    easing,
+    elevation,
+    // Tipografía
+    fontFamily,
+    fontSize,
+    fontWeight,
+    gestures,
+    gradients,
+    iconSizes,
+    iconStroke,
+    layout, // Export layout
+    letterSpacing,
+    // Colores
+    lightColors,
+    lineHeight,
+    opacity,
+    screenMargins,
+    // Espaciado
+    spacing,
+    spring,
+    typography,
+    zIndex
 };
 
 /**
  * Exportar todos los tipos TypeScript
  */
-  export type { ColorPalette, Gradients, Opacity, Palette } from "./colors";
+    export type { ColorPalette, Gradients, Opacity, Palette } from "./colors";
 
 export type {
-  BorderRadius,
-  BorderRadiusKey,
-  BreakpointKey,
-  Breakpoints,
-  Elevation,
-  ElevationKey,
-  IconSizeKey,
-  IconSizes,
-  IconStroke,
-  ScreenMargins,
-  Spacing,
-  SpacingKey,
-  ZIndex,
-  ZIndexKey
+    BorderRadius,
+    BorderRadiusKey,
+    BreakpointKey,
+    Breakpoints,
+    Elevation,
+    ElevationKey,
+    IconSizeKey,
+    IconSizes,
+    IconStroke,
+    ScreenMargins,
+    Spacing,
+    SpacingKey,
+    ZIndex,
+    ZIndexKey
 } from "./spacing";
 
 export type {
-  FontFamily,
-  FontFamilyKey,
-  FontSize,
-  FontSizeKey,
-  FontWeight,
-  FontWeightKey,
-  LetterSpacing,
-  LetterSpacingKey,
-  LineHeight,
-  LineHeightKey,
-  TextTransform,
-  Typography,
-  TypographyStyle
+    FontFamily,
+    FontFamilyKey,
+    FontSize,
+    FontSizeKey,
+    FontWeight,
+    FontWeightKey,
+    LetterSpacing,
+    LetterSpacingKey,
+    LineHeight,
+    LineHeightKey,
+    TextTransform,
+    Typography,
+    TypographyStyle
 } from "./typography";
 
 export type {
-  AnimationKey,
-  Animations,
-  CustomEasing,
-  Duration,
-  DurationKey,
-  Easing,
-  EasingKey,
-  Gestures,
-  Spring,
-  SpringKey
+    AnimationKey,
+    Animations,
+    CustomEasing,
+    Duration,
+    DurationKey,
+    Easing,
+    EasingKey,
+    Gestures,
+    Spring,
+    SpringKey
 } from "./animations";
 
 /**
@@ -143,6 +146,7 @@ export const lightTheme = {
   easing,
   customEasing,
   gestures,
+  layout,
   mode: "light" as const,
 } as const;
 
@@ -168,6 +172,7 @@ export const darkTheme = {
   easing,
   customEasing,
   gestures,
+  layout,
   mode: "dark" as const,
 } as const;
 
@@ -203,6 +208,7 @@ export type Theme = {
   easing: typeof easing;
   customEasing: typeof customEasing;
   gestures: typeof gestures;
+  layout: typeof layout;
   mode: "light" | "dark";
 };
 

@@ -1,4 +1,5 @@
 import { useTheme } from "@/src/hooks";
+import { layout } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React from "react";
@@ -15,7 +16,7 @@ interface HomeHeaderProps {
 }
 
 // Altura del header sin contar el status bar
-const HEADER_CONTENT_HEIGHT = 52;
+const HEADER_CONTENT_HEIGHT = layout.headerHeight;
 
 export const HomeHeader: React.FC<HomeHeaderProps> = ({
   scrollY,
@@ -39,7 +40,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
   // Intensidad del blur disminuye al hacer scroll (cuando hay más opacidad)
   const blurIntensity = scrollY.interpolate({
     inputRange: [0, 60],
-    outputRange: [80, 40],
+    outputRange: [layout.blur.regular, layout.blur.light],
     extrapolate: "clamp",
   });
 

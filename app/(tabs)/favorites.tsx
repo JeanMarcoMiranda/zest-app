@@ -1,13 +1,13 @@
 import { EmptyState } from "@/src/components/common";
 import { RecipeCard } from "@/src/components/recipe";
 import { useFavorites, useTheme } from "@/src/hooks";
+import { layout } from "@/src/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import {
   Alert,
-  Platform,
   Pressable,
   StatusBar,
   StyleSheet,
@@ -28,7 +28,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Sync with tab bar layout
-const TAB_BAR_HEIGHT = 48;
+const TAB_BAR_HEIGHT = layout.tabBarHeight;
 
 export default function FavoritesScreen() {
   const router = useRouter();
@@ -197,7 +197,7 @@ export default function FavoritesScreen() {
         style={[StyleSheet.absoluteFill, { bottom: undefined, zIndex: 10 }]}
       >
         <BlurView
-          intensity={Platform.OS === "ios" ? 80 : 50}
+          intensity={layout.blur.regular}
           tint={isDark ? "dark" : "light"}
           style={{
             paddingTop: insets.top,
