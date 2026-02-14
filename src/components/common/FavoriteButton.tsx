@@ -8,12 +8,16 @@ interface FavoriteButtonProps {
   isFavorite: boolean;
   onPress: () => void;
   size?: number;
+  style?: any;
+  containerSize?: number;
 }
 
 const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   isFavorite,
   onPress,
   size = 18,
+  style,
+  containerSize = 38,
 }) => {
   const theme = useTheme();
   const { isDark, colors } = theme;
@@ -38,10 +42,13 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
 
   return (
     <TouchableOpacity
-      style={{
-        borderRadius: theme.borderRadius.full,
-        overflow: "hidden",
-      }}
+      style={[
+        {
+          borderRadius: theme.borderRadius.full,
+          overflow: "hidden",
+        },
+        style,
+      ]}
       onPress={handlePress}
       activeOpacity={0.8}
     >
@@ -49,8 +56,8 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
         intensity={Platform.OS === "ios" ? 40 : 80}
         tint={isDark ? "dark" : "light"}
         style={{
-          width: 38,
-          height: 38,
+          width: containerSize,
+          height: containerSize,
           justifyContent: "center",
           alignItems: "center",
           backgroundColor: isDark

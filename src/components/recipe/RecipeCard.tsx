@@ -1,4 +1,5 @@
 import { GlassView } from "@/src/components/common";
+import FavoriteButton from "@/src/components/common/FavoriteButton";
 import { useFavorites, useTheme } from "@/src/hooks";
 import { RecipeCard as RecipeCardType } from "@/src/types/recipe.types";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,7 +16,6 @@ import {
 
 // Constantes de animación
 const ANIMATION_SCALE_PRESSED = 0.97;
-const ANIMATION_SCALE_FAVORITE = 1.3;
 
 export type RecipeCardVariant = "list" | "bento-small" | "bento-large";
 
@@ -37,7 +37,6 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
   const { colors } = theme;
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  const favoriteScaleAnim = useRef(new Animated.Value(1)).current;
   const [imageLoaded, setImageLoaded] = useState(false);
 
   // Configuraciones según variante
@@ -61,32 +60,6 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
       tension: 40,
       friction: 5,
     }).start();
-  };
-
-  const handleFavoritePress = () => {
-    const isFav = isFavorite(recipe.id);
-
-    Animated.sequence([
-      Animated.timing(favoriteScaleAnim, {
-        toValue: 0.8,
-        duration: 80,
-        useNativeDriver: true,
-      }),
-      Animated.spring(favoriteScaleAnim, {
-        toValue: isFav ? 1 : ANIMATION_SCALE_FAVORITE,
-        friction: 3,
-        tension: 100,
-        useNativeDriver: true,
-      }),
-      Animated.spring(favoriteScaleAnim, {
-        toValue: 1,
-        friction: 4,
-        tension: 50,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    toggleFavorite(recipe);
   };
 
   const isFav = isFavorite(recipe.id);
@@ -197,33 +170,20 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
         </View>
 
         {/* Botón de Favorito */}
-        <Animated.View
+        <View
           style={{
             position: "absolute",
             top: theme.spacing.sm,
             right: theme.spacing.sm,
-            transform: [{ scale: favoriteScaleAnim }],
           }}
         >
-          <TouchableOpacity onPress={handleFavoritePress} activeOpacity={0.8}>
-            <GlassView
-              intensity={40}
-              borderRadius={theme.borderRadius.full}
-              style={{
-                width: isLarge || isList ? 34 : 28,
-                height: isLarge || isList ? 34 : 28,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Ionicons
-                name={isFav ? "heart" : "heart-outline"}
-                size={isLarge || isList ? 16 : 14}
-                color={isFav ? "#FF4757" : "#FFF"}
-              />
-            </GlassView>
-          </TouchableOpacity>
-        </Animated.View>
+          <FavoriteButton
+            isFavorite={isFav}
+            onPress={() => toggleFavorite(recipe)}
+            size={isLarge || isList ? 16 : 14}
+            containerSize={isLarge || isList ? 34 : 28}
+          />
+        </View>
 
         {/* Info Overlay */}
         <View
