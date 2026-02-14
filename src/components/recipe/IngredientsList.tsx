@@ -1,6 +1,5 @@
 import { useTheme } from "@/src/hooks";
 import { Ingredient } from "@/src/types/recipe.types";
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, View } from "react-native";
 
@@ -17,42 +16,50 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({
   if (!ingredients || ingredients.length === 0) return null;
 
   return (
-    <View style={{ marginBottom: theme.spacing.lg }}>
+    <View style={{ marginBottom: theme.spacing.xl }}>
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
-          gap: theme.spacing.xs,
-          marginBottom: theme.spacing.sm,
+          marginBottom: theme.spacing.md,
+          paddingHorizontal: theme.spacing.xs,
         }}
       >
-        <Ionicons name="restaurant-outline" size={18} color={colors.primary} />
         <Text style={[theme.typography.h3, { color: colors.text }]}>
           Ingredientes
         </Text>
-        <Text
-          style={[
-            theme.typography.caption,
-            {
-              color: colors.textSecondary,
-              textTransform: "none",
-              marginLeft: 4,
-            },
-          ]}
+        <View
+          style={{
+            backgroundColor: isDark
+              ? "rgba(255,255,255,0.1)"
+              : "rgba(0,0,0,0.05)",
+            paddingHorizontal: theme.spacing.sm,
+            paddingVertical: 2,
+            borderRadius: 12,
+            marginLeft: theme.spacing.sm,
+          }}
         >
-          ({ingredients.length})
-        </Text>
+          <Text
+            style={[
+              theme.typography.caption,
+              {
+                color: colors.textSecondary,
+                fontWeight: "600",
+              },
+            ]}
+          >
+            {ingredients.length} items
+          </Text>
+        </View>
       </View>
 
       <View
         style={{
-          padding: theme.spacing.md,
-          borderRadius: theme.borderRadius.md,
           backgroundColor: isDark
-            ? "rgba(255,255,255,0.04)"
+            ? "rgba(255,255,255,0.02)"
             : "rgba(0,0,0,0.02)",
-          borderWidth: 0.5,
-          borderColor: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
+          borderRadius: theme.borderRadius.lg,
+          padding: theme.spacing.sm,
         }}
       >
         {ingredients.map((ingredient, index) => (
@@ -60,20 +67,32 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({
             key={index}
             style={{
               flexDirection: "row",
-              paddingVertical: theme.spacing.xs + 1,
-              borderBottomWidth: index < ingredients.length - 1 ? 0.5 : 0,
+              alignItems: "center",
+              paddingVertical: theme.spacing.sm,
+              paddingHorizontal: theme.spacing.xs,
+              borderBottomWidth: index < ingredients.length - 1 ? 1 : 0,
               borderBottomColor: isDark
-                ? "rgba(255,255,255,0.04)"
-                : "rgba(0,0,0,0.04)",
+                ? "rgba(255,255,255,0.05)"
+                : "rgba(0,0,0,0.03)",
             }}
           >
+            <View
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: 3,
+                backgroundColor: colors.primary,
+                marginRight: theme.spacing.md,
+                opacity: 0.8,
+              }}
+            />
             <Text
               style={[
-                theme.typography.bodySm,
+                theme.typography.bodyLg,
                 {
                   color: colors.primary,
-                  fontWeight: "600",
-                  minWidth: 80,
+                  fontWeight: "700",
+                  marginRight: theme.spacing.sm,
                 },
               ]}
             >
@@ -81,7 +100,7 @@ export const IngredientsList: React.FC<IngredientsListProps> = ({
             </Text>
             <Text
               style={[
-                theme.typography.bodySm,
+                theme.typography.bodyLg,
                 {
                   flex: 1,
                   color: colors.text,
