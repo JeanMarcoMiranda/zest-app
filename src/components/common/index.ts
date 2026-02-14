@@ -1,4 +1,5 @@
 export { default as CategoryFilter } from "./CategoryFilter";
+export * from "./EmptyState";
 export { default as ErrorView } from "./ErrorView";
 export { default as FavoriteButton } from "./FavoriteButton";
 export * from "./GlassView";

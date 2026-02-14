@@ -1,13 +1,11 @@
-import { ErrorView, ListSkeleton } from "@/src/components/common";
+import { EmptyState, ErrorView, ListSkeleton } from "@/src/components/common";
 import { FilterSection, HomeHeader } from "@/src/components/home";
 import { RecipeCard } from "@/src/components/recipe";
 import { useFavorites, useRecipes, useTheme } from "@/src/hooks";
 import { getCategories } from "@/src/services";
-import { createShadow } from "@/src/utils";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Animated, RefreshControl, StatusBar, Text, View } from "react-native";
+import { Animated, RefreshControl, StatusBar, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Altura del header flotante (sin contar status bar)
@@ -149,65 +147,20 @@ export default function HomeScreen() {
   }
 
   // ─── Empty State ──────────────────────────────────────────────
-  const EmptyState = () => (
-    <View
+  const renderEmptyState = () => (
+    <EmptyState
+      icon={searchQuery ? "search-outline" : "restaurant-outline"}
+      title={searchQuery ? "Sin resultados" : "No hay recetas"}
+      message={
+        searchQuery
+          ? `No encontramos recetas para "${searchQuery}"`
+          : "Desliza hacia abajo para recargar"
+      }
       style={{
-        alignItems: "center",
         paddingTop: theme.spacing.xxl * 2,
         paddingHorizontal: theme.spacing.xl,
       }}
-    >
-      <View
-        style={[
-          {
-            width: 120,
-            height: 120,
-            borderRadius: theme.borderRadius.full,
-            justifyContent: "center",
-            alignItems: "center",
-            marginBottom: theme.spacing.xl,
-            backgroundColor: isDark
-              ? colors.surfaceVariant
-              : "rgba(255,255,255,0.8)",
-            borderWidth: isDark ? 1 : 0,
-            borderColor: colors.border,
-          },
-          !isDark && createShadow(theme as any, theme.elevation.medium),
-        ]}
-      >
-        <Ionicons
-          name={searchQuery ? "search-outline" : "restaurant-outline"}
-          size={theme.iconSizes.xl}
-          color={colors.textLight}
-        />
-      </View>
-      <Text
-        style={[
-          theme.typography.h2,
-          {
-            color: colors.text,
-            marginBottom: theme.spacing.sm,
-            textAlign: "center",
-          },
-        ]}
-      >
-        {searchQuery ? "Sin resultados" : "No hay recetas"}
-      </Text>
-      <Text
-        style={[
-          theme.typography.bodySm,
-          {
-            color: colors.textSecondary,
-            textAlign: "center",
-            maxWidth: 260,
-          },
-        ]}
-      >
-        {searchQuery
-          ? `No encontramos recetas para "${searchQuery}"`
-          : "Desliza hacia abajo para recargar"}
-      </Text>
-    </View>
+    />
   );
 
   // Alturas totales para padding
@@ -284,7 +237,7 @@ export default function HomeScreen() {
 
           {/* Recipe List or Empty State */}
           {recipes.length === 0 ? (
-            <EmptyState />
+            renderEmptyState()
           ) : (
             <View style={{ marginTop: theme.spacing.sm }}>
               {recipes.map((recipe) => (

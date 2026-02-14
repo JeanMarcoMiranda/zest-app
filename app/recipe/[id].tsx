@@ -3,6 +3,7 @@ import {
   FavoriteButton,
   LoadingSpinner,
 } from "@/src/components/common";
+import { IngredientsList, InstructionsPreview } from "@/src/components/recipe";
 import { useFavorites, useRecipes, useTheme } from "@/src/hooks";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
@@ -276,150 +277,10 @@ export default function RecipeDetailScreen() {
           }}
         >
           {/* Ingredientes */}
-          <View style={{ marginBottom: theme.spacing.lg }}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: theme.spacing.xs,
-                marginBottom: theme.spacing.sm,
-              }}
-            >
-              <Ionicons
-                name="restaurant-outline"
-                size={18}
-                color={colors.primary}
-              />
-              <Text style={[theme.typography.h3, { color: colors.text }]}>
-                Ingredientes
-              </Text>
-              <Text
-                style={[
-                  theme.typography.caption,
-                  {
-                    color: colors.textSecondary,
-                    textTransform: "none",
-                    marginLeft: 4,
-                  },
-                ]}
-              >
-                ({recipe.ingredients.length})
-              </Text>
-            </View>
-
-            <View
-              style={{
-                padding: theme.spacing.md,
-                borderRadius: theme.borderRadius.md,
-                backgroundColor: isDark
-                  ? "rgba(255,255,255,0.04)"
-                  : "rgba(0,0,0,0.02)",
-                borderWidth: 0.5,
-                borderColor: isDark
-                  ? "rgba(255,255,255,0.06)"
-                  : "rgba(0,0,0,0.05)",
-              }}
-            >
-              {recipe.ingredients.map((ingredient, index) => (
-                <View
-                  key={index}
-                  style={{
-                    flexDirection: "row",
-                    paddingVertical: theme.spacing.xs + 1,
-                    borderBottomWidth:
-                      index < recipe.ingredients.length - 1 ? 0.5 : 0,
-                    borderBottomColor: isDark
-                      ? "rgba(255,255,255,0.04)"
-                      : "rgba(0,0,0,0.04)",
-                  }}
-                >
-                  <Text
-                    style={[
-                      theme.typography.bodySm,
-                      {
-                        color: colors.primary,
-                        fontWeight: "600",
-                        minWidth: 80,
-                      },
-                    ]}
-                  >
-                    {ingredient.measure}
-                  </Text>
-                  <Text
-                    style={[
-                      theme.typography.bodySm,
-                      {
-                        flex: 1,
-                        color: colors.text,
-                      },
-                    ]}
-                  >
-                    {ingredient.name}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          </View>
+          <IngredientsList ingredients={recipe.ingredients} />
 
           {/* Instrucciones preview */}
-          <View style={{ marginBottom: theme.spacing.lg }}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: theme.spacing.xs,
-                marginBottom: theme.spacing.sm,
-              }}
-            >
-              <Ionicons
-                name="document-text-outline"
-                size={18}
-                color={colors.primary}
-              />
-              <Text style={[theme.typography.h3, { color: colors.text }]}>
-                Instrucciones
-              </Text>
-            </View>
-
-            <View
-              style={{
-                padding: theme.spacing.md,
-                borderRadius: theme.borderRadius.md,
-                backgroundColor: isDark
-                  ? "rgba(255,255,255,0.04)"
-                  : "rgba(0,0,0,0.02)",
-                borderWidth: 0.5,
-                borderColor: isDark
-                  ? "rgba(255,255,255,0.06)"
-                  : "rgba(0,0,0,0.05)",
-              }}
-            >
-              <Text
-                style={[
-                  theme.typography.bodySm,
-                  {
-                    color: colors.text,
-                    lineHeight: 20,
-                  },
-                ]}
-                numberOfLines={4}
-              >
-                {recipe.instructions}
-              </Text>
-              <Text
-                style={[
-                  theme.typography.caption,
-                  {
-                    color: colors.textLight,
-                    textTransform: "none",
-                    marginTop: theme.spacing.sm,
-                  },
-                ]}
-              >
-                Toca &quot;Comenzar a Cocinar&quot; para ver el paso a paso
-              </Text>
-            </View>
-          </View>
+          <InstructionsPreview instructions={recipe.instructions} />
 
           {/* Tags */}
           {recipe.tags.length > 0 && (

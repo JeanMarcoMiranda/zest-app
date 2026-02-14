@@ -1,3 +1,4 @@
+import { EmptyState } from "@/src/components/common";
 import { RecipeCard } from "@/src/components/recipe";
 import { useFavorites, useTheme } from "@/src/hooks";
 import { Ionicons } from "@expo/vector-icons";
@@ -299,72 +300,42 @@ export default function FavoritesScreen() {
           />
         )}
         ListEmptyComponent={
-          <View
+          <EmptyState
+            centerInContainer
+            customIcon={
+              <Animated.View style={animatedHeartStyle}>
+                <View
+                  style={{
+                    width: 120,
+                    height: 120,
+                    borderRadius: 60,
+                    backgroundColor: isDark
+                      ? "rgba(255,255,255,0.05)"
+                      : "rgba(0,0,0,0.03)",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Ionicons
+                    name="heart"
+                    size={64}
+                    color={colors.primary}
+                    style={{
+                      shadowColor: colors.primary,
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 8,
+                    }}
+                  />
+                </View>
+              </Animated.View>
+            }
+            title="Tu recetario está vacío"
+            message="Explora nuestra colección y guarda las recetas que más te gusten para tenerlas siempre a mano."
             style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              paddingHorizontal: theme.spacing.xl,
-              // Adjust spacing to account for header being visually there but structurally absolute
               marginTop: theme.spacing.xl * 2,
             }}
-          >
-            <Animated.View style={animatedHeartStyle}>
-              <View
-                style={{
-                  width: 120,
-                  height: 120,
-                  borderRadius: 60,
-                  backgroundColor: isDark
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(0,0,0,0.03)",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginBottom: theme.spacing.lg,
-                }}
-              >
-                <Ionicons
-                  name="heart"
-                  size={64}
-                  color={colors.primary}
-                  style={{
-                    shadowColor: colors.primary,
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 8,
-                  }}
-                />
-              </View>
-            </Animated.View>
-
-            <Text
-              style={[
-                theme.typography.h2,
-                {
-                  color: colors.text,
-                  marginBottom: theme.spacing.sm,
-                  textAlign: "center",
-                },
-              ]}
-            >
-              Tu recetario está vacío
-            </Text>
-
-            <Text
-              style={[
-                theme.typography.bodyLg,
-                {
-                  color: colors.textSecondary,
-                  textAlign: "center",
-                  maxWidth: 300,
-                  lineHeight: 22,
-                },
-              ]}
-            >
-              Explora nuestra colección y guarda las recetas que más te gusten
-              para tenerlas siempre a mano.
-            </Text>
-          </View>
+          />
         }
         showsVerticalScrollIndicator={false}
       />
