@@ -26,8 +26,6 @@ export default function TabLayout() {
           right: 0,
           height: TAB_BAR_HEIGHT + insets.bottom,
           paddingBottom: insets.bottom,
-          borderTopLeftRadius: theme.borderRadius.lg,
-          borderTopRightRadius: theme.borderRadius.lg,
           backgroundColor: "transparent",
           borderTopWidth: 0,
           elevation: 0,
@@ -46,17 +44,15 @@ export default function TabLayout() {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                borderTopLeftRadius: theme.borderRadius.lg,
-                borderTopRightRadius: theme.borderRadius.lg,
                 overflow: "hidden",
-                borderWidth: 1,
+                borderTopWidth: 1,
                 borderColor: isDark
                   ? "rgba(252, 248, 242, 0.1)"
                   : "rgba(42, 36, 31, 0.08)",
                 shadowColor: colors.text,
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: isDark ? 0.4 : 0.08,
-                shadowRadius: 24,
+                shadowOffset: { width: 0, height: -2 },
+                shadowOpacity: isDark ? 0.2 : 0.05,
+                shadowRadius: 8,
               }}
             >
               <BlurView
@@ -75,12 +71,10 @@ export default function TabLayout() {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                borderTopLeftRadius: theme.borderRadius.lg,
-                borderTopRightRadius: theme.borderRadius.lg,
                 backgroundColor: isDark
-                  ? "rgba(42, 38, 34, 0.92)"
-                  : "rgba(255, 255, 255, 0.88)",
-                borderWidth: 1,
+                  ? "rgba(42, 38, 34, 0.95)"
+                  : "rgba(255, 255, 255, 0.95)",
+                borderTopWidth: 1,
                 borderColor: isDark
                   ? "rgba(252, 248, 242, 0.1)"
                   : "rgba(42, 36, 31, 0.08)",
