@@ -4,7 +4,7 @@
     "slug": "zest",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/zest-icon.png",
     "scheme": "zest",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,18 +13,23 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#FCF8F2",
+        "foregroundImage": "./assets/images/zest-icon-foreground.png",
+        "backgroundImage": "./assets/images/zest-icon-background.png"
       },
       "permissions": ["INTERNET", "ACCESS_NETWORK_STATE"],
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.jacketmll.zest"
     },
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
+    },
+    "splash": {
+      "image": "./assets/images/zest-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FCF8F2"
     },
     "plugins": [
       "expo-router",
