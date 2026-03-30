@@ -17,7 +17,10 @@
         "foregroundImage": "./assets/images/zest-icon-foreground.png",
         "backgroundImage": "./assets/images/zest-icon-background.png"
       },
-      "permissions": ["INTERNET", "ACCESS_NETWORK_STATE"],
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.jacketmll.zest"
@@ -49,6 +52,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "fcdd0e6a-adfa-4d40-943e-eb16bb6db20e"
+      }
     }
   }
 }
